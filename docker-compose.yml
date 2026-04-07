@@ -1,0 +1,11 @@
+services:
+  web:
+    build:
+      context: client
+    ports:
+      - "80:80"
+  server:
+    build:
+      context: server
+    ports:
+      - "8000:8000"
