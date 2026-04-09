@@ -1,11 +1,25 @@
 services:
+  nginx:
+    build:
+      context: nginx
+    ports:
+      - "80:80"
+    depends_on:
+      - web
+      - server
+
   web:
     build:
       context: client
-    ports:
-      - "80:80"
+    env_file:
+      - .product.env
+    expose:
+      - "80"
+
   server:
     build:
       context: server
-    ports:
-      - "8000:8000"
+    env_file:
+      - .product.env
+    expose:
+      - "8000"

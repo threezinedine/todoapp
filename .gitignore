@@ -11,3 +11,4 @@ wheels/
 
 # Vibekit
 .claude/
+.product.env
