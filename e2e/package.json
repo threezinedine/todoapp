@@ -1,0 +1,8 @@
+{
+  "name": "todoapp-e2e",
+  "private": true,
+  "devDependencies": {
+    "@playwright/test": "^1.40.0",
+    "@types/node": "^20.0.0"
+  }
+}
