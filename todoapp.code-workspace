@@ -4,6 +4,12 @@
       "path": "e2e",
     },
     {
+      "path": "client",
+    },
+    {
+      "path": "server",
+    },
+    {
       "path": ".",
     },
   ],
