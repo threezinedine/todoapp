@@ -1,8 +1,13 @@
 {
-  "name": "todoapp-e2e",
-  "private": true,
-  "devDependencies": {
-    "@playwright/test": "^1.40.0",
-    "@types/node": "^20.0.0"
-  }
+	"name": "todoapp-e2e",
+	"private": true,
+	"scripts": {
+		"format": "prettier --write .",
+		"format:check": "prettier --check ."
+	},
+	"devDependencies": {
+		"@playwright/test": "^1.40.0",
+		"@types/node": "^20.0.0",
+		"prettier": "^3.8.1"
+	}
 }
