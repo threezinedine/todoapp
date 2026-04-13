@@ -13,3 +13,6 @@ dependencies = [
 
 [tool.uv.sources]
 ntt-vibekit = { path = "../ntt-vibekit", editable = true }
+
+[tool.uv.workspace]
+members = ["server"]

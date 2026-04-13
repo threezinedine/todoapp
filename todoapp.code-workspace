@@ -1,17 +1,14 @@
 {
-  "folders": [
-    {
-      "path": "e2e",
-    },
-    {
-      "path": "client",
-    },
-    {
-      "path": "server",
-    },
-    {
-      "path": ".",
-    },
-  ],
-  "settings": {},
+	"folders": [
+		{
+			"path": "e2e",
+		},
+		{
+			"path": "client",
+		},
+		{
+			"path": ".",
+		},
+	],
+	"settings": {},
 }
