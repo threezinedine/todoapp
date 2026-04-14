@@ -40,6 +40,24 @@ function GlickButton({
 	)
 }
 
+function GlickBlackButton({
+	text = 'Glick',
+	classNames = '',
+	onClick = undefined,
+	dataTestId = undefined,
+}: VariantButtonProps) {
+	return (
+		<button
+			className={clsx(styles['glick-black'], classNames)}
+			onClick={onClick}
+			data-testid={dataTestId}
+			data-text={text}
+		>
+			<span>{text}</span>
+		</button>
+	)
+}
+
 function GlassMorphismButton({
 	text = 'Glass',
 	classNames = '',
@@ -99,7 +117,7 @@ export function Button({
 
 	return (
 		<div className={(clsx(className), styles[sizeClass])}>
-			{variant === 'normal' && (
+			{finalVariant === 'normal' && (
 				<NormalButton
 					text={text}
 					classNames={clsx(
@@ -111,7 +129,7 @@ export function Button({
 					{...rest}
 				/>
 			)}
-			{variant === 'glick' && (
+			{finalVariant === 'glick' && (
 				<GlickButton
 					text={text}
 					classNames={clsx(
@@ -122,7 +140,7 @@ export function Button({
 					{...rest}
 				/>
 			)}
-			{variant === 'glass-morphism' && (
+			{finalVariant === 'glass-morphism' && (
 				<GlassMorphismButton
 					text={text}
 					classNames={clsx(
@@ -138,6 +156,17 @@ export function Button({
 				<GlintButton
 					text={text}
 					icon={icon}
+					classNames={clsx(
+						styles.button,
+						styles[borderRadiusClass],
+						styles[paddingClass],
+					)}
+					{...rest}
+				/>
+			)}
+			{finalVariant === 'glick-black' && (
+				<GlickBlackButton
+					text={text}
 					classNames={clsx(
 						styles.button,
 						styles[borderRadiusClass],

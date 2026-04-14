@@ -67,6 +67,11 @@ export const DarkVariants: Story = {
 				variant="glint"
 				icon={<OpenAIIcon />}
 			/>
+
+			<Button
+				text="Glick Black"
+				variant="glick-black"
+			/>
 		</div>
 	),
 }

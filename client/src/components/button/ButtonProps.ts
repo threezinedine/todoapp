@@ -2,7 +2,7 @@ import type { ButtonHTMLAttributes } from 'react'
 
 export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 	text?: string | React.ReactNode
-	variant?: 'normal' | 'glick' | 'glass-morphism' | 'glint'
+	variant?: 'normal' | 'glick' | 'glick-black' | 'glass-morphism' | 'glint'
 	size?: 'small' | 'medium' | 'large' | 'full'
 	borderRadius?: 'none' | 'small' | 'medium' | 'large'
 	padding?: 'none' | 'small' | 'medium' | 'large'
