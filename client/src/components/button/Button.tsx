@@ -1,23 +1,48 @@
-import type { ButtonHTMLAttributes, ReactNode } from 'react';
-import styles from './Button.module.scss';
+import type { ButtonHTMLAttributes } from 'react'
+import styles from './Button.module.scss'
+import clsx from 'clsx'
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
-	children: ReactNode;
-	variant?: 'primary' | 'secondary' | 'danger';
+	text?: string
+	variant?: 'normal' | 'film' | 'background'
+	size?: 'small' | 'medium' | 'large' | 'full'
+	borderRadius?: 'none' | 'small' | 'medium' | 'large'
+	padding?: 'none' | 'small' | 'medium' | 'large'
+}
+
+interface NormalButtonProps {
+	text?: string
+	classNames?: string
+}
+
+function NormalButton({ text = 'Button', classNames = '' }: NormalButtonProps) {
+	return <button className={clsx(styles.normal, classNames)}>{text}</button>
 }
 
 export function Button({
-	children,
-	variant = 'primary',
+	variant = 'normal',
+	text = 'Button',
+	size = 'medium',
+	borderRadius = 'medium',
+	padding = 'medium',
 	className = '',
-	...rest
 }: ButtonProps) {
+	let sizeClass = `button-${size}`
+	let borderRadiusClass = `button-radius-${borderRadius}`
+	let paddingClass = `button-padding-${padding}`
+
 	return (
-		<button
-			className={`${styles.button} ${styles[variant]} ${className}`}
-			{...rest}
-		>
-			{children}
-		</button>
-	);
+		<div className={(clsx(className), styles[sizeClass])}>
+			{variant === 'normal' && (
+				<NormalButton
+					text={text}
+					classNames={clsx(
+						styles[sizeClass],
+						styles[borderRadiusClass],
+						styles[paddingClass],
+					)}
+				/>
+			)}
+		</div>
+	)
 }

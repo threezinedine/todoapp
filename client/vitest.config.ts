@@ -1,6 +1,6 @@
 /// <reference types="vitest/globals" />
-import react from '@vitejs/plugin-react';
-import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react'
+import { defineConfig } from 'vite'
 
 export default defineConfig({
 	plugins: [react()],
@@ -10,4 +10,4 @@ export default defineConfig({
 		include: ['src/**/*.{test,spec}.{ts,tsx}'],
 		setupFiles: ['./src/test-setup.ts'],
 	},
-});
+})
