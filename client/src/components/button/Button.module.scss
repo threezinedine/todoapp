@@ -1,0 +1,30 @@
+.button {
+	cursor: pointer;
+	border: none;
+	border-radius: 6px;
+	font-size: 0.875rem;
+	font-weight: 500;
+	padding: 0.5rem 1rem;
+	transition: opacity 0.15s ease;
+
+	&:disabled {
+		cursor: not-allowed;
+		opacity: 0.6;
+	}
+}
+
+.primary {
+	background-color: #646cff;
+	color: #fff;
+}
+
+.secondary {
+	background-color: transparent;
+	color: #646cff;
+	border: 1px solid #646cff;
+}
+
+.danger {
+	background-color: #ff4d4f;
+	color: #fff;
+}

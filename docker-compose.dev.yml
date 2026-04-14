@@ -48,5 +48,16 @@ services:
         volumes:
             - db_data_dev:/var/lib/mysql
 
+    storybook:
+        image: node:20-alpine
+        working_dir: /app
+        command: sh -c "npm install && npm run storybook"
+        env_file:
+            - .env
+        volumes:
+            - ./client:/app
+        ports:
+            - '6006:6006'
+
 volumes:
     db_data_dev:
