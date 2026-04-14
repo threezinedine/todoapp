@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react'
 import { Button } from './Button'
+import { OpenAIIcon } from '~/icons'
 
 const meta: Meta<typeof Button> = {
 	component: Button,
@@ -27,6 +28,11 @@ export const LightVariants: Story = {
 				text="Glass"
 				variant="glass-morphism"
 			/>
+			<Button
+				text="Glint"
+				variant="glint"
+				icon={<OpenAIIcon />}
+			/>
 		</div>
 	),
 }
@@ -40,6 +46,7 @@ export const DarkVariants: Story = {
 				gap: '1rem',
 				backgroundColor: '#333',
 				padding: '1rem',
+				height: '90vh',
 			}}
 		>
 			<Button
@@ -53,6 +60,12 @@ export const DarkVariants: Story = {
 			<Button
 				text="Glass"
 				variant="glass-morphism"
+			/>
+
+			<Button
+				text="Glint"
+				variant="glint"
+				icon={<OpenAIIcon />}
 			/>
 		</div>
 	),
