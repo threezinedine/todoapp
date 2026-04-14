@@ -19,6 +19,10 @@ export const LightVariants: Story = {
 				text="Normal"
 				variant="normal"
 			/>
+			<Button
+				text="Glick"
+				variant="glick"
+			/>
 		</div>
 	),
 }
@@ -37,6 +41,10 @@ export const DarkVariants: Story = {
 			<Button
 				text="Normal"
 				variant="normal"
+			/>
+			<Button
+				text="Glick"
+				variant="glick"
 			/>
 		</div>
 	),
@@ -60,6 +68,22 @@ export const AllSizes: Story = {
 			<Button
 				text="Full"
 				size="full"
+			/>
+
+			<Button
+				text="Small"
+				variant="glick"
+				size="small"
+			/>
+			<Button
+				text="Medium"
+				variant="glick"
+				size="medium"
+			/>
+			<Button
+				text="Large"
+				variant="glick"
+				size="large"
 			/>
 		</div>
 	),

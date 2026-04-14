@@ -4,19 +4,26 @@ import clsx from 'clsx'
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 	text?: string
-	variant?: 'normal' | 'film' | 'background'
+	variant?: 'normal' | 'glick' | 'background'
 	size?: 'small' | 'medium' | 'large' | 'full'
 	borderRadius?: 'none' | 'small' | 'medium' | 'large'
 	padding?: 'none' | 'small' | 'medium' | 'large'
 }
 
-interface NormalButtonProps {
+interface VariantButtonProps {
 	text?: string
 	classNames?: string
 }
 
-function NormalButton({ text = 'Button', classNames = '' }: NormalButtonProps) {
+function NormalButton({
+	text = 'Button',
+	classNames = '',
+}: VariantButtonProps) {
 	return <button className={clsx(styles.normal, classNames)}>{text}</button>
+}
+
+function GlickButton({ text = 'Glick', classNames = '' }: VariantButtonProps) {
+	return <button className={clsx(styles.glick, classNames)}>{text}</button>
 }
 
 export function Button({
@@ -37,8 +44,19 @@ export function Button({
 				<NormalButton
 					text={text}
 					classNames={clsx(
+						styles.button,
 						styles[sizeClass],
 						styles[borderRadiusClass],
+						styles[paddingClass],
+					)}
+				/>
+			)}
+			{variant === 'glick' && (
+				<GlickButton
+					text={text}
+					classNames={clsx(
+						styles.button,
+						styles[sizeClass],
 						styles[paddingClass],
 					)}
 				/>
