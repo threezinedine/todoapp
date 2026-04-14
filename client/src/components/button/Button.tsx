@@ -1,54 +1,75 @@
-import type { ButtonHTMLAttributes } from 'react'
 import styles from './Button.module.scss'
 import clsx from 'clsx'
-
-interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
-	text?: string | React.ReactNode
-	variant?: 'normal' | 'glick' | 'glass-morphism' | 'glint'
-	size?: 'small' | 'medium' | 'large' | 'full'
-	borderRadius?: 'none' | 'small' | 'medium' | 'large'
-	padding?: 'none' | 'small' | 'medium' | 'large'
-	icon?: React.ReactNode
-}
-
-interface VariantButtonProps {
-	text?: string | React.ReactNode
-	classNames?: string
-}
+import type {
+	VariantButtonProps,
+	ButtonProps,
+	IconVariantButtonProps,
+} from './ButtonProps'
 
 function NormalButton({
 	text = 'Button',
 	classNames = '',
-}: VariantButtonProps) {
-	return <button className={clsx(styles.normal, classNames)}>{text}</button>
-}
-
-function GlickButton({ text = 'Glick', classNames = '' }: VariantButtonProps) {
-	return <button className={clsx(styles.glick, classNames)}>{text}</button>
-}
-
-function GlassMorphismButton({
-	text = 'Glass',
-	classNames = '',
+	onClick = undefined,
+	dataTestId = undefined,
 }: VariantButtonProps) {
 	return (
-		<button className={clsx(styles['glass-morphism'], classNames)}>
+		<button
+			className={clsx(styles.normal, classNames)}
+			onClick={onClick}
+			data-testid={dataTestId}
+		>
 			{text}
 		</button>
 	)
 }
 
-interface IconVariantButtonProps extends VariantButtonProps {
-	icon: React.ReactNode
+function GlickButton({
+	text = 'Glick',
+	classNames = '',
+	onClick = undefined,
+	dataTestId = undefined,
+}: VariantButtonProps) {
+	return (
+		<button
+			className={clsx(styles.glick, classNames)}
+			onClick={onClick}
+			data-testid={dataTestId}
+		>
+			{text}
+		</button>
+	)
+}
+
+function GlassMorphismButton({
+	text = 'Glass',
+	classNames = '',
+	onClick = undefined,
+	dataTestId = undefined,
+}: VariantButtonProps) {
+	return (
+		<button
+			className={clsx(styles['glass-morphism'], classNames)}
+			onClick={onClick}
+			data-testid={dataTestId}
+		>
+			{text}
+		</button>
+	)
 }
 
 function GlintButton({
 	text = 'Glint',
 	classNames = '',
 	icon,
+	onClick = undefined,
+	dataTestId = undefined,
 }: IconVariantButtonProps) {
 	return (
-		<button className={clsx(styles.glint, classNames)}>
+		<button
+			className={clsx(styles.glint, classNames)}
+			onClick={onClick}
+			data-testid={dataTestId}
+		>
 			<div className={styles.logo}>{icon}</div>
 			<div className={styles.text}>{text}</div>
 		</button>
@@ -63,6 +84,7 @@ export function Button({
 	padding = 'medium',
 	icon = null,
 	className = '',
+	...rest
 }: ButtonProps) {
 	let finalVariant = variant
 	let iconVariants = ['glint']
@@ -86,6 +108,7 @@ export function Button({
 						styles[borderRadiusClass],
 						styles[paddingClass],
 					)}
+					{...rest}
 				/>
 			)}
 			{variant === 'glick' && (
@@ -96,6 +119,7 @@ export function Button({
 						styles[sizeClass],
 						styles[paddingClass],
 					)}
+					{...rest}
 				/>
 			)}
 			{variant === 'glass-morphism' && (
@@ -107,6 +131,7 @@ export function Button({
 						styles[borderRadiusClass],
 						styles[paddingClass],
 					)}
+					{...rest}
 				/>
 			)}
 			{finalVariant === 'glint' && (
@@ -118,6 +143,7 @@ export function Button({
 						styles[borderRadiusClass],
 						styles[paddingClass],
 					)}
+					{...rest}
 				/>
 			)}
 		</div>

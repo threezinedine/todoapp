@@ -1,10 +1,20 @@
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import { render } from '@testing-library/react'
 import { Button } from './Button'
 
 describe('Button', () => {
-	it('renders with children', () => {
-		render(<Button>Click me</Button>)
-		expect(3).toBe(3)
+	it('call the onClick function when clicked', () => {
+		const onClick = vi.fn()
+		const { getByText } = render(
+			<Button
+				text="Click me"
+				onClick={onClick}
+			/>,
+		)
+
+		const button = getByText('Click me')
+		button.click()
+
+		expect(onClick).toHaveBeenCalled()
 	})
 })
