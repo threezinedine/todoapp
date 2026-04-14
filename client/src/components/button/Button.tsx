@@ -4,7 +4,7 @@ import clsx from 'clsx'
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 	text?: string
-	variant?: 'normal' | 'glick' | 'background'
+	variant?: 'normal' | 'glick' | 'glass-morphism'
 	size?: 'small' | 'medium' | 'large' | 'full'
 	borderRadius?: 'none' | 'small' | 'medium' | 'large'
 	padding?: 'none' | 'small' | 'medium' | 'large'
@@ -24,6 +24,17 @@ function NormalButton({
 
 function GlickButton({ text = 'Glick', classNames = '' }: VariantButtonProps) {
 	return <button className={clsx(styles.glick, classNames)}>{text}</button>
+}
+
+function GlassMorphismButton({
+	text = 'Glass',
+	classNames = '',
+}: VariantButtonProps) {
+	return (
+		<button className={clsx(styles['glass-morphism'], classNames)}>
+			{text}
+		</button>
+	)
 }
 
 export function Button({
@@ -57,6 +68,17 @@ export function Button({
 					classNames={clsx(
 						styles.button,
 						styles[sizeClass],
+						styles[paddingClass],
+					)}
+				/>
+			)}
+			{variant === 'glass-morphism' && (
+				<GlassMorphismButton
+					text={text}
+					classNames={clsx(
+						styles.button,
+						styles[sizeClass],
+						styles[borderRadiusClass],
 						styles[paddingClass],
 					)}
 				/>

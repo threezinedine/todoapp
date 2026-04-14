@@ -23,6 +23,10 @@ export const LightVariants: Story = {
 				text="Glick"
 				variant="glick"
 			/>
+			<Button
+				text="Glass"
+				variant="glass-morphism"
+			/>
 		</div>
 	),
 }
@@ -46,6 +50,10 @@ export const DarkVariants: Story = {
 				text="Glick"
 				variant="glick"
 			/>
+			<Button
+				text="Glass"
+				variant="glass-morphism"
+			/>
 		</div>
 	),
 }
@@ -53,38 +61,60 @@ export const DarkVariants: Story = {
 export const AllSizes: Story = {
 	render: () => (
 		<div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-			<Button
-				text="Small"
-				size="small"
-			/>
-			<Button
-				text="Medium"
-				size="medium"
-			/>
-			<Button
-				text="Large"
-				size="large"
-			/>
+			<div style={{ display: 'flex', gap: '1rem' }}>
+				<Button
+					text="Small"
+					size="small"
+				/>
+				<Button
+					text="Medium"
+					size="medium"
+				/>
+				<Button
+					text="Large"
+					size="large"
+				/>
+			</div>
 			<Button
 				text="Full"
 				size="full"
 			/>
 
-			<Button
-				text="Small"
-				variant="glick"
-				size="small"
-			/>
-			<Button
-				text="Medium"
-				variant="glick"
-				size="medium"
-			/>
-			<Button
-				text="Large"
-				variant="glick"
-				size="large"
-			/>
+			<div style={{ display: 'flex', gap: '1rem' }}>
+				<Button
+					text="Small"
+					variant="glick"
+					size="small"
+				/>
+				<Button
+					text="Medium"
+					variant="glick"
+					size="medium"
+				/>
+				<Button
+					text="Large"
+					variant="glick"
+					size="large"
+				/>
+			</div>
+
+			<div style={{ display: 'flex', gap: '1rem' }}>
+				<Button
+					text="Small"
+					variant="glass-morphism"
+					size="small"
+				/>
+				<Button
+					text="Medium"
+					variant="glass-morphism"
+					size="medium"
+				/>
+				<Button
+					text="Large"
+					variant="glass-morphism"
+					size="large"
+				/>
+			</div>
 		</div>
 	),
 }
