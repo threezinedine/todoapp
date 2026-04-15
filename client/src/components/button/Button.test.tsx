@@ -191,6 +191,43 @@ describe('Button', () => {
 		expect(screen.getByTestId(BUTTON_TEST_ID)).toHaveClass('button-medium')
 	})
 
+	it('does NOT apply borderRadius class for "glick" variant (gets size + padding instead)', () => {
+		render(
+			<Button
+				variant="glick"
+				size="large"
+				borderRadius="large"
+				dataTestId={BUTTON_TEST_ID}
+			/>,
+		)
+		// glick applies sizeClass and paddingClass, but NOT borderRadiusClass
+		expect(screen.getByTestId(BUTTON_TEST_ID)).toHaveClass('button-large')
+		expect(screen.getByTestId(BUTTON_TEST_ID)).not.toHaveClass('button-radius-large')
+		expect(screen.getByTestId(BUTTON_TEST_ID)).toHaveClass('button-padding-medium')
+	})
+
+	it('does NOT apply size class for "glick-black" variant', () => {
+		render(
+			<Button
+				variant="glick-black"
+				size="large"
+				dataTestId={BUTTON_TEST_ID}
+			/>,
+		)
+		expect(screen.getByTestId(BUTTON_TEST_ID)).not.toHaveClass('button-large')
+	})
+
+	it('does NOT apply size class for "glint" variant', () => {
+		render(
+			<Button
+				variant="glint"
+				size="large"
+				dataTestId={BUTTON_TEST_ID}
+			/>,
+		)
+		expect(screen.getByTestId(BUTTON_TEST_ID)).not.toHaveClass('button-large')
+	})
+
 	// ─── borderRadius ──────────────────────────────────────────────────────────
 
 	it('applies "button-radius-none" class when borderRadius is "none"', () => {
@@ -246,6 +283,36 @@ describe('Button', () => {
 		expect(screen.getByTestId(BUTTON_TEST_ID)).toHaveClass(
 			'button-radius-medium',
 		)
+	})
+
+	it('does NOT apply borderRadius class for "glick" variant (only padding is applied)', () => {
+		render(
+			<Button
+				variant="glick"
+				borderRadius="large"
+				dataTestId={BUTTON_TEST_ID}
+			/>,
+		)
+		// glick variant only gets button-padding-* classes, not button-radius-*
+		expect(screen.getByTestId(BUTTON_TEST_ID)).not.toHaveClass(
+			'button-radius-large',
+		)
+		expect(screen.getByTestId(BUTTON_TEST_ID)).toHaveClass('button-padding-medium')
+	})
+
+	it('does NOT apply size class for "glint" variant (gets borderRadius + padding instead)', () => {
+		render(
+			<Button
+				variant="glint"
+				size="large"
+				borderRadius="large"
+				dataTestId={BUTTON_TEST_ID}
+			/>,
+		)
+		// glint applies borderRadiusClass and paddingClass, but NOT sizeClass
+		expect(screen.getByTestId(BUTTON_TEST_ID)).toHaveClass('button-radius-large')
+		expect(screen.getByTestId(BUTTON_TEST_ID)).toHaveClass('button-padding-medium')
+		expect(screen.getByTestId(BUTTON_TEST_ID)).not.toHaveClass('button-large')
 	})
 
 	// ─── padding ───────────────────────────────────────────────────────────────
