@@ -6,6 +6,7 @@ export function Input({
 	value = undefined,
 	onChange,
 	type = 'text',
+	dataTestId = undefined,
 }: InputProps) {
 	return (
 		<div className={styles.container}>
@@ -15,6 +16,7 @@ export function Input({
 				onChange={onChange}
 				type={type}
 				placeholder=""
+				data-testid={dataTestId}
 			/>
 			<label
 				className={styles.label}

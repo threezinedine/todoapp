@@ -1,0 +1,45 @@
+.modal {
+	--bg-color: #0d0d0d;
+	--primary-color: #00f2ea;
+	--secondary-color: #a855f7;
+	--text-color: #e5e5e5;
+	--font-family: 'Fira Code', Consolas, 'Courier New', Courier, monospace;
+	--glitch-anim-duration: 0.5s;
+
+	.overlay {
+		position: fixed;
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		background-color: rgba(0, 0, 0, 0.5);
+		z-index: 999;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+
+		.content {
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			font-family: var(--font-family);
+			background-color: #050505;
+
+			&.border-radius-none {
+				border-radius: 0;
+			}
+
+			&.border-radius-small {
+				border-radius: 0.25rem;
+			}
+
+			&.border-radius-medium {
+				border-radius: 1rem;
+			}
+
+			&.border-radius-large {
+				border-radius: 1.5rem;
+			}
+		}
+	}
+}
