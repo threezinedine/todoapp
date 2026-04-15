@@ -1,0 +1,98 @@
+.container {
+	--bg-color: #0d0d0d;
+	--primary-color: #00f2ea;
+	--secondary-color: #a855f7;
+	--text-color: #e5e5e5;
+	--font-family: 'Fira Code', Consolas, 'Courier New', Courier, monospace;
+	--glitch-anim-duration: 0.5s;
+
+	position: relative;
+	margin-bottom: 1.5rem;
+
+	.label {
+		position: absolute;
+		top: 0.75em;
+		left: 0;
+		font-size: 1rem;
+		color: var(--primary-color);
+		opacity: 0.6;
+		text-transform: uppercase;
+		letter-spacing: 0.1em;
+		pointer-events: none;
+		transition: all 0.3s ease;
+	}
+
+	& input {
+		width: 100%;
+		background: transparent;
+		border: none;
+		border-bottom: 2px solid rgba(0, 242, 234, 0.3);
+		padding: 0.75em 0;
+		font-size: 1rem;
+		color: var(--text-color);
+		font-family: inherit;
+		outline: none;
+		transition: border-color 0.3s ease;
+	}
+
+	& input:focus {
+		border-color: var(--primary-color);
+	}
+
+	& input:focus + .label,
+	& input:not(:placeholder-shown) + .label {
+		top: -1.2em;
+		font-size: 0.8rem;
+		opacity: 1;
+	}
+
+	& input:focus + .label::before,
+	& input:focus + .label::after {
+		content: attr(data-text);
+		position: absolute;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 100%;
+		background-color: var(--bg-color);
+	}
+
+	& input:focus + .label::before {
+		color: var(--secondary-color);
+		animation: glitch-anim var(--glitch-anim-duration)
+			cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+	}
+
+	& input:focus + .label::after {
+		color: var(--primary-color);
+		animation: glitch-anim var(--glitch-anim-duration)
+			cubic-bezier(0.25, 0.46, 0.45, 0.94) reverse both;
+	}
+}
+
+@keyframes glitch-anim {
+	0% {
+		transform: translate(0);
+		clip-path: inset(0 0 0 0);
+	}
+	20% {
+		transform: translate(-5px, 3px);
+		clip-path: inset(50% 0 20% 0);
+	}
+	40% {
+		transform: translate(3px, -2px);
+		clip-path: inset(20% 0 60% 0);
+	}
+	60% {
+		transform: translate(-4px, 2px);
+		clip-path: inset(80% 0 5% 0);
+	}
+	80% {
+		transform: translate(4px, -3px);
+		clip-path: inset(30% 0 45% 0);
+	}
+	100% {
+		transform: translate(0);
+		clip-path: inset(0 0 0 0);
+	}
+}
