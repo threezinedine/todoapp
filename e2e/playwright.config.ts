@@ -19,9 +19,4 @@ export default defineConfig({
 			},
 		},
 	],
-	webServer: {
-		command: '',
-		url: 'http://localhost:8000',
-		reuseExistingServer: !process.env.CI,
-	},
 })
