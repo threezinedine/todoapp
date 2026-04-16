@@ -12,6 +12,7 @@ export function Input({
 		<div className={styles.container}>
 			<input
 				className={styles.input}
+				name={field}
 				value={value}
 				onChange={onChange}
 				type={type}

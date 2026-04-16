@@ -8,7 +8,10 @@ export function Card({ title, content, dataTestId }: CardProps) {
 			className={styles.card}
 			data-testid={dataTestId}
 		>
-			<div className={styles['card-header']}>
+			<div
+				className={styles['card-header']}
+				data-testid={dataTestId ? `${dataTestId}-header` : undefined}
+			>
 				<div className={styles['card-title']}>
 					<SecureDataIcon />
 					<span>{title}</span>
@@ -19,7 +22,12 @@ export function Card({ title, content, dataTestId }: CardProps) {
 					<span></span>
 				</div>
 			</div>
-			<div className={styles['card-body']}>{content}</div>
+			<div
+				className={styles['card-body']}
+				data-testid={dataTestId ? `${dataTestId}-body` : undefined}
+			>
+				{content}
+			</div>
 		</div>
 	)
 }
