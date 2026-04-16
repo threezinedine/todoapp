@@ -1,5 +1,5 @@
 export interface TooltipProps {
 	content: string
-	childrend: React.ReactNode
+	children: React.ReactNode
 	position?: 'top' | 'bottom' | 'left' | 'right'
 }
