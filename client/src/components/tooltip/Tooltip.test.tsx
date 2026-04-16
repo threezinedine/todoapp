@@ -47,7 +47,6 @@ describe('Tooltip', () => {
 			</Tooltip>,
 		)
 
-		// The outer wrapper is the first .tooltip div (grandparent of the button)
 		const tooltipEl = document.querySelector('.tooltip')
 		expect(tooltipEl).toHaveClass('tooltip')
 	})
@@ -90,10 +89,7 @@ describe('Tooltip', () => {
 
 	it('applies "top" class to tooltip text when position is "top"', () => {
 		render(
-			<Tooltip
-				content="Content"
-				position="top"
-			>
+			<Tooltip content="Content" position="top">
 				<button>Target</button>
 			</Tooltip>,
 		)
@@ -105,10 +101,7 @@ describe('Tooltip', () => {
 
 	it('applies "bottom" class to tooltip text when position is "bottom"', () => {
 		render(
-			<Tooltip
-				content="Content"
-				position="bottom"
-			>
+			<Tooltip content="Content" position="bottom">
 				<button>Target</button>
 			</Tooltip>,
 		)
@@ -120,10 +113,7 @@ describe('Tooltip', () => {
 
 	it('applies "left" class to tooltip text when position is "left"', () => {
 		render(
-			<Tooltip
-				content="Content"
-				position="left"
-			>
+			<Tooltip content="Content" position="left">
 				<button>Target</button>
 			</Tooltip>,
 		)
@@ -135,10 +125,7 @@ describe('Tooltip', () => {
 
 	it('applies "right" class to tooltip text when position is "right"', () => {
 		render(
-			<Tooltip
-				content="Content"
-				position="right"
-			>
+			<Tooltip content="Content" position="right">
 				<button>Target</button>
 			</Tooltip>,
 		)
@@ -199,7 +186,6 @@ describe('Tooltip', () => {
 			</Tooltip>,
 		)
 
-		// The DOM should have exactly:
 		// div.tooltip > div.tooltiptext + div.component > span.child
 		const tooltipEl = document.querySelector('.tooltip')
 		expect(tooltipEl?.childNodes).toHaveLength(2)
@@ -242,10 +228,7 @@ describe('Tooltip', () => {
 
 		positions.forEach((position) => {
 			const { unmount } = render(
-				<Tooltip
-					content={position}
-					position={position}
-				>
+				<Tooltip content={position} position={position}>
 					<button>Target</button>
 				</Tooltip>,
 			)

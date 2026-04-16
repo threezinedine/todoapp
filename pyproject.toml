@@ -18,3 +18,10 @@ ntt-vibekit = { path = "../ntt-vibekit", editable = true }
 
 [tool.uv.workspace]
 members = ["server"]
+
+[dependency-groups]
+dev = [
+    "pytest>=7.0.0",
+    "pytest-asyncio>=0.18.0",
+    "httpx>=0.24.0",
+]
