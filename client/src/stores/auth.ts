@@ -1,77 +1,72 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
-import { post } from '~/utils/request'
+import { post } from '~/utils'
+import { setToken } from '~/utils'
 
 export interface User {}
 
 interface AuthState {
 	user: User | null
 	isAuthenticated: boolean
-	token: string | null
-	verify: () => Promise<boolean>
-	login: (token: string) => Promise<boolean>
+	verify: () => Promise<string | null>
+	login: (token: string) => Promise<string | null>
 	logout: () => Promise<void>
 }
 
 export const useAuthStore = create<AuthState>()(
 	persist(
-		(set, get) => ({
+		(set) => ({
 			user: null,
 			isAuthenticated: false,
-			token: null,
 
 			verify: async () => {
 				// get token from state
-				if (!get().token) {
-					return false
-				}
+				const response = await post('/auth/verify', {})
 
-				const response = await post('/auth/verify', {
-					token: get().token,
-				})
-
-				if (!response.success) {
+				if (!response.ok) {
 					set({
 						user: null,
-						token: null,
 						isAuthenticated: false,
 					})
-					return false
+					return (
+						response.statusText ||
+						'Token verification failed. Please login again.'
+					)
 				}
 
-				return true
+				return null
 			},
 
 			login: async (token: string) => {
-				const response = await post('/auth/verify', { token })
+				await setToken(token)
+				const response = await post('/auth/verify', {})
 
-				if (!response.success) {
-					return false
+				if (!response.ok) {
+					return (
+						response.statusText || 'Login failed. Please try again.'
+					)
 				}
 
 				set({
 					user: null,
-					token,
 					isAuthenticated: true,
 				})
-				return true
+				return null
 			},
 
 			logout: async () => {
+				await setToken(null)
+
 				set({
 					user: null,
-					token: null,
 					isAuthenticated: false,
 				})
 			},
-
-			setToken: (token: string) => set({ token }),
 		}),
 		{
 			name: 'auth-storage',
 			partialize: (state) => ({
 				user: state.user,
-				token: state.token,
 				isAuthenticated: state.isAuthenticated,
 			}),
 		},

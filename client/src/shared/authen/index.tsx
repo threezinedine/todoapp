@@ -8,11 +8,13 @@ export function AuthenRoute({ children, fallback = undefined }: AuthenProps) {
 	const navigate = useNavigate()
 
 	useEffect(() => {
+		console.log('Checking authentication...', isAuthenticated)
+
 		if (!isAuthenticated) {
 			navigate(fallback || '/')
 		} else {
 			verify().then((valid) => {
-				if (!valid) {
+				if (valid) {
 					navigate(fallback || '/')
 				}
 			})

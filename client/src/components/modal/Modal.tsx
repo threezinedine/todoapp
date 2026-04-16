@@ -1,3 +1,4 @@
+import React from 'react'
 import type { ModalProps } from './ModalProps'
 import styles from './Modal.module.scss'
 import clsx from 'clsx'

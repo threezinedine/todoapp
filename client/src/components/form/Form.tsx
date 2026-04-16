@@ -6,7 +6,7 @@ import styles from './Form.module.scss'
 import clsx from 'clsx'
 
 export const Form = forwardRef<FormHandle, FormProps>(function Form(
-	{ fields, submitButton, className, onSubmit },
+	{ fields, submitButton, className, onSubmit, dataTestId },
 	ref,
 ) {
 	const formRef = useRef<HTMLFormElement>(null)
@@ -60,10 +60,12 @@ export const Form = forwardRef<FormHandle, FormProps>(function Form(
 		<form
 			onSubmit={handleSubmit}
 			ref={formRef}
+			data-testid={dataTestId}
 			className={clsx(styles.form, className)}
 		>
 			{fields.map(({ field, type }, index) => (
 				<Input
+					dataTestId={`${dataTestId}-${field}`}
 					key={index}
 					field={field}
 					type={type}
