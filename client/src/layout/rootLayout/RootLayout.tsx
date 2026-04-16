@@ -1,4 +1,4 @@
-import styles from './RootLayout.module.css'
+import styles from './RootLayout.module.scss'
 import clsx from 'clsx'
 
 export function RootLayout({ children }: { children: React.ReactNode }) {
