@@ -1,0 +1,46 @@
+.navbar {
+	user-select: none;
+	background-color: #252525;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+
+	padding: 1rem 2rem;
+	border-bottom: 1px solid rgba(0, 242, 234, 0.2);
+	box-shadow:
+		0 0 20px rgba(0, 242, 234, 0.1),
+		inset 0 0 10px rgba(0, 0, 0, 0.5);
+
+	.left-side {
+		display: flex;
+		align-items: center;
+		gap: 1rem;
+
+		.logo,
+		.branch {
+			cursor: pointer;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+		}
+
+		.logo {
+			width: 2.5rem;
+			height: 2.5rem;
+		}
+
+		.branch {
+			font-size: 1.25rem;
+			text-transform: uppercase;
+			font-family: 'Courier New', Courier, monospace;
+			color: #888888;
+			text-align: center;
+		}
+	}
+
+	.right-side {
+		display: flex;
+		align-items: center;
+		gap: 1rem;
+	}
+}

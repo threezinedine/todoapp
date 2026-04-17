@@ -1,0 +1,29 @@
+import type { Meta, StoryObj } from '@storybook/react'
+import { Navbar } from './Navbar'
+import { PomodoroIcon } from '~/icons/PomodoroIcon'
+import { Button } from '../button'
+
+const meta: Meta<typeof Navbar> = {
+	component: Navbar,
+	tags: ['autodocs'],
+}
+
+export default meta
+type Story = StoryObj<typeof Navbar>
+
+export const Default: Story = {
+	render: () => (
+		<div style={{ backgroundColor: '#252525', height: '100vh' }}>
+			<Navbar
+				icon={<PomodoroIcon />}
+				rightSide={
+					<Button
+						variant="glick-black"
+						text="Login"
+						borderRadius="none"
+					/>
+				}
+			/>
+		</div>
+	),
+}
