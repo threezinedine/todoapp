@@ -16,6 +16,12 @@
 		align-items: center;
 		gap: 1rem;
 
+		.menu-toggle {
+			display: flex;
+			justify-content: center;
+			align-items: center;
+		}
+
 		.logo,
 		.branch {
 			cursor: pointer;
