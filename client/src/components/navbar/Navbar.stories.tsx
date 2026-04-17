@@ -11,7 +11,7 @@ const meta: Meta<typeof Navbar> = {
 export default meta
 type Story = StoryObj<typeof Navbar>
 
-export const Default: Story = {
+export const NoLoggedIn: Story = {
 	render: () => (
 		<div style={{ backgroundColor: '#252525', height: '100vh' }}>
 			<Navbar
@@ -20,6 +20,31 @@ export const Default: Story = {
 					<Button
 						variant="glick-black"
 						text="Login"
+						borderRadius="none"
+					/>
+				}
+			/>
+		</div>
+	),
+}
+
+export const LoginPage: Story = {
+	render: () => (
+		<div style={{ backgroundColor: '#252525', height: '100vh' }}>
+			<Navbar icon={<PomodoroIcon />} />
+		</div>
+	),
+}
+
+export const LoggedIn: Story = {
+	render: () => (
+		<div style={{ backgroundColor: '#252525', height: '100vh' }}>
+			<Navbar
+				icon={<PomodoroIcon />}
+				rightSide={
+					<Button
+						variant="glick-black"
+						text="Logout"
 						borderRadius="none"
 					/>
 				}
