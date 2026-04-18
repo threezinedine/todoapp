@@ -1,4 +1,7 @@
 export { GoogleChromeIcon } from './GoogleChromeIcon'
 export { OpenAIIcon } from './OpenAIIcon'
 export { PomodoroIcon } from './PomodoroIcon'
+export { ProfileIcon } from './ProfileIcon'
 export { SecureDataIcon } from './SecureDataIcon'
+export { SettingsIcon } from './SettingsIcon'
+export { LogoutIcon } from './LogoutIcon'
