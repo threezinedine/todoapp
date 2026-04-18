@@ -16,7 +16,7 @@ export function DropMenu({ items, isOpen }: DropMenuProps) {
 						<div
 							key={index}
 							className={clsx(styles['menu-item'])}
-							onClick={item.onClick}
+							onMouseDown={item.onClick}
 						>
 							<label className={styles['menu-item-label']}>
 								{item.icon && (
