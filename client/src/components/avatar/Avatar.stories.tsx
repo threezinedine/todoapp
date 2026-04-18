@@ -15,20 +15,6 @@ export const Default: Story = {
 	},
 }
 
-export const Small: Story = {
-	args: {
-		url: 'https://avatars.githubusercontent.com/u/105328?v=4',
-		size: 32,
-	},
-}
-
-export const Large: Story = {
-	args: {
-		url: 'https://avatars.githubusercontent.com/u/105328?v=4',
-		size: 80,
-	},
-}
-
 export const FallbackInitials: Story = {
 	args: {
 		name: 'John Doe',
@@ -36,34 +22,36 @@ export const FallbackInitials: Story = {
 	},
 }
 
-export const Online: Story = {
-	args: {
-		url: 'https://avatars.githubusercontent.com/u/105328?v=4',
-		size: 48,
-		status: 'online',
-	},
-}
-
-export const Busy: Story = {
-	args: {
-		url: 'https://avatars.githubusercontent.com/u/105328?v=4',
-		size: 48,
-		status: 'busy',
-	},
-}
-
-export const Away: Story = {
-	args: {
-		url: 'https://avatars.githubusercontent.com/u/105328?v=4',
-		size: 48,
-		status: 'away',
-	},
-}
-
-export const Offline: Story = {
-	args: {
-		url: 'https://avatars.githubusercontent.com/u/105328?v=4',
-		size: 48,
-		status: 'offline',
-	},
+export const Variants: Story = {
+	render: () => (
+		<div
+			style={{
+				display: 'flex',
+				gap: '16px',
+				backgroundColor: '#202020',
+				padding: '16px',
+			}}
+		>
+			<Avatar
+				url="https://avatars.githubusercontent.com/u/105328?v=4"
+				size={48}
+				status="online"
+			/>
+			<Avatar
+				url="https://avatars.githubusercontent.com/u/105328?v=4"
+				size={48}
+				status="busy"
+			/>
+			<Avatar
+				url="https://avatars.githubusercontent.com/u/105328?v=4"
+				size={48}
+				status="away"
+			/>
+			<Avatar
+				url="https://avatars.githubusercontent.com/u/105328?v=4"
+				size={48}
+				status="offline"
+			/>
+		</div>
+	),
 }

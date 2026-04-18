@@ -9,20 +9,40 @@ function getInitials(name: string): string {
 		.join('')
 }
 
-export function Avatar({ url, name, size = 40, status }: AvatarProps) {
+export function Avatar({
+	url,
+	name,
+	size = 40,
+	offsetX = 0,
+	offsetY = 0,
+	status,
+}: AvatarProps) {
 	const hasImage = Boolean(url)
 
 	return (
-		<div className={styles.wrapper} style={{ width: size, height: size }}>
-			<div className={`${styles.avatar} ${hasImage ? '' : styles.fallback}`}>
+		<div
+			className={styles.wrapper}
+			style={{ width: size, height: size }}
+		>
+			<div
+				className={`${styles.avatar} ${hasImage ? '' : styles.fallback}`}
+				style={{ transform: `translate(${offsetX}px, ${offsetY}px)` }}
+			>
 				{hasImage ? (
-					<img src={url} alt={name ?? 'Avatar'} />
+					<img
+						src={url}
+						alt={name ?? 'Avatar'}
+					/>
 				) : (
-					<span className={styles.initials}>{name ? getInitials(name) : '?'}</span>
+					<span className={styles.initials}>
+						{name ? getInitials(name) : '?'}
+					</span>
 				)}
 			</div>
 			{status && (
-				<span className={`${styles.status} ${styles[`status-${status}`]}`} />
+				<span
+					className={`${styles.status} ${styles[`status-${status}`]}`}
+				/>
 			)}
 		</div>
 	)
