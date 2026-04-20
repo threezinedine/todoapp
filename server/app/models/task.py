@@ -1,4 +1,4 @@
-from sqlalchemy import String, DateTime, ForeignKey
+from sqlalchemy import String, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.models.base import Base
@@ -14,7 +14,9 @@ class Task(Base):
     )
     name: Mapped[str] = mapped_column(String(50), index=True)
     description: Mapped[str] = mapped_column(String(255))
-    dueDate: Mapped[DateTime] = mapped_column(DateTime)  # ISO format date string
+    dueDate: Mapped[str] = mapped_column(
+        String(10)
+    )  # ISO format date string (YYYY-MM-DD)
     isCompleted: Mapped[bool] = mapped_column(default=False)
     remainSeconds: Mapped[int] = mapped_column(
         default=60 * 45

@@ -1,18 +1,31 @@
 from pydantic import BaseModel
-from datetime import datetime as Datetime
 
 
 class AllTasksRequest(BaseModel):
-    date: Datetime
+    pass
+
+
+class CreateTaskRequest(BaseModel):
+    name: str
+    description: str
+    due_date: str
+
+
+class CreateTaskResponse(BaseModel):
+    id: str
+    name: str
+    description: str
+    due_date: str
+    is_completed: bool
 
 
 class TaskResponse(BaseModel):
     id: str
-    title: str
+    name: str
     description: str
     due_date: str
-    completed: bool
-    template_id: str | None
+    completed: bool = False
+    template_id: str | None = None
 
 
 class AllTasksResponse(BaseModel):

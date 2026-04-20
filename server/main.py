@@ -1,4 +1,3 @@
-import os
 import uuid
 from contextlib import asynccontextmanager
 
@@ -6,7 +5,7 @@ from fastapi import FastAPI
 from sqlalchemy import select
 
 from app.database import engine, async_session_maker
-from app.features import authenticate
+from app.features import authenticate, tasks
 from app.models import Base, User
 
 
@@ -39,6 +38,7 @@ async def lifespan(app: FastAPI):
 app = FastAPI(lifespan=lifespan)
 
 app.include_router(authenticate.router)
+app.include_router(tasks.router)
 
 app.add_api_route("/api/health", lambda: {"status": "ok"})
 
