@@ -129,3 +129,44 @@ async def test_update_task_with_valid_token_returns_200(client: AsyncClient):
     assert retrieved_task.get("name") == "Updated Task Name"
     assert retrieved_task.get("description") == "Updated description"
     assert retrieved_task.get("due_date") == "2024-07-31"
+
+
+@pytest.mark.asyncio
+async def test_get_task_by_id_without_valid_token_returns_401(client: AsyncClient):
+    """Calling GET /api/tasks/{task_id} without a valid token returns 401."""
+    response = await client.get(
+        "/api/tasks/some-task-id",
+    )
+    assert response.status_code == 401
+
+
+@pytest.mark.asyncio
+async def test_delete_task_with_valid_token_returns_200(client: AsyncClient):
+    """Calling DELETE /api/tasks/{task_id} with a valid token deletes the task and returns 200."""
+    # First, create a task to delete
+    create_response = await client.post(
+        "/api/tasks",
+        json={
+            "name": "Task to Delete",
+            "description": "This task will be deleted",
+            "due_date": "2024-06-30",
+        },
+        headers=TEST_AUTH_HEADER,
+    )
+    assert create_response.status_code == 200
+    created_task = create_response.json().get("task", {})
+    task_id = created_task.get("id")
+
+    # Now, delete the task
+    delete_response = await client.delete(
+        f"/api/tasks/{task_id}",
+        headers=TEST_AUTH_HEADER,
+    )
+    assert delete_response.status_code == 200
+
+    # Verify that the task was actually deleted by trying to retrieve it
+    get_response = await client.get(
+        f"/api/tasks/{task_id}",
+        headers=TEST_AUTH_HEADER,
+    )
+    assert get_response.status_code == 404

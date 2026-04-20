@@ -76,3 +76,17 @@ async def test_tasks_walkthrough(client: AsyncClient):
         == "This task has been updated in the walkthrough test"
     )
     assert updated_task.get("due_date") == date.today().isoformat()
+
+    # Delete the task
+    delete_response = await client.delete(
+        f"/api/tasks/{task_id}",
+        headers=TEST_AUTH_HEADER,
+    )
+    assert delete_response.status_code == 200
+
+    # Verify the task has been deleted
+    get_after_delete_response = await client.get(
+        f"/api/tasks/{task_id}",
+        headers=TEST_AUTH_HEADER,
+    )
+    assert get_after_delete_response.status_code == 404

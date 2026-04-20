@@ -148,3 +148,28 @@ async def update_task(
         )
     except:
         raise HTTPException(status_code=500, detail="Internal Server Error")
+
+
+@router.delete("/tasks/{task_id}")
+async def delete_task(
+    task_id: str,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    user: Annotated[User, Depends(get_current_user)],
+):
+    try:
+        result = await db.execute(
+            select(Task).where(Task.id == task_id, Task.userId == user.id)
+        )
+        existing_task = result.scalar_one_or_none()
+
+        if not existing_task:
+            raise HTTPException(status_code=404, detail="Task not found")
+
+        await db.delete(existing_task)
+        await db.commit()
+
+        return {"detail": "Task deleted successfully"}
+    except HTTPException:
+        raise
+    except:
+        raise HTTPException(status_code=500, detail="Internal Server Error")
