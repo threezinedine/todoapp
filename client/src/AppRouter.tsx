@@ -39,7 +39,7 @@ const routes: RouteConfig[] = [
 	{
 		path: '/login',
 		element: (
-			<RootLayout>
+			<RootLayout hasNavbarRightSide={false}>
 				<Login />
 			</RootLayout>
 		),

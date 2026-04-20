@@ -5,7 +5,9 @@ import clsx from 'clsx'
 export function Login() {
 	return (
 		<div className={clsx(styles.container)}>
-			<LoginCard />
+			<div className={clsx(styles.internal)}>
+				<LoginCard />
+			</div>
 		</div>
 	)
 }
