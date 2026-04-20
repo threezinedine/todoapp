@@ -1,5 +1,6 @@
 import pytest
 from httpx import AsyncClient
+from datetime import date
 
 
 @pytest.mark.asyncio
@@ -33,6 +34,22 @@ async def test_create_task_without_token_returns_401(client: AsyncClient):
         },
     )
     assert response.status_code == 401
+
+
+@pytest.mark.asyncio
+async def test_create_task_without_due_date_use_today_as_default(client: AsyncClient):
+    """Calling POST /api/tasks without a due_date should default to today's date."""
+    response = await client.post(
+        "/api/tasks",
+        json={
+            "name": "Test Task Without Due Date",
+            "description": "This task should default to today's date",
+        },
+        headers={"Authorization": "Bearer valid-test-token"},
+    )
+
+    assert response.status_code == 200
+    assert response.json()["due_date"] == date.today().isoformat()
 
 
 @pytest.mark.asyncio

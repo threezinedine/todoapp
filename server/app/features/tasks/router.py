@@ -57,7 +57,7 @@ async def create_task(
             id=str(uuid.uuid4()),
             name=task.name,
             description=task.description,
-            dueDate=task.due_date,
+            dueDate=task.due_date or date.today().isoformat(),
             userId=user.id,
         )
         db.add(new_task)

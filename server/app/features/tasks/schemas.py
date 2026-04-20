@@ -8,14 +8,14 @@ class AllTasksRequest(BaseModel):
 class CreateTaskRequest(BaseModel):
     name: str
     description: str
-    due_date: str
+    due_date: str | None = None
 
 
 class CreateTaskResponse(BaseModel):
     id: str
     name: str
     description: str
-    due_date: str
+    due_date: str | None = None
     is_completed: bool
 
 
@@ -23,7 +23,7 @@ class TaskResponse(BaseModel):
     id: str
     name: str
     description: str
-    due_date: str
+    due_date: str | None = None
     completed: bool = False
     template_id: str | None = None
 
