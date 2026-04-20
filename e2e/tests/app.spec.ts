@@ -99,7 +99,29 @@ test.describe('App Walkthrough', () => {
 		await expect(page.url()).toContain('/dashboard')
 
 		// after 1 second, not redirected back to login page (signals token is still valid and user is authenticated)
-		await page.waitForTimeout(1000)
+		await page.waitForTimeout(100)
 		await expect(page.url()).not.toContain('/login')
+
+		// logout by clicking on the avatar -> logout -> confirm
+		await page.goto('/') // make sure we are on the home page where the avatar is located
+		await page.click('[data-testid="avatar"]')
+		await page.click('text=Logout')
+
+		await page.click('[data-testid="logout-validate-modal-cancel"]') // first click cancel to make sure the modal works
+		await page.waitForTimeout(100)
+		await expect(page.url()).not.toContain('/login') // still not logged out
+
+		await page.click('[data-testid="avatar"]') // open the dropdown again
+		await page.click('text=Logout') // click logout again to open the modal
+		await page.click('[data-testid="logout-validate-modal-confirm"]') // first click cancel to make sure the modal works
+
+		// wait for navigation to login page
+		await page.waitForURL('/login')
+
+		// redirected back to home -> wait 1 second -> redirected back to login (signals user is logged out and token is cleared)
+		await page.waitForTimeout(100)
+		await page.goto('/dashboard') // try to visit protected page again to confirm we are logged out
+		await page.waitForTimeout(100)
+		await expect(page.url()).toContain('/login')
 	})
 })

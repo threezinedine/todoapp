@@ -16,12 +16,14 @@ export function Avatar({
 	offsetX = 0,
 	offsetY = 0,
 	status,
+	dataTestId,
 }: AvatarProps) {
 	const hasImage = Boolean(url)
 
 	return (
 		<div
 			className={styles.wrapper}
+			data-testid={dataTestId}
 			style={{ width: size, height: size }}
 		>
 			<div

@@ -5,4 +5,5 @@ export interface AvatarProps {
 	offsetX?: number
 	offsetY?: number
 	status?: 'online' | 'offline' | 'busy' | 'away'
+	dataTestId?: string
 }

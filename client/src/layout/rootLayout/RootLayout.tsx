@@ -47,7 +47,10 @@ export function RootLayout({
 									},
 								]}
 							>
-								<Avatar name="John Doe" />
+								<Avatar
+									name="John Doe"
+									dataTestId="avatar"
+								/>
 							</Dropdown>
 						) : (
 							<Button
@@ -61,6 +64,7 @@ export function RootLayout({
 			</div>
 			<div className={clsx(styles.body)}>{children}</div>
 			<ValidateModal
+				dataTestId="logout-validate-modal"
 				ref={validateModalRef}
 				content="Are you sure you want to logout?"
 				onCancel={async () => {}}

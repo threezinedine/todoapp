@@ -9,4 +9,5 @@ export interface ValidateModalProps {
 	content: string
 	onCancel: () => Promise<void>
 	onConfirm: () => Promise<void>
+	dataTestId?: string
 }

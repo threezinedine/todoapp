@@ -11,7 +11,7 @@ export const ValidateModal = forwardRef<
 	ValidateModalHandle,
 	ValidateModalProps
 >(function ValidateModal(
-	{ icon, content, onCancel, onConfirm }: ValidateModalProps,
+	{ icon, content, onCancel, onConfirm, dataTestId }: ValidateModalProps,
 	ref,
 ) {
 	const [isOpen, setIsOpen] = useState(false)
@@ -36,6 +36,7 @@ export const ValidateModal = forwardRef<
 		<Modal
 			isOpen={isOpen}
 			onClose={() => setIsOpen(false)}
+			dataTestId={dataTestId}
 		>
 			<Card
 				title="Confirm"
@@ -45,6 +46,7 @@ export const ValidateModal = forwardRef<
 						<p className={clsx(styles.content)}>{content}</p>
 						<div className={clsx(styles.buttons)}>
 							<Button
+								dataTestId={`${dataTestId}-cancel`}
 								text="Cancel"
 								onClick={handleCancel}
 								variant="glick-black"
@@ -52,6 +54,7 @@ export const ValidateModal = forwardRef<
 							<Button
 								variant="glick"
 								text="Confirm"
+								dataTestId={`${dataTestId}-confirm`}
 								onClick={handleConfirm}
 							/>
 						</div>
