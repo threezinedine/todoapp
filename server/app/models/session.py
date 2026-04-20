@@ -15,5 +15,5 @@ class Session(Base):
         DateTime, nullable=True
     )  # ISO format date string
 
-    user = relationship("User", back_populates="sessions")
-    task = relationship("Task", back_populates="sessions")
+    user = relationship("User")
+    task = relationship("Task")
