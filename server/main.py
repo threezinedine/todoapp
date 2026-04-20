@@ -1,16 +1,38 @@
+import os
+import uuid
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
+from sqlalchemy import select
 
-from app.database import engine
+from app.database import engine, async_session_maker
 from app.features import authenticate
-from app.models import Base
+from app.models import Base, User
+
+
+async def create_default_user():
+    """Create a default user if it doesn't exist."""
+    async with async_session_maker() as session:
+        # Check if default user exists
+        result = await session.execute(select(User).where(User.username == "default"))
+        existing_user = result.scalar_one_or_none()
+
+        if not existing_user:
+            default_user = User(
+                id=str(uuid.uuid4()),
+                username="default",
+                email="default@todoapp.local",
+                hashed_password="",  # No password needed for default user
+            )
+            session.add(default_user)
+            await session.commit()
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
+    await create_default_user()
     yield
 
 
