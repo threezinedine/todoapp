@@ -5,6 +5,7 @@ from app.models.task import Task
 from app.models.template import *
 from app.models.categoryTask import CategoryTask
 from app.models.categoryTemplate import CategoryTemplate
+from app.models.session import Session
 
 __all__ = [
     "Base",
@@ -14,4 +15,5 @@ __all__ = [
     "Template",
     "CategoryTask",
     "CategoryTemplate",
+    "Session",
 ]

@@ -21,6 +21,7 @@ class Template(Base):
     repeatSettings: Mapped[str] = mapped_column(
         String(255)
     )  # JSON string to store the repeat settings
+    seconds: Mapped[int] = mapped_column(default=60 * 45)  # Default duration in seconds
 
     user = relationship("User", back_populates="templates")
     tasks = relationship("Task", back_populates="template")

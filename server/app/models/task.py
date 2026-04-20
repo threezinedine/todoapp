@@ -14,9 +14,13 @@ class Task(Base):
     )
     name: Mapped[str] = mapped_column(String(50), index=True)
     description: Mapped[str] = mapped_column(String(255))
-    dueDate: Mapped[str] = mapped_column(DateTime)  # ISO format date string
+    dueDate: Mapped[DateTime] = mapped_column(DateTime)  # ISO format date string
     isCompleted: Mapped[bool] = mapped_column(default=False)
+    remainSeconds: Mapped[int] = mapped_column(
+        default=60 * 45
+    )  # Remaining time in seconds
 
     user = relationship("User", back_populates="tasks")
     template = relationship("Template", back_populates="tasks")
     categories = relationship("CategoryTask", back_populates="task")
+    sessions = relationship("Session", back_populates="task")
