@@ -1,12 +1,14 @@
 import styles from './RootLayout.module.scss'
 import type { RootLayoutProps } from './RootLayoutProps'
 import clsx from 'clsx'
-import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Avatar, Button, Navbar } from '~/components'
-import { Dropdown } from '~/features/dropdown/components/dropdown/Dropdown'
+import { Dropdown } from '~/features/dropdown/'
+import { ValidateModal } from '~/features/validate-modal'
+import type { ValidateModalHandle } from '~/features/validate-modal'
 import { PomodoroIcon } from '~/icons'
 import { useAuthStore } from '~/stores'
+import { useRef } from 'react'
 
 export function RootLayout({
 	children,
@@ -14,7 +16,7 @@ export function RootLayout({
 }: RootLayoutProps) {
 	const { isAuthenticated } = useAuthStore()
 	const navigate = useNavigate()
-	const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false)
+	const validateModalRef = useRef<ValidateModalHandle>(null)
 
 	return (
 		<div className={clsx(styles.wrapper)}>
@@ -40,7 +42,7 @@ export function RootLayout({
 									{
 										label: 'Logout',
 										onClick: async () => {
-											setIsLogoutModalOpen(true)
+											validateModalRef.current?.open()
 										},
 									},
 								]}
@@ -51,12 +53,22 @@ export function RootLayout({
 							<Button
 								text="Login"
 								variant="glick-black"
+								onClick={async () => navigate('/login')}
 							/>
 						))
 					}
 				/>
 			</div>
 			<div className={clsx(styles.body)}>{children}</div>
+			<ValidateModal
+				ref={validateModalRef}
+				content="Are you sure you want to logout?"
+				onCancel={async () => {}}
+				onConfirm={async () => {
+					await useAuthStore.getState().logout()
+					navigate('/login')
+				}}
+			/>
 		</div>
 	)
 }

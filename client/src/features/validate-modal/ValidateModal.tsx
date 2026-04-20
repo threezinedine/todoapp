@@ -1,16 +1,36 @@
-import { useState } from 'react'
-import type { ValidateModalProps } from './ValidateModalProps'
+import { forwardRef, useImperativeHandle, useState } from 'react'
+import type {
+	ValidateModalHandle,
+	ValidateModalProps,
+} from './ValidateModalProps'
 import { Modal, Card, Button } from '~/components'
 import styles from './ValidateModal.module.scss'
 import clsx from 'clsx'
 
-export function ValidateModal({
-	icon,
-	content,
-	onCancel,
-	onConfirm,
-}: ValidateModalProps) {
+export const ValidateModal = forwardRef<
+	ValidateModalHandle,
+	ValidateModalProps
+>(function ValidateModal(
+	{ icon, content, onCancel, onConfirm }: ValidateModalProps,
+	ref,
+) {
 	const [isOpen, setIsOpen] = useState(false)
+
+	useImperativeHandle(ref, () => ({
+		open: () => setIsOpen(true),
+		close: () => setIsOpen(false),
+		toggle: () => setIsOpen((current) => !current),
+	}))
+
+	async function handleCancel() {
+		await onCancel()
+		setIsOpen(false)
+	}
+
+	async function handleConfirm() {
+		await onConfirm()
+		setIsOpen(false)
+	}
 
 	return (
 		<Modal
@@ -26,13 +46,13 @@ export function ValidateModal({
 						<div className={clsx(styles.buttons)}>
 							<Button
 								text="Cancel"
-								onClick={onCancel}
+								onClick={handleCancel}
 								variant="glick-black"
 							/>
 							<Button
 								variant="glick"
 								text="Confirm"
-								onClick={onConfirm}
+								onClick={handleConfirm}
 							/>
 						</div>
 					</div>
@@ -40,4 +60,6 @@ export function ValidateModal({
 			></Card>
 		</Modal>
 	)
-}
+})
+
+ValidateModal.displayName = 'ValidateModal'
