@@ -5,6 +5,7 @@ from typing import AsyncGenerator
 import pytest_asyncio
 from httpx import ASGITransport, AsyncClient
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sessionmaker
+from .contants import *
 
 os.environ.setdefault("DEFAULT_TOKEN", "valid-test-token")
 

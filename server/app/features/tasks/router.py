@@ -14,6 +14,8 @@ from .schemas import (
     TaskResponse,
     CreateTaskRequest,
     CreateTaskResponse,
+    UpdateTaskResponse,
+    UpdateTaskRequest,
 )
 
 router = APIRouter(prefix="/api", tags=["pomodoro"])
@@ -46,6 +48,34 @@ async def get_all_tasks(
         raise HTTPException(status_code=500, detail="Internal Server Error")
 
 
+@router.get("/tasks/{task_id}")
+async def get_task_by_id(
+    task_id: str,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    user: Annotated[User, Depends(get_current_user)],
+) -> TaskResponse:
+    try:
+        result = await db.execute(
+            select(Task).where(Task.id == task_id, Task.userId == user.id)
+        )
+        task = result.scalar_one_or_none()
+
+        if not task:
+            raise HTTPException(status_code=404, detail="Task not found")
+
+        return TaskResponse(
+            id=task.id,
+            name=task.name,
+            description=task.description,
+            due_date=task.dueDate,
+            completed=task.isCompleted,
+        )
+    except HTTPException:
+        raise
+    except:
+        raise HTTPException(status_code=500, detail="Internal Server Error")
+
+
 @router.post("/tasks")
 async def create_task(
     task: CreateTaskRequest,
@@ -65,11 +95,56 @@ async def create_task(
         await db.refresh(new_task)
 
         return CreateTaskResponse(
-            id=new_task.id,
-            name=new_task.name,
-            description=new_task.description,
-            due_date=new_task.dueDate,
-            is_completed=new_task.isCompleted,
+            task=TaskResponse(
+                id=new_task.id,
+                name=new_task.name,
+                description=new_task.description,
+                due_date=new_task.dueDate,
+                completed=new_task.isCompleted,
+            )
+        )
+    except:
+        raise HTTPException(status_code=500, detail="Internal Server Error")
+
+
+@router.put("/tasks/{task_id}")
+async def update_task(
+    task_id: str,
+    task: UpdateTaskRequest,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    user: Annotated[User, Depends(get_current_user)],
+) -> UpdateTaskResponse:
+    try:
+        result = await db.execute(
+            select(Task).where(Task.id == task_id, Task.userId == user.id)
+        )
+        existing_task = result.scalar_one_or_none()
+
+        if not existing_task:
+            raise HTTPException(status_code=404, detail="Task not found")
+
+        if task.name is not None:
+            existing_task.name = task.name
+
+        if task.description is not None:
+            existing_task.description = task.description
+
+        if task.due_date is not None:
+            existing_task.dueDate = task.due_date
+        else:
+            existing_task.dueDate = date.today().isoformat()
+
+        await db.commit()
+        await db.refresh(existing_task)
+
+        return UpdateTaskResponse(
+            task=TaskResponse(
+                id=existing_task.id,
+                name=existing_task.name,
+                description=existing_task.description,
+                due_date=existing_task.dueDate,
+                completed=existing_task.isCompleted,
+            )
         )
     except:
         raise HTTPException(status_code=500, detail="Internal Server Error")

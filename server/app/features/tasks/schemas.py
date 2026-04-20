@@ -5,20 +5,6 @@ class AllTasksRequest(BaseModel):
     pass
 
 
-class CreateTaskRequest(BaseModel):
-    name: str
-    description: str
-    due_date: str | None = None
-
-
-class CreateTaskResponse(BaseModel):
-    id: str
-    name: str
-    description: str
-    due_date: str | None = None
-    is_completed: bool
-
-
 class TaskResponse(BaseModel):
     id: str
     name: str
@@ -30,3 +16,23 @@ class TaskResponse(BaseModel):
 
 class AllTasksResponse(BaseModel):
     tasks: list[TaskResponse]
+
+
+class CreateTaskRequest(BaseModel):
+    name: str
+    description: str
+    due_date: str | None = None
+
+
+class CreateTaskResponse(BaseModel):
+    task: TaskResponse
+
+
+class UpdateTaskRequest(BaseModel):
+    name: str | None = None
+    description: str | None = None
+    due_date: str | None = None
+
+
+class UpdateTaskResponse(BaseModel):
+    task: TaskResponse
