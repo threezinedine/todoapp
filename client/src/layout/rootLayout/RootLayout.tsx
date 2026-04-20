@@ -1,6 +1,7 @@
 import styles from './RootLayout.module.scss'
 import type { RootLayoutProps } from './RootLayoutProps'
 import clsx from 'clsx'
+import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Avatar, Button, Navbar } from '~/components'
 import { Dropdown } from '~/features/dropdown/components/dropdown/Dropdown'
@@ -13,6 +14,7 @@ export function RootLayout({
 }: RootLayoutProps) {
 	const { isAuthenticated } = useAuthStore()
 	const navigate = useNavigate()
+	const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false)
 
 	return (
 		<div className={clsx(styles.wrapper)}>
@@ -38,7 +40,7 @@ export function RootLayout({
 									{
 										label: 'Logout',
 										onClick: async () => {
-											navigate('/login')
+											setIsLogoutModalOpen(true)
 										},
 									},
 								]}

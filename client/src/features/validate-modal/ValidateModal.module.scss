@@ -1,0 +1,15 @@
+.container {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+
+	.content {
+		color: var(--primary-color);
+		margin-bottom: 3rem;
+	}
+
+	.buttons {
+		display: flex;
+		gap: 2rem;
+	}
+}

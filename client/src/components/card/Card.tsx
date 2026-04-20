@@ -2,7 +2,7 @@ import type { CardProps } from './CardProps'
 import { SecureDataIcon } from '~/icons'
 import styles from './Card.module.scss'
 
-export function Card({ title, content, dataTestId }: CardProps) {
+export function Card({ title, content, dataTestId, icon }: CardProps) {
 	return (
 		<div
 			className={styles.card}
@@ -13,7 +13,7 @@ export function Card({ title, content, dataTestId }: CardProps) {
 				data-testid={dataTestId ? `${dataTestId}-header` : undefined}
 			>
 				<div className={styles['card-title']}>
-					<SecureDataIcon />
+					{icon || <SecureDataIcon />}
 					<span>{title}</span>
 				</div>
 				<div className={styles['card-dots']}>

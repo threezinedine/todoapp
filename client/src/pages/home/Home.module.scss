@@ -1,0 +1,12 @@
+.container {
+	display: flex;
+	color: var(--primary-color);
+}
+
+.todo {
+	flex: 1;
+}
+
+.calendar {
+	flex: 3;
+}
