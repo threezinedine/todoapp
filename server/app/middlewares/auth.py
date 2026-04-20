@@ -16,13 +16,21 @@ async def get_current_user(
     credentials: Annotated[HTTPAuthorizationCredentials, Depends(HTTPBearer())],
 ) -> User:
     secret_key = os.getenv("DEFAULT_TOKEN")
+    secret_key_2 = os.getenv("DEFAULT_TOKEN_2")
 
-    if credentials.credentials != secret_key:
+    if (
+        credentials.credentials != secret_key
+        and credentials.credentials != secret_key_2
+    ):
         raise HTTPException(
             status_code=401, detail="Invalid authentication credentials"
         )
 
-    result = await db.execute(select(User).where(User.username == "default"))
+    if credentials.credentials == secret_key:
+        result = await db.execute(select(User).where(User.username == "default"))
+    else:
+        result = await db.execute(select(User).where(User.username == "default-2"))
+
     user = result.scalar_one_or_none()
 
     if not user:

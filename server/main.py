@@ -26,6 +26,19 @@ async def create_default_user():
             session.add(default_user)
             await session.commit()
 
+        result = await session.execute(select(User).where(User.username == "default-2"))
+        existing_user_2 = result.scalar_one_or_none()
+
+        if not existing_user_2:
+            default_user_2 = User(
+                id=str(uuid.uuid4()),
+                username="default-2",
+                email="default-2@todoapp.local",
+                hashed_password="",  # No password needed for default user
+            )
+            session.add(default_user_2)
+            await session.commit()
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):

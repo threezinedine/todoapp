@@ -170,3 +170,147 @@ async def test_delete_task_with_valid_token_returns_200(client: AsyncClient):
         headers=TEST_AUTH_HEADER,
     )
     assert get_response.status_code == 404
+
+
+@pytest.mark.asyncio
+async def test_toggle_task_completion_with_invalid_token_returns_401(
+    client: AsyncClient,
+):
+    """Calling POST /api/tasks/{task_id}/toggle without a valid token returns 401."""
+    response = await client.post(
+        "/api/tasks/some-task-id/toggle",
+    )
+    assert response.status_code == 401
+
+
+@pytest.mark.asyncio
+async def test_toggle_task_completion_with_valid_token_returns_200(client: AsyncClient):
+    """Calling POST /api/tasks/{task_id}/toggle with a valid token toggles completion and returns 200."""
+    # First, create a task to toggle
+    create_response = await client.post(
+        "/api/tasks",
+        json={
+            "name": "Task to Toggle",
+            "description": "This task will have its completion toggled",
+            "due_date": "2024-06-30",
+        },
+        headers=TEST_AUTH_HEADER,
+    )
+
+    assert create_response.status_code == 200
+
+    # Now, toggle the task's completion status
+    created_task = create_response.json().get("task", {})
+    task_id = created_task.get("id")
+    toggle_response = await client.post(
+        f"/api/tasks/{task_id}/toggle",
+        headers=TEST_AUTH_HEADER,
+    )
+    assert toggle_response.status_code == 200
+    toggled_task = toggle_response.json()
+    assert toggled_task.get("completed") is True
+
+
+@pytest.mark.asyncio
+async def test_update_nonexistent_task_returns_404(client: AsyncClient):
+    """Calling PUT /api/tasks/{nonexistent_task_id} with a valid token returns 404."""
+    response = await client.put(
+        "/api/tasks/nonexistent-task-id",
+        json={
+            "name": "Updated Task Name",
+            "description": "Updated description",
+            "due_date": "2024-07-31",
+        },
+        headers=TEST_AUTH_HEADER,
+    )
+    assert response.status_code == 404
+
+
+@pytest.mark.asyncio
+async def test_update_other_accounts_task_returns_404(client: AsyncClient):
+    """Calling PUT /api/tasks/{task_id} for a task that belongs to another user returns 404."""
+    # First, create a task with the default user
+    create_response = await client.post(
+        "/api/tasks",
+        json={
+            "name": "Task Owned by Default User",
+            "description": "This task is owned by the default user",
+            "due_date": "2024-06-30",
+        },
+        headers=TEST_AUTH_HEADER,
+    )
+    assert create_response.status_code == 200
+    created_task = create_response.json().get("task", {})
+    task_id = created_task.get("id")
+
+    # Now, try to update the task using the second user's token
+    response = await client.put(
+        f"/api/tasks/{task_id}",
+        json={
+            "name": "Updated Task Name",
+            "description": "Updated description",
+            "due_date": "2024-07-31",
+        },
+        headers={"Authorization": "Bearer valid-test-token-2"},
+    )
+    assert response.status_code == 404
+
+
+@pytest.mark.asyncio
+async def test_delete_nonexistent_task_returns_404(client: AsyncClient):
+    """Calling DELETE /api/tasks/{nonexistent_task_id} with a valid token returns 404."""
+    response = await client.delete(
+        "/api/tasks/nonexistent-task-id",
+        headers=TEST_AUTH_HEADER,
+    )
+    assert response.status_code == 404
+
+
+@pytest.mark.asyncio
+async def test_delete_other_accounts_task_returns_404(client: AsyncClient):
+    """Calling DELETE /api/tasks/{task_id} for a task that belongs to another user returns 404."""
+    # First, create a task with the default user
+    create_response = await client.post(
+        "/api/tasks",
+        json={
+            "name": "Task Owned by Default User",
+            "description": "This task is owned by the default user",
+            "due_date": "2024-06-30",
+        },
+        headers=TEST_AUTH_HEADER,
+    )
+    assert create_response.status_code == 200
+    created_task = create_response.json().get("task", {})
+    task_id = created_task.get("id")
+
+    # Now, try to delete the task using the second user's token
+    response = await client.delete(
+        f"/api/tasks/{task_id}",
+        headers={"Authorization": "Bearer valid-test-token-2"},
+    )
+    assert response.status_code == 404
+
+
+@pytest.mark.asyncio
+async def test_toggle_other_accounts_task_returns_404(client: AsyncClient):
+    """Calling POST /api/tasks/{task_id}/toggle for a task that belongs to another user returns 404."""
+    # First, create a task with the default user
+    create_response = await client.post(
+        "/api/tasks",
+        json={
+            "name": "Task Owned by Default User",
+            "description": "This task is owned by the default user",
+            "due_date": "2024-06-30",
+        },
+        headers=TEST_AUTH_HEADER,
+    )
+    assert create_response.status_code == 200
+    created_task = create_response.json().get("task", {})
+    task_id = created_task.get("id")
+
+    # Now, try to toggle the task using the second user's token
+    response = await client.post(
+        f"/api/tasks/{task_id}/toggle",
+        headers={"Authorization": "Bearer valid-test-token-2"},
+    )
+    assert response.status_code == 404

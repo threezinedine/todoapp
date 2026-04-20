@@ -8,6 +8,7 @@ from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sess
 from .contants import *
 
 os.environ.setdefault("DEFAULT_TOKEN", "valid-test-token")
+os.environ.setdefault("DEFAULT_TOKEN_2", "valid-test-token-2")
 
 # Use SQLite for testing (in-memory database)
 TEST_DATABASE_URL = "sqlite+aiosqlite:///:memory:"
@@ -52,7 +53,14 @@ async def test_db_session(test_session_maker):
             email="default@todoapp.local",
             hashed_password="",
         )
+        default_user_2 = User(
+            id=str(uuid.uuid4()),
+            username="default-2",
+            email="default2@todoapp.local",
+            hashed_password="",
+        )
         session.add(default_user)
+        session.add(default_user_2)
         await session.commit()
         yield session
 

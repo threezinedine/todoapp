@@ -146,6 +146,41 @@ async def update_task(
                 completed=existing_task.isCompleted,
             )
         )
+    except HTTPException:
+        raise
+    except:
+        raise HTTPException(status_code=500, detail="Internal Server Error")
+
+
+@router.post("/tasks/{task_id}/toggle")
+async def toggle_task_completion(
+    task_id: str,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    user: Annotated[User, Depends(get_current_user)],
+) -> TaskResponse:
+    try:
+        result = await db.execute(
+            select(Task).where(Task.id == task_id, Task.userId == user.id)
+        )
+        existing_task = result.scalar_one_or_none()
+
+        if not existing_task:
+            raise HTTPException(status_code=404, detail="Task not found")
+
+        existing_task.isCompleted = not existing_task.isCompleted
+
+        await db.commit()
+        await db.refresh(existing_task)
+
+        return TaskResponse(
+            id=existing_task.id,
+            name=existing_task.name,
+            description=existing_task.description,
+            due_date=existing_task.dueDate,
+            completed=existing_task.isCompleted,
+        )
+    except HTTPException:
+        raise
     except:
         raise HTTPException(status_code=500, detail="Internal Server Error")
 
