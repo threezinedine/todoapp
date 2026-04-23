@@ -1,0 +1,167 @@
+.container {
+	color: var(--primary-color);
+	user-select: none;
+	cursor: pointer;
+	padding: 0.75rem 1rem;
+	font-size: 1.24rem;
+	border-radius: 0.55rem;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+
+	input {
+		display: none;
+	}
+
+	&:hover {
+		background-color: var(--primary-hover-color);
+	}
+
+	.content {
+		display: flex;
+		gap: 0.3rem;
+		align-items: center;
+		flex: 1;
+
+		.icon,
+		.checkbox,
+		.name {
+			display: flex;
+			align-items: center;
+		}
+
+		.icon {
+			margin-right: 1rem;
+
+			&:hover {
+				cursor: grab;
+			}
+		}
+
+		&.completed {
+			.checkbox {
+				.rect {
+					transform: scale(1);
+					opacity: 1;
+				}
+
+				.mark {
+					opacity: 1;
+					transform: scale(1) rotate(0deg);
+					animation: checkPop 0.3s ease-out 0.2s;
+				}
+			}
+
+			.name {
+				color: var(--primary-text-hover-color);
+
+				&::after {
+					width: 100%;
+				}
+			}
+		}
+
+		.checkbox {
+			position: relative;
+			width: 22px;
+			height: 22px;
+			border: 2px solid #d1d5db;
+			border-radius: 6px;
+			margin-right: 12px;
+			transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+			background: #ffffff;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			overflow: visible;
+
+			.rect {
+				position: absolute;
+				top: 0;
+				left: 0;
+				width: 100%;
+				height: 100%;
+				background: linear-gradient(
+					135deg,
+					var(--primary-color) 0%,
+					var(--primary-color-darker) 100%
+				);
+				transform: scale(0);
+				transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+				border-radius: 4px;
+				opacity: 0;
+			}
+
+			.mark {
+				position: relative;
+				z-index: 2;
+				opacity: 0;
+				transform: scale(0.3) rotate(20deg);
+				transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+
+				svg {
+					width: 14px;
+					height: 14px;
+					filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.2));
+				}
+			}
+		}
+
+		.name {
+			transition: all 0.3s ease;
+			position: relative;
+
+			&::after {
+				content: '';
+				position: absolute;
+				top: 50%;
+				left: 0;
+				width: 0;
+				height: 2px;
+				background: var(--primary-text-hover-color);
+				transition: width 0.4s ease;
+				transform: translateY(-50%);
+			}
+		}
+	}
+
+	.option {
+		padding-top: 0.25rem;
+		padding-bottom: 0.25rem;
+		border-radius: 0.5rem;
+
+		&:hover {
+			background-color: var(--primary-hover-color-darker);
+		}
+	}
+}
+
+@keyframes rippleSuccess {
+	0% {
+		width: 0;
+		height: 0;
+		opacity: 0.6;
+	}
+	70% {
+		width: 50px;
+		height: 50px;
+		opacity: 0.3;
+	}
+	100% {
+		width: 60px;
+		height: 60px;
+		opacity: 0;
+	}
+}
+
+@keyframes checkPop {
+	0% {
+		transform: scale(1) rotate(0deg);
+	}
+	50% {
+		transform: scale(1.2) rotate(-5deg);
+	}
+	100% {
+		transform: scale(1) rotate(0deg);
+	}
+}

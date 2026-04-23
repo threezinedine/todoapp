@@ -1,4 +1,8 @@
 export { GoogleChromeIcon } from './GoogleChromeIcon'
+export { CheckMarkIcon } from './CheckMarkIcon'
+export { DeleteIcon } from './DeleteIcon'
+export { DragHandleIcon } from './DragHandleIcon'
+export { OptionIcon } from './OptionIcon'
 export { OpenAIIcon } from './OpenAIIcon'
 export { PomodoroIcon } from './PomodoroIcon'
 export { ProfileIcon } from './ProfileIcon'
