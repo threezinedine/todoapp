@@ -3,7 +3,7 @@ export interface TaskCardProps {
 	taskId?: string
 	taskName: string
 	isComplete?: boolean
-	onCompleteChange?: (isComplete: boolean) => Promise<void>
-	onDelete?: () => Promise<void>
-	onSettings?: () => Promise<void>
+	onCompleteChange?: (isComplete: boolean) => Promise<void> | void
+	onDelete?: () => Promise<void> | void
+	onSettings?: () => Promise<void> | void
 }

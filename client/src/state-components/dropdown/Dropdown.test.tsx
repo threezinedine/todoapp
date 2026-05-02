@@ -2,19 +2,26 @@ import { describe, expect, it, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { Dropdown } from './Dropdown'
-import { DropMenu } from '~/components/drop-menu'
 
 // Mock the DropMenu component to avoid its SCSS module dependencies
 vi.mock('~/components/drop-menu', () => ({
 	DropMenu: vi.fn(({ items, isOpen }) =>
 		isOpen ? (
 			<div data-testid="drop-menu">
-				{items.map((item: { label?: string; onMouseDown?: () => void }, index: number) =>
-					item.onMouseDown ? (
-						<button key={index} data-testid={`menu-item-${index}`} onMouseDown={item.onMouseDown}>
-							{item.label}
-						</button>
-					) : null,
+				{items.map(
+					(
+						item: { label?: string; onClick?: () => void },
+						index: number,
+					) =>
+						item.onClick ? (
+							<button
+								key={index}
+								data-testid={`menu-item-${index}`}
+								onClick={item.onClick}
+							>
+								{item.label}
+							</button>
+						) : null,
 				)}
 			</div>
 		) : null,
@@ -36,11 +43,7 @@ describe('Dropdown', () => {
 
 	it('renders children as the trigger', () => {
 		render(
-			<Dropdown
-				items={[
-					{ label: 'Option 1', onMouseDown: vi.fn() },
-				]}
-			>
+			<Dropdown items={[{ label: 'Option 1', onClick: vi.fn() }]}>
 				<button data-testid={TRIGGER_TEST_ID}>Open</button>
 			</Dropdown>,
 		)
@@ -50,11 +53,7 @@ describe('Dropdown', () => {
 
 	it('does not render the menu on initial render', () => {
 		render(
-			<Dropdown
-				items={[
-					{ label: 'Option 1', onMouseDown: vi.fn() },
-				]}
-			>
+			<Dropdown items={[{ label: 'Option 1', onClick: vi.fn() }]}>
 				<button data-testid={TRIGGER_TEST_ID}>Open</button>
 			</Dropdown>,
 		)
@@ -65,11 +64,7 @@ describe('Dropdown', () => {
 	it('renders the menu when opened', async () => {
 		const user = userEvent.setup()
 		render(
-			<Dropdown
-				items={[
-					{ label: 'Option 1', onMouseDown: vi.fn() },
-				]}
-			>
+			<Dropdown items={[{ label: 'Option 1', onClick: vi.fn() }]}>
 				<button data-testid={TRIGGER_TEST_ID}>Open</button>
 			</Dropdown>,
 		)
@@ -83,9 +78,9 @@ describe('Dropdown', () => {
 		render(
 			<Dropdown
 				items={[
-					{ label: 'Option 1', onMouseDown: vi.fn() },
-					{ label: 'Option 2', onMouseDown: vi.fn() },
-					{ label: 'Option 3', onMouseDown: vi.fn() },
+					{ label: 'Option 1', onClick: vi.fn() },
+					{ label: 'Option 2', onClick: vi.fn() },
+					{ label: 'Option 3', onClick: vi.fn() },
 				]}
 			>
 				<button data-testid={TRIGGER_TEST_ID}>Open</button>
@@ -104,11 +99,7 @@ describe('Dropdown', () => {
 	it('opens the menu on trigger click', async () => {
 		const user = userEvent.setup()
 		render(
-			<Dropdown
-				items={[
-					{ label: 'Option 1', onMouseDown: vi.fn() },
-				]}
-			>
+			<Dropdown items={[{ label: 'Option 1', onClick: vi.fn() }]}>
 				<button data-testid={TRIGGER_TEST_ID}>Open</button>
 			</Dropdown>,
 		)
@@ -120,11 +111,7 @@ describe('Dropdown', () => {
 	it('closes the menu on second trigger click (toggle)', async () => {
 		const user = userEvent.setup()
 		render(
-			<Dropdown
-				items={[
-					{ label: 'Option 1', onMouseDown: vi.fn() },
-				]}
-			>
+			<Dropdown items={[{ label: 'Option 1', onClick: vi.fn() }]}>
 				<button data-testid={TRIGGER_TEST_ID}>Open</button>
 			</Dropdown>,
 		)
@@ -139,11 +126,7 @@ describe('Dropdown', () => {
 	it('closes the menu when clicking outside the container', async () => {
 		const user = userEvent.setup()
 		render(
-			<Dropdown
-				items={[
-					{ label: 'Option 1', onMouseDown: vi.fn() },
-				]}
-			>
+			<Dropdown items={[{ label: 'Option 1', onClick: vi.fn() }]}>
 				<button data-testid={TRIGGER_TEST_ID}>Open</button>
 			</Dropdown>,
 		)
@@ -158,11 +141,7 @@ describe('Dropdown', () => {
 	it('does not close the menu when clicking inside the container but outside the trigger', async () => {
 		const user = userEvent.setup()
 		render(
-			<Dropdown
-				items={[
-					{ label: 'Option 1', onMouseDown: vi.fn() },
-				]}
-			>
+			<Dropdown items={[{ label: 'Option 1', onClick: vi.fn() }]}>
 				<button data-testid={TRIGGER_TEST_ID}>Open</button>
 			</Dropdown>,
 		)
@@ -177,15 +156,15 @@ describe('Dropdown', () => {
 
 	// ─── Menu item interaction ───────────────────────────────────────────────────
 
-	it('calls the onMouseDown callback when a menu item is clicked', async () => {
+	it('calls the onClick callback when a menu item is clicked', async () => {
 		const user = userEvent.setup()
-		const onMouseDown = vi.fn()
+		const onClick = vi.fn()
 
 		render(
 			<Dropdown
 				items={[
-					{ label: 'Option 1', onMouseDown },
-					{ label: 'Option 2', onMouseDown: vi.fn() },
+					{ label: 'Option 1', onClick },
+					{ label: 'Option 2', onClick: vi.fn() },
 				]}
 			>
 				<button data-testid={TRIGGER_TEST_ID}>Open</button>
@@ -195,7 +174,7 @@ describe('Dropdown', () => {
 		await user.click(screen.getByTestId(TRIGGER_TEST_ID))
 		await user.click(screen.getByTestId('menu-item-0'))
 
-		expect(onMouseDown).toHaveBeenCalledTimes(1)
+		expect(onClick).toHaveBeenCalledTimes(1)
 	})
 
 	it('does NOT close the menu when clicking a menu item (only closes on outside-click or trigger)', async () => {
@@ -203,8 +182,8 @@ describe('Dropdown', () => {
 		render(
 			<Dropdown
 				items={[
-					{ label: 'Option 1', onMouseDown: vi.fn() },
-					{ label: 'Option 2', onMouseDown: vi.fn() },
+					{ label: 'Option 1', onClick: vi.fn() },
+					{ label: 'Option 2', onClick: vi.fn() },
 				]}
 			>
 				<button data-testid={TRIGGER_TEST_ID}>Open</button>
@@ -233,14 +212,10 @@ describe('Dropdown', () => {
 		expect(screen.getByTestId('drop-menu')).toBeInTheDocument()
 	})
 
-	it('renders with items that have no onMouseDown callback', async () => {
+	it('renders with items that have no onClick callback', async () => {
 		const user = userEvent.setup()
 		render(
-			<Dropdown
-				items={[
-					{ label: 'Option 1' },
-				]}
-			>
+			<Dropdown items={[{ label: 'Option 1' }]}>
 				<button data-testid={TRIGGER_TEST_ID}>Open</button>
 			</Dropdown>,
 		)
@@ -252,11 +227,7 @@ describe('Dropdown', () => {
 	it('can be re-opened after closing via outside click', async () => {
 		const user = userEvent.setup()
 		render(
-			<Dropdown
-				items={[
-					{ label: 'Option 1', onMouseDown: vi.fn() },
-				]}
-			>
+			<Dropdown items={[{ label: 'Option 1', onClick: vi.fn() }]}>
 				<button data-testid={TRIGGER_TEST_ID}>Open</button>
 			</Dropdown>,
 		)
@@ -275,18 +246,10 @@ describe('Dropdown', () => {
 		const user = userEvent.setup()
 		render(
 			<>
-				<Dropdown
-					items={[
-						{ label: 'A1', onMouseDown: vi.fn() },
-					]}
-				>
+				<Dropdown items={[{ label: 'A1', onClick: vi.fn() }]}>
 					<button data-testid="dropdown-a-trigger">Open A</button>
 				</Dropdown>
-				<Dropdown
-					items={[
-						{ label: 'B1', onMouseDown: vi.fn() },
-					]}
-				>
+				<Dropdown items={[{ label: 'B1', onClick: vi.fn() }]}>
 					<button data-testid="dropdown-b-trigger">Open B</button>
 				</Dropdown>
 			</>,

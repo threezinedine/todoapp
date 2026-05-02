@@ -1,7 +1,7 @@
 export interface DropMenuItem {
 	icon?: React.ReactNode
 	label?: string
-	onClick?: () => Promise<void>
+	onClick?: () => Promise<void> | void
 	isSeparator?: boolean
 }
 

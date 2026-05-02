@@ -35,6 +35,8 @@ export const Default: Story = {
 						)
 						setIsComplete(newIsComplete)
 					}}
+					onSettings={() => alert('Setting')}
+					onDelete={() => alert('Delete')}
 				/>
 			</div>
 		)
