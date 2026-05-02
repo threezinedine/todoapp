@@ -177,7 +177,7 @@ describe('Dropdown', () => {
 		expect(onClick).toHaveBeenCalledTimes(1)
 	})
 
-	it('does NOT close the menu when clicking a menu item (only closes on outside-click or trigger)', async () => {
+	it('closes the menu when clicking a menu item', async () => {
 		const user = userEvent.setup()
 		render(
 			<Dropdown
@@ -194,8 +194,28 @@ describe('Dropdown', () => {
 		expect(screen.getByTestId('drop-menu')).toBeInTheDocument()
 
 		await user.click(screen.getByTestId('menu-item-0'))
-		// Menu stays open after item click — only outside-click or trigger closes it
+		expect(screen.queryByTestId('drop-menu')).not.toBeInTheDocument()
+	})
+
+	it('closes the menu when clicking any menu item', async () => {
+		const user = userEvent.setup()
+		render(
+			<Dropdown
+				items={[
+					{ label: 'Option 1', onClick: vi.fn() },
+					{ label: 'Option 2', onClick: vi.fn() },
+					{ label: 'Option 3', onClick: vi.fn() },
+				]}
+			>
+				<button data-testid={TRIGGER_TEST_ID}>Open</button>
+			</Dropdown>,
+		)
+
+		await user.click(screen.getByTestId(TRIGGER_TEST_ID))
 		expect(screen.getByTestId('drop-menu')).toBeInTheDocument()
+
+		await user.click(screen.getByTestId('menu-item-2'))
+		expect(screen.queryByTestId('drop-menu')).not.toBeInTheDocument()
 	})
 
 	// ─── Edge cases ──────────────────────────────────────────────────────────────

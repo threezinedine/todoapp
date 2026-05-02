@@ -24,8 +24,21 @@ export function Dropdown({ children, items }: DropdownProps) {
 		}
 	}, [isOpen])
 
+	const itemsWithClose = items.map((item) => ({
+		...item,
+		onClick: item.onClick
+			? () => {
+					item.onClick?.()
+					setIsOpen(false)
+				}
+			: undefined,
+	}))
+
 	return (
-		<div ref={containerRef} className={styles.container}>
+		<div
+			ref={containerRef}
+			className={styles.container}
+		>
 			<div
 				className={clsx(styles.trigger)}
 				onClick={() => {
@@ -36,7 +49,7 @@ export function Dropdown({ children, items }: DropdownProps) {
 			</div>
 			{isOpen && (
 				<DropMenu
-					items={items}
+					items={itemsWithClose}
 					isOpen={isOpen}
 				/>
 			)}
