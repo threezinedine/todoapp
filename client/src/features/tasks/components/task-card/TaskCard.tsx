@@ -9,6 +9,7 @@ import {
 	DeleteIcon,
 } from '~/icons'
 import { Dropdown } from '~/state-components'
+import { useRef } from 'react'
 
 export function TaskCard({
 	testId,
@@ -22,10 +23,13 @@ export function TaskCard({
 		void onCompleteChange?.(!isComplete)
 	}
 
+	const containerRef = useRef<HTMLDivElement>(null)
+
 	return (
 		<div
 			data-testid={testId}
 			className={clsx(styles.container)}
+			ref={containerRef}
 		>
 			<input
 				type="checkbox"
@@ -43,6 +47,18 @@ export function TaskCard({
 					className={clsx(styles.icon)}
 					onClick={(event) => event.stopPropagation()}
 					draggable={true}
+					onDragStart={() => {
+						if (containerRef.current) {
+							containerRef.current.classList.add(styles.dragging)
+						}
+					}}
+					onDragEnd={() => {
+						if (containerRef.current) {
+							containerRef.current.classList.remove(
+								styles.dragging,
+							)
+						}
+					}}
 				>
 					<DragHandleIcon />
 				</div>

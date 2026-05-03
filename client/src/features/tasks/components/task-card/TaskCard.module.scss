@@ -10,6 +10,10 @@
 	justify-content: space-between;
 	border: 1px solid #02b9b371;
 
+	&.dragging {
+		opacity: 0.1;
+	}
+
 	input {
 		display: none;
 	}

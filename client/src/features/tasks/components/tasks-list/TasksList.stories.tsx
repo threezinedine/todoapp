@@ -21,6 +21,11 @@ export const Default: Story = {
 				}}
 			>
 				<TasksList
+					onTaskReorder={(sourceTaskId, targetTaskId, position) => {
+						alert(
+							`Reorder task ${sourceTaskId} ${position} task ${targetTaskId}`,
+						)
+					}}
 					tasks={[
 						{
 							taskId: '1',
@@ -31,6 +36,16 @@ export const Default: Story = {
 							taskId: '2',
 							taskName: 'Task 2',
 							isComplete: true,
+						},
+						{
+							taskId: '3',
+							taskName: 'Task 3',
+							isComplete: false,
+						},
+						{
+							taskId: '4',
+							taskName: 'Task 4',
+							isComplete: false,
 						},
 					]}
 				/>
