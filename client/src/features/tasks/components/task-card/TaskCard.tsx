@@ -42,6 +42,7 @@ export function TaskCard({
 				<div
 					className={clsx(styles.icon)}
 					onClick={(event) => event.stopPropagation()}
+					draggable={true}
 				>
 					<DragHandleIcon />
 				</div>
