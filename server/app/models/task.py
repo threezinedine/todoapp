@@ -21,6 +21,7 @@ class Task(Base):
     remainSeconds: Mapped[int] = mapped_column(
         default=60 * 45
     )  # Remaining time in seconds
+    createdAt: Mapped[str] = mapped_column(String(20))  # ISO format datetime string
 
     user = relationship("User", back_populates="tasks")
     template = relationship("Template", back_populates="tasks")

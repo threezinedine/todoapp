@@ -6,6 +6,7 @@ from app.models.template import *
 from app.models.categoryTask import CategoryTask
 from app.models.categoryTemplate import CategoryTemplate
 from app.models.session import Session
+from app.models.taskOrder import TaskOrder
 
 __all__ = [
     "Base",
@@ -16,4 +17,5 @@ __all__ = [
     "CategoryTask",
     "CategoryTemplate",
     "Session",
+    "TaskOrder",
 ]

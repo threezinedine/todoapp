@@ -8,9 +8,10 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.middlewares import get_current_user
 from app.dependencies import get_db
-from app.models import User, Task
+from app.models import User, Task, TaskOrder
 from .schemas import (
     AllTasksResponse,
+    TaskOrderResponse,
     TaskResponse,
     CreateTaskRequest,
     CreateTaskResponse,
@@ -27,6 +28,7 @@ async def get_all_tasks(
     user: Annotated[User, Depends(get_current_user)],
 ) -> AllTasksResponse:
     try:
+        # TODO: Add pagination and filtering by date
         today = date.today().isoformat()
         result = await db.execute(
             select(Task).where(Task.userId == user.id, Task.dueDate == today)
@@ -44,6 +46,39 @@ async def get_all_tasks(
         ]
 
         return AllTasksResponse(tasks=respondTasks)
+    except:
+        raise HTTPException(status_code=500, detail="Internal Server Error")
+
+
+@router.get("/tasks/orders")
+async def get_task_orders(
+    db: Annotated[AsyncSession, Depends(get_db)],
+    user: Annotated[User, Depends(get_current_user)],
+) -> TaskOrderResponse:
+    try:
+        today = date.today().isoformat()
+        result = await db.execute(
+            select(TaskOrder).where(
+                TaskOrder.userId == user.id, TaskOrder.date == today
+            )
+        )
+        task_order = result.scalar_one_or_none()
+
+        if not task_order:
+            # find all tasks for today and return their ids in order of creation
+            tasks = await db.execute(
+                select(Task)
+                .where(Task.userId == user.id, Task.dueDate == today)
+                .order_by(Task.createdAt)
+            )
+            return TaskOrderResponse(
+                order_task_ids=[task.id for task in tasks.scalars().all()]
+            )
+
+        order_task_ids = (
+            task_order.orderTaskIds.split(",") if task_order.orderTaskIds else []
+        )
+        return TaskOrderResponse(order_task_ids=order_task_ids)
     except:
         raise HTTPException(status_code=500, detail="Internal Server Error")
 
@@ -89,6 +124,7 @@ async def create_task(
             description=task.description,
             dueDate=task.due_date or date.today().isoformat(),
             userId=user.id,
+            createdAt=date.today().isoformat(),
         )
         db.add(new_task)
         await db.commit()

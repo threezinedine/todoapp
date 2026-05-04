@@ -314,3 +314,49 @@ async def test_toggle_other_accounts_task_returns_404(client: AsyncClient):
         headers={"Authorization": "Bearer valid-test-token-2"},
     )
     assert response.status_code == 404
+
+
+@pytest.mark.asyncio
+async def test_get_non_existed_task_order_date_returns_order_by_created_time(
+    client: AsyncClient,
+):
+    """Calling GET /api/tasks/order with a valid token but no order for today should return tasks ordered by created time."""
+    respose = await client.post(
+        "/api/tasks",
+        json={
+            "name": "Task 1",
+            "description": "First task",
+            "due_date": date.today().isoformat(),
+        },
+        headers=TEST_AUTH_HEADER,
+    )
+    task1Id = respose.json().get("task", {}).get("id")
+
+    respose = await client.post(
+        "/api/tasks",
+        json={
+            "name": "Task 2",
+            "description": "Second task",
+            "due_date": date.today().isoformat(),
+        },
+        headers=TEST_AUTH_HEADER,
+    )
+    task2Id = respose.json().get("task", {}).get("id")
+
+    respose = await client.post(
+        "/api/tasks",
+        json={
+            "name": "Task 3",
+            "description": "Third task",
+            "due_date": date.today().isoformat(),
+        },
+        headers=TEST_AUTH_HEADER,
+    )
+    task3Id = respose.json().get("task", {}).get("id")
+
+    response = await client.get(
+        "/api/tasks/orders",
+        headers=TEST_AUTH_HEADER,
+    )
+    assert response.status_code == 200
+    assert response.json().get("order_task_ids") == [task1Id, task2Id, task3Id]

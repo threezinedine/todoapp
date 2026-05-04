@@ -18,6 +18,10 @@ class AllTasksResponse(BaseModel):
     tasks: list[TaskResponse]
 
 
+class TaskOrderResponse(BaseModel):
+    order_task_ids: list[str]
+
+
 class CreateTaskRequest(BaseModel):
     name: str
     description: str
