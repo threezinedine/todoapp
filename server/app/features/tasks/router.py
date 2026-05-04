@@ -17,6 +17,7 @@ from .schemas import (
     CreateTaskResponse,
     UpdateTaskResponse,
     UpdateTaskRequest,
+    ReorderTasksRequest,
 )
 
 router = APIRouter(prefix="/api", tags=["pomodoro"])
@@ -79,6 +80,39 @@ async def get_task_orders(
             task_order.orderTaskIds.split(",") if task_order.orderTaskIds else []
         )
         return TaskOrderResponse(order_task_ids=order_task_ids)
+    except:
+        raise HTTPException(status_code=500, detail="Internal Server Error")
+
+
+@router.patch("/tasks/orders")
+async def reorder_tasks(
+    reorder_request: ReorderTasksRequest,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    user: Annotated[User, Depends(get_current_user)],
+) -> TaskOrderResponse:
+    try:
+        today = date.today().isoformat()
+        result = await db.execute(
+            select(TaskOrder).where(
+                TaskOrder.userId == user.id, TaskOrder.date == today
+            )
+        )
+        task_order = result.scalar_one_or_none()
+
+        if not task_order:
+            task_order = TaskOrder(
+                userId=user.id,
+                date=today,
+                orderTaskIds=",".join(reorder_request.order_task_ids),
+            )
+            db.add(task_order)
+        else:
+            task_order.orderTaskIds = ",".join(reorder_request.order_task_ids)
+
+        await db.commit()
+        await db.refresh(task_order)
+
+        return TaskOrderResponse(order_task_ids=reorder_request.order_task_ids)
     except:
         raise HTTPException(status_code=500, detail="Internal Server Error")
 

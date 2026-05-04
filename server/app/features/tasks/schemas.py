@@ -22,6 +22,10 @@ class TaskOrderResponse(BaseModel):
     order_task_ids: list[str]
 
 
+class ReorderTasksRequest(BaseModel):
+    order_task_ids: list[str]
+
+
 class CreateTaskRequest(BaseModel):
     name: str
     description: str

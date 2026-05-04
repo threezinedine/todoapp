@@ -321,42 +321,62 @@ async def test_get_non_existed_task_order_date_returns_order_by_created_time(
     client: AsyncClient,
 ):
     """Calling GET /api/tasks/order with a valid token but no order for today should return tasks ordered by created time."""
-    respose = await client.post(
-        "/api/tasks",
-        json={
-            "name": "Task 1",
-            "description": "First task",
-            "due_date": date.today().isoformat(),
-        },
-        headers=TEST_AUTH_HEADER,
-    )
-    task1Id = respose.json().get("task", {}).get("id")
-
-    respose = await client.post(
-        "/api/tasks",
-        json={
-            "name": "Task 2",
-            "description": "Second task",
-            "due_date": date.today().isoformat(),
-        },
-        headers=TEST_AUTH_HEADER,
-    )
-    task2Id = respose.json().get("task", {}).get("id")
-
-    respose = await client.post(
-        "/api/tasks",
-        json={
-            "name": "Task 3",
-            "description": "Third task",
-            "due_date": date.today().isoformat(),
-        },
-        headers=TEST_AUTH_HEADER,
-    )
-    task3Id = respose.json().get("task", {}).get("id")
+    task_ids: list[str] = []
+    for i in range(3):
+        create_response = await client.post(
+            "/api/tasks",
+            json={
+                "name": f"Task {i+1}",
+                "description": f"Task number {i+1}",
+                "due_date": date.today().isoformat(),
+            },
+            headers=TEST_AUTH_HEADER,
+        )
+        assert create_response.status_code == 200
+        created_task = create_response.json().get("task", {})
+        task_ids.append(created_task.get("id"))
 
     response = await client.get(
         "/api/tasks/orders",
         headers=TEST_AUTH_HEADER,
     )
     assert response.status_code == 200
-    assert response.json().get("order_task_ids") == [task1Id, task2Id, task3Id]
+    assert response.json().get("order_task_ids") == task_ids
+
+
+@pytest.mark.asyncio
+async def test_update_task_order_with_valid_token_returns_200(client: AsyncClient):
+    """Calling PATCH /api/tasks/order with a valid token updates the task order and returns 200."""
+    # First, create some tasks to reorder
+    task_ids: list[str] = []
+    for i in range(3):
+        create_response = await client.post(
+            "/api/tasks",
+            json={
+                "name": f"Task {i+1}",
+                "description": f"Task number {i+1}",
+                "due_date": date.today().isoformat(),
+            },
+            headers=TEST_AUTH_HEADER,
+        )
+        assert create_response.status_code == 200
+        created_task = create_response.json().get("task", {})
+        task_ids.append(created_task.get("id"))
+
+    # Now, update the task order
+    new_order = [task_ids[2], task_ids[0], task_ids[1]]
+    update_response = await client.patch(
+        "/api/tasks/orders",
+        json={"order_task_ids": new_order},
+        headers=TEST_AUTH_HEADER,
+    )
+    assert update_response.status_code == 200
+    assert update_response.json().get("order_task_ids") == new_order
+
+    # Verify that the order was actually updated by retrieving it
+    get_response = await client.get(
+        "/api/tasks/orders",
+        headers=TEST_AUTH_HEADER,
+    )
+    assert get_response.status_code == 200
+    assert get_response.json().get("order_task_ids") == new_order
