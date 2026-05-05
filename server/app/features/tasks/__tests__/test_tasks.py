@@ -1,6 +1,6 @@
 import pytest
 from httpx import AsyncClient
-from datetime import date
+from datetime import date, datetime, timedelta
 from app.contants import TEST_AUTH_HEADER
 
 
@@ -18,9 +18,21 @@ async def test_get_all_tasks_returns_200_with_valid_token(client: AsyncClient):
         "/api/tasks",
         headers=TEST_AUTH_HEADER,
     )
-    print(response.json())
     assert response.status_code == 200
     assert "tasks" in response.json()
+
+
+@pytest.mark.asyncio
+async def test_get_all_tasks_with_date_filter_returns_200(client: AsyncClient):
+    response = await client.get(
+        f"/api/tasks?date={(date.today() + timedelta(days=1)).isoformat()}",
+        headers=TEST_AUTH_HEADER,
+    )
+    assert response.status_code == 200
+    assert "tasks" in response.json()
+    assert (
+        response.json()["tasks"] == []
+    )  # Assuming there are no tasks for tomorrow in the test database
 
 
 @pytest.mark.asyncio

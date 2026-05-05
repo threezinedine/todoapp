@@ -1,4 +1,4 @@
-from datetime import date
+import datetime
 from typing import Annotated
 import uuid
 
@@ -27,12 +27,12 @@ router = APIRouter(prefix="/api", tags=["pomodoro"])
 async def get_all_tasks(
     db: Annotated[AsyncSession, Depends(get_db)],
     user: Annotated[User, Depends(get_current_user)],
+    date: str | None = None,
 ) -> AllTasksResponse:
     try:
-        # TODO: Add pagination and filtering by date
-        today = date.today().isoformat()
+        check_date = date or datetime.date.today().isoformat()
         result = await db.execute(
-            select(Task).where(Task.userId == user.id, Task.dueDate == today)
+            select(Task).where(Task.userId == user.id, Task.dueDate == check_date)
         )
         tasks = result.scalars().all()
 
@@ -55,9 +55,10 @@ async def get_all_tasks(
 async def get_task_orders(
     db: Annotated[AsyncSession, Depends(get_db)],
     user: Annotated[User, Depends(get_current_user)],
+    date: str | None = None,
 ) -> TaskOrderResponse:
     try:
-        today = date.today().isoformat()
+        today = date or datetime.date.today().isoformat()
         result = await db.execute(
             select(TaskOrder).where(
                 TaskOrder.userId == user.id, TaskOrder.date == today
@@ -91,10 +92,10 @@ async def reorder_tasks(
     user: Annotated[User, Depends(get_current_user)],
 ) -> TaskOrderResponse:
     try:
-        today = date.today().isoformat()
+        check_date = reorder_request.date or datetime.date.today().isoformat()
         result = await db.execute(
             select(TaskOrder).where(
-                TaskOrder.userId == user.id, TaskOrder.date == today
+                TaskOrder.userId == user.id, TaskOrder.date == check_date
             )
         )
         task_order = result.scalar_one_or_none()
@@ -102,7 +103,7 @@ async def reorder_tasks(
         if not task_order:
             task_order = TaskOrder(
                 userId=user.id,
-                date=today,
+                date=check_date,
                 orderTaskIds=",".join(reorder_request.order_task_ids),
             )
             db.add(task_order)
@@ -156,9 +157,9 @@ async def create_task(
             id=str(uuid.uuid4()),
             name=task.name,
             description=task.description,
-            dueDate=task.due_date or date.today().isoformat(),
+            dueDate=task.due_date or datetime.date.today().isoformat(),
             userId=user.id,
-            createdAt=date.today().isoformat(),
+            createdAt=datetime.date.today().isoformat(),
         )
         db.add(new_task)
         await db.commit()
@@ -202,7 +203,7 @@ async def update_task(
         if task.due_date is not None:
             existing_task.dueDate = task.due_date
         else:
-            existing_task.dueDate = date.today().isoformat()
+            existing_task.dueDate = datetime.date.today().isoformat()
 
         await db.commit()
         await db.refresh(existing_task)

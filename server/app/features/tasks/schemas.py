@@ -2,7 +2,7 @@ from pydantic import BaseModel
 
 
 class AllTasksRequest(BaseModel):
-    pass
+    date: str | None = None
 
 
 class TaskResponse(BaseModel):
@@ -18,11 +18,16 @@ class AllTasksResponse(BaseModel):
     tasks: list[TaskResponse]
 
 
+class TaskOrderRequest(BaseModel):
+    date: str | None = None
+
+
 class TaskOrderResponse(BaseModel):
     order_task_ids: list[str]
 
 
 class ReorderTasksRequest(BaseModel):
+    date: str | None = None
     order_task_ids: list[str]
 
 
