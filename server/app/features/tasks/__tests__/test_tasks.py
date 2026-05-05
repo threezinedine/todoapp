@@ -345,6 +345,15 @@ async def test_get_non_existed_task_order_date_returns_order_by_created_time(
 
 
 @pytest.mark.asyncio
+async def test_get_task_order_with_invalid_token_returns_401(client: AsyncClient):
+    """Calling GET /api/tasks/order without a valid token returns 401."""
+    response = await client.get(
+        "/api/tasks/orders",
+    )
+    assert response.status_code == 401
+
+
+@pytest.mark.asyncio
 async def test_update_task_order_with_valid_token_returns_200(client: AsyncClient):
     """Calling PATCH /api/tasks/order with a valid token updates the task order and returns 200."""
     # First, create some tasks to reorder
@@ -380,3 +389,13 @@ async def test_update_task_order_with_valid_token_returns_200(client: AsyncClien
     )
     assert get_response.status_code == 200
     assert get_response.json().get("order_task_ids") == new_order
+
+
+@pytest.mark.asyncio
+async def test_update_task_order_with_invalid_token_returns_401(client: AsyncClient):
+    """Calling PATCH /api/tasks/order without a valid token returns 401."""
+    response = await client.patch(
+        "/api/tasks/orders",
+        json={"order_task_ids": ["some-task-id-1", "some-task-id-2"]},
+    )
+    assert response.status_code == 401
