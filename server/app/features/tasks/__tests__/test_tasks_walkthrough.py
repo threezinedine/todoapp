@@ -1,6 +1,6 @@
 import pytest
 from httpx import AsyncClient
-from datetime import date
+from datetime import date, timedelta
 
 from app.contants import TEST_AUTH_HEADER
 
@@ -42,6 +42,15 @@ async def test_tasks_walkthrough(client: AsyncClient):
     assert get_response.status_code == 200
     tasks = get_response.json().get("tasks", [])
     assert len(tasks) == 1
+
+    # Tommorow's date should not return the created task
+    get_tomorrow_response = await client.get(
+        "/api/tasks?date=" + (date.today() + timedelta(days=1)).isoformat(),
+        headers=TEST_AUTH_HEADER,
+    )
+    assert get_tomorrow_response.status_code == 200
+    tasks_tomorrow = get_tomorrow_response.json().get("tasks", [])
+    assert len(tasks_tomorrow) == 0
 
     # Retrieve the created task by ID
     task_id = created_task.get("id")

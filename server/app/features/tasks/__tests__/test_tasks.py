@@ -1,6 +1,6 @@
 import pytest
 from httpx import AsyncClient
-from datetime import date, datetime, timedelta
+from datetime import date, timedelta
 from app.contants import TEST_AUTH_HEADER
 
 
@@ -63,6 +63,31 @@ async def test_create_task_without_due_date_use_today_as_default(client: AsyncCl
 
     assert response.status_code == 200
     assert response.json()["task"]["due_date"] == date.today().isoformat()
+
+
+@pytest.mark.asyncio
+async def test_get_task_with_different_date_with_created_task_returns_empty_list(
+    client: AsyncClient,
+):
+    """Calling GET /api/tasks with a date filter that doesn't match the created task's due date should return an empty list."""
+    # First, create a task with today's date
+    create_response = await client.post(
+        "/api/tasks",
+        json={
+            "name": "Task for Date Filter Test",
+            "description": "This task is used to test the date filter",
+        },
+        headers=TEST_AUTH_HEADER,
+    )
+    assert create_response.status_code == 200
+
+    # Now, try to retrieve tasks with a different date filter (e.g., tomorrow)
+    get_response = await client.get(
+        f"/api/tasks?date={(date.today() + timedelta(days=1)).isoformat()}",
+        headers=TEST_AUTH_HEADER,
+    )
+    assert get_response.status_code == 200
+    assert get_response.json().get("tasks") == []
 
 
 @pytest.mark.asyncio
