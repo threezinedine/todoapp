@@ -22,11 +22,18 @@ export const Default: Story = {
 					height: '100vh',
 				}}
 			>
-				<div style={{ backgroundColor: '#5a5a5a99' }}>
+				<div
+					style={{
+						backgroundColor: '#5a5a5a99',
+						height: '100%',
+						minWidth: '300px',
+					}}
+				>
 					<TasksContainer />
 				</div>
 				<div
 					style={{
+						flex: 1,
 						backgroundColor: '#9999',
 					}}
 				>
