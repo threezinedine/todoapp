@@ -98,6 +98,32 @@ async def reorder_tasks(
                 TaskOrder.userId == user.id, TaskOrder.date == check_date
             )
         )
+        taskResults = await db.execute(
+            select(Task).where(Task.userId == user.id, Task.dueDate == check_date)
+        )
+        tasks = taskResults.scalars().all()
+
+        if len(tasks) != len(reorder_request.order_task_ids):
+            raise HTTPException(
+                status_code=400,
+                detail="The number of task IDs provided does not match the number of tasks for the specified date.",
+            )
+
+        if len(set(reorder_request.order_task_ids)) != len(
+            reorder_request.order_task_ids
+        ):
+            raise HTTPException(
+                status_code=400,
+                detail="Duplicate task IDs are not allowed in the order.",
+            )
+
+        for task_id in reorder_request.order_task_ids:
+            if task_id not in [task.id for task in tasks]:
+                raise HTTPException(
+                    status_code=400,
+                    detail=f"Task ID {task_id} is not valid for the specified date.",
+                )
+
         task_order = result.scalar_one_or_none()
 
         if not task_order:
@@ -114,6 +140,8 @@ async def reorder_tasks(
         await db.refresh(task_order)
 
         return TaskOrderResponse(order_task_ids=reorder_request.order_task_ids)
+    except HTTPException:
+        raise
     except:
         raise HTTPException(status_code=500, detail="Internal Server Error")
 

@@ -353,13 +353,10 @@ async def test_toggle_other_accounts_task_returns_404(client: AsyncClient):
     assert response.status_code == 404
 
 
-@pytest.mark.asyncio
-async def test_get_non_existed_task_order_date_returns_order_by_created_time(
-    client: AsyncClient,
-):
-    """Calling GET /api/tasks/order with a valid token but no order for today should return tasks ordered by created time."""
+async def _create_tasks(client: AsyncClient, tasks_count: int) -> list[str]:
+    """Helper function to create a specified number of tasks and return their IDs."""
     task_ids: list[str] = []
-    for i in range(3):
+    for i in range(tasks_count):
         create_response = await client.post(
             "/api/tasks",
             json={
@@ -372,6 +369,15 @@ async def test_get_non_existed_task_order_date_returns_order_by_created_time(
         assert create_response.status_code == 200
         created_task = create_response.json().get("task", {})
         task_ids.append(created_task.get("id"))
+    return task_ids
+
+
+@pytest.mark.asyncio
+async def test_get_non_existed_task_order_date_returns_order_by_created_time(
+    client: AsyncClient,
+):
+    """Calling GET /api/tasks/order with a valid token but no order for today should return tasks ordered by created time."""
+    task_ids = await _create_tasks(client, 3)
 
     response = await client.get(
         "/api/tasks/orders",
@@ -394,20 +400,7 @@ async def test_get_task_order_with_invalid_token_returns_401(client: AsyncClient
 async def test_update_task_order_with_valid_token_returns_200(client: AsyncClient):
     """Calling PATCH /api/tasks/order with a valid token updates the task order and returns 200."""
     # First, create some tasks to reorder
-    task_ids: list[str] = []
-    for i in range(3):
-        create_response = await client.post(
-            "/api/tasks",
-            json={
-                "name": f"Task {i+1}",
-                "description": f"Task number {i+1}",
-                "due_date": date.today().isoformat(),
-            },
-            headers=TEST_AUTH_HEADER,
-        )
-        assert create_response.status_code == 200
-        created_task = create_response.json().get("task", {})
-        task_ids.append(created_task.get("id"))
+    task_ids = await _create_tasks(client, 3)
 
     # Now, update the task order
     new_order = [task_ids[2], task_ids[0], task_ids[1]]
@@ -436,3 +429,53 @@ async def test_update_task_order_with_invalid_token_returns_401(client: AsyncCli
         json={"order_task_ids": ["some-task-id-1", "some-task-id-2"]},
     )
     assert response.status_code == 401
+
+
+@pytest.mark.asyncio
+async def test_update_task_order_with_missing_task_ids_at_the_db_returns_400(
+    client: AsyncClient,
+):
+    """Calling PATCH /api/tasks/order with a valid token updates the task order and returns 200."""
+    # First, create some tasks to reorder
+    task_ids = await _create_tasks(client, 3)
+
+    # Now, update the task order with a non-existent task id
+    new_order = [task_ids[2], task_ids[0]]
+
+    update_response = await client.patch(
+        "/api/tasks/orders",
+        json={"order_task_ids": new_order},
+        headers=TEST_AUTH_HEADER,
+    )
+    assert update_response.status_code == 400
+
+
+@pytest.mark.asyncio
+async def test_update_task_order_with_invalid_task_ids_returns_400(client: AsyncClient):
+    task_ids = await _create_tasks(client, 3)
+
+    # Now, update with non-existent task ids
+    new_order = [task_ids[2], "non-existent-task-id", task_ids[0]]
+
+    update_response = await client.patch(
+        "/api/tasks/orders",
+        json={"order_task_ids": new_order},
+        headers=TEST_AUTH_HEADER,
+    )
+    assert update_response.status_code == 400
+
+
+@pytest.mark.asyncio
+async def test_update_task_order_with_duplicate_task_ids_returns_400(
+    client: AsyncClient,
+):
+    task_ids = await _create_tasks(client, 3)
+
+    # Update duplicate task ids
+    new_order = [task_ids[2], task_ids[0], task_ids[0]]
+    update_response = await client.patch(
+        "/api/tasks/orders",
+        json={"order_task_ids": new_order},
+        headers=TEST_AUTH_HEADER,
+    )
+    assert update_response.status_code == 400
