@@ -7,7 +7,7 @@ export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 	borderRadius?: 'none' | 'small' | 'medium' | 'large'
 	padding?: 'none' | 'small' | 'medium' | 'large'
 	icon?: React.ReactNode
-	onClick?: () => Promise<void>
+	onClick?: () => Promise<void> | void
 	dataTestId?: string
 }
 
@@ -15,7 +15,7 @@ export interface VariantButtonProps {
 	dataTestId?: string
 	text?: string | React.ReactNode
 	classNames?: string
-	onClick?: () => Promise<void>
+	onClick?: () => Promise<void> | void
 }
 
 export interface IconVariantButtonProps extends VariantButtonProps {

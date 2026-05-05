@@ -1,12 +1,19 @@
-.container {
+.wrapper {
 	display: flex;
-	color: var(--primary-color);
-}
+	flex-direction: column;
+	height: 100%;
 
-.todo {
-	flex: 1;
-}
+	.container {
+		flex: 1;
+		display: flex;
+		color: var(--primary-color);
+	}
 
-.calendar {
-	flex: 3;
+	.todo {
+		flex: 1;
+	}
+
+	.calendar {
+		flex: 3;
+	}
 }
