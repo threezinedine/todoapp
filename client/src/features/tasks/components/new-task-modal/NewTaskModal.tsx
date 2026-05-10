@@ -11,6 +11,7 @@ export function NewTaskModal({
 	onSuccess,
 	onFailed,
 	onError,
+	onClose,
 }: NewTaskModalProps) {
 	const formRef = useRef<FormHandle>(null)
 
@@ -39,6 +40,7 @@ export function NewTaskModal({
 			<Modal
 				isOpen={isOpen}
 				dataTestId="new-task-modal"
+				onClose={onClose}
 			>
 				<div className={clsx(styles.wrapper)}>
 					<h2 className={clsx(styles.title)}>Create New Task</h2>
@@ -67,7 +69,10 @@ export function NewTaskModal({
 						<Button
 							text="Cancel"
 							variant="glick-black"
-							onClick={() => formRef?.current?.reset()}
+							onClick={() => {
+								formRef?.current?.reset()
+								onClose?.()
+							}}
 						/>
 						<Button
 							text="Create"

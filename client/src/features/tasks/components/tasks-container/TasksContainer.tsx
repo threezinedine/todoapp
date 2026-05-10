@@ -17,6 +17,7 @@ export function TasksContainer() {
 		response.json().then((data) => {
 			console.error('Failed to create task:', data)
 		})
+		setIsModalOpen(false)
 	}
 
 	function onCreateTaskError() {
@@ -58,6 +59,7 @@ export function TasksContainer() {
 				onSuccess={onCreateTaskSuccess}
 				onFailed={onCreateTaskFailed}
 				onError={onCreateTaskError}
+				onClose={() => setIsModalOpen(false)}
 			/>
 		</div>
 	)

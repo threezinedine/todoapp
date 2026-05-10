@@ -9,12 +9,14 @@ export function CalendarViewContainer() {
 
 	return (
 		<div className={clsx(styles.wrapper)}>
-			<ViewSwitch
-				defaultView="day"
-				onViewChange={(view) => {
-					console.log(`Switched to ${view} view`)
-				}}
-			/>
+			<div className={clsx(styles.viewSwitchWrapper)}>
+				<ViewSwitch
+					defaultView="day"
+					onViewChange={(view) => {
+						console.log(`Switched to ${view} view`)
+					}}
+				/>
+			</div>
 			<div className={clsx(styles.calendarWrapper)}>
 				<Calendar
 					ref={calendarRef}

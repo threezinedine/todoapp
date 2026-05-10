@@ -1,6 +1,7 @@
 import styles from './Home.module.scss'
 import clsx from 'clsx'
 import { TasksContainer } from '~/features/tasks'
+import { CalendarViewContainer } from '~/features/calendar-view'
 import { useAuthStore } from '~/stores'
 
 export function Home() {
@@ -18,7 +19,9 @@ export function Home() {
 						<div className={clsx(styles.todo)}>
 							<TasksContainer />
 						</div>
-						<div className={clsx(styles.calendar)}>Calendar</div>
+						<div className={clsx(styles.calendar)}>
+							<CalendarViewContainer />
+						</div>
 					</>
 				)}
 			</div>
