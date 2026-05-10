@@ -261,10 +261,15 @@ export function DayCalendar({
 				0,
 				marker.offsetTop - viewport.clientHeight / 2,
 			)
-			viewport.scrollTo({
-				top: centeredTop,
-				behavior: 'smooth',
-			})
+
+			if (typeof viewport.scrollTo === 'function') {
+				viewport.scrollTo({
+					top: centeredTop,
+					behavior: 'smooth',
+				})
+			} else {
+				viewport.scrollTop = centeredTop
+			}
 		}
 
 		return () => {
