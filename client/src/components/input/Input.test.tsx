@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest'
-import { render, screen } from '@testing-library/react'
+import { fireEvent, render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { Input } from './Input'
 
@@ -9,6 +9,10 @@ vi.mock('./Input.module.scss', () => ({
 		container: 'container',
 		input: 'input',
 		label: 'label',
+		dateContainer: 'dateContainer',
+		dateInput: 'dateInput',
+		dateLabel: 'dateLabel',
+		textarea: 'textarea',
 	},
 }))
 
@@ -164,6 +168,119 @@ describe('Input', () => {
 			const input = document.querySelector(`input[type="${type}"]`)
 			expect(input).toBeInTheDocument()
 			unmount()
+		})
+	})
+
+	describe('date input', () => {
+		it('renders date input with date-specific classes', () => {
+			render(
+				<Input
+					type="date"
+					field="Due Date"
+				/>,
+			)
+
+			const dateInput = document.querySelector('input[type="date"]')
+			const dateContainer = document.querySelector('.dateContainer')
+			const dateLabel = document.querySelector('.dateLabel')
+
+			expect(dateContainer).toBeInTheDocument()
+			expect(dateInput).toBeInTheDocument()
+			expect(dateInput).toHaveClass('input')
+			expect(dateInput).toHaveClass('dateInput')
+			expect(dateLabel).toBeInTheDocument()
+			expect(dateLabel).toHaveTextContent('Due Date')
+		})
+
+		it('renders date input with provided value', () => {
+			render(
+				<Input
+					type="date"
+					value="2026-05-10"
+				/>,
+			)
+
+			const dateInput = document.querySelector('input[type="date"]')
+			expect(dateInput).toHaveValue('2026-05-10')
+		})
+
+		it('sets date label data-text from field prop', () => {
+			render(
+				<Input
+					type="date"
+					field="Deadline"
+				/>,
+			)
+
+			const label = screen.getByText('Deadline')
+			expect(label).toHaveAttribute('data-text', 'Deadline')
+		})
+
+		it('passes data-testid to date input', () => {
+			render(
+				<Input
+					type="date"
+					dataTestId="due-date-input"
+				/>,
+			)
+
+			expect(screen.getByTestId('due-date-input')).toHaveAttribute(
+				'type',
+				'date',
+			)
+		})
+
+		it('uses field as date input name attribute', () => {
+			render(
+				<Input
+					type="date"
+					field="dueDate"
+				/>,
+			)
+
+			const dateInput = document.querySelector('input[type="date"]')
+			expect(dateInput).toHaveAttribute('name', 'dueDate')
+		})
+
+		it('calls onChange when date value changes', () => {
+			const onChange = vi.fn()
+			render(
+				<Input
+					type="date"
+					onChange={onChange}
+				/>,
+			)
+
+			const dateInput = document.querySelector('input[type="date"]')
+			expect(dateInput).toBeInTheDocument()
+
+			fireEvent.change(dateInput as HTMLInputElement, {
+				target: { value: '2026-12-24' },
+			})
+
+			expect(onChange).toHaveBeenCalledTimes(1)
+			expect(onChange).toHaveBeenCalledWith(
+				expect.objectContaining({
+					target: expect.objectContaining({ value: '2026-12-24' }),
+				}),
+			)
+		})
+
+		it('updates date value without onChange handler in uncontrolled mode', () => {
+			render(<Input type="date" />)
+
+			const dateInput = document.querySelector(
+				'input[type="date"]',
+			) as HTMLInputElement
+			fireEvent.change(dateInput, { target: { value: '2026-01-31' } })
+
+			expect(dateInput).toHaveValue('2026-01-31')
+		})
+
+		it('does not render textarea for date type', () => {
+			render(<Input type="date" />)
+
+			expect(document.querySelector('textarea')).not.toBeInTheDocument()
 		})
 	})
 })
