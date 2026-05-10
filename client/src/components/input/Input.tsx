@@ -10,7 +10,7 @@ export function Input({
 }: InputProps) {
 	if (type === 'textarea') {
 		return (
-			<div className={styles.container}>
+			<div className={`${styles.container} ${styles.textareaContainer}`}>
 				<textarea
 					className={styles.textarea}
 					name={field}
@@ -20,7 +20,7 @@ export function Input({
 					data-testid={dataTestId}
 				/>
 				<label
-					className={styles.label}
+					className={`${styles.label} ${styles.textareaLabel}`}
 					data-text={field}
 				>
 					{field}

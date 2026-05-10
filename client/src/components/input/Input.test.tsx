@@ -13,6 +13,8 @@ vi.mock('./Input.module.scss', () => ({
 		dateInput: 'dateInput',
 		dateLabel: 'dateLabel',
 		textarea: 'textarea',
+		textareaContainer: 'textareaContainer',
+		textareaLabel: 'textareaLabel',
 	},
 }))
 
@@ -281,6 +283,111 @@ describe('Input', () => {
 			render(<Input type="date" />)
 
 			expect(document.querySelector('textarea')).not.toBeInTheDocument()
+		})
+	})
+
+	describe('textarea input', () => {
+		it('renders textarea with textarea-specific classes', () => {
+			render(
+				<Input
+					type="textarea"
+					field="Description"
+				/>,
+			)
+
+			const textarea = screen.getByRole('textbox')
+			const textareaContainer = document.querySelector('.textareaContainer')
+			const textareaLabel = document.querySelector('.textareaLabel')
+
+			expect(textarea).toBeInTheDocument()
+			expect(textarea).toHaveClass('textarea')
+			expect(textareaContainer).toBeInTheDocument()
+			expect(textareaLabel).toBeInTheDocument()
+			expect(textareaLabel).toHaveTextContent('Description')
+		})
+
+		it('renders textarea with provided value', () => {
+			render(
+				<Input
+					type="textarea"
+					value="A detailed task description"
+				/>,
+			)
+
+			expect(screen.getByRole('textbox')).toHaveValue('A detailed task description')
+		})
+
+		it('sets textarea label data-text from field prop', () => {
+			render(
+				<Input
+					type="textarea"
+					field="Notes"
+				/>,
+			)
+
+			const label = screen.getByText('Notes')
+			expect(label).toHaveAttribute('data-text', 'Notes')
+		})
+
+		it('passes data-testid to textarea', () => {
+			render(
+				<Input
+					type="textarea"
+					dataTestId="new-task-description"
+				/>,
+			)
+
+			expect(screen.getByTestId('new-task-description').tagName).toBe('TEXTAREA')
+		})
+
+		it('uses field as textarea name attribute', () => {
+			render(
+				<Input
+					type="textarea"
+					field="taskDetails"
+				/>,
+			)
+
+			expect(screen.getByRole('textbox')).toHaveAttribute('name', 'taskDetails')
+		})
+
+		it('calls onChange when typing in textarea', async () => {
+			const user = userEvent.setup()
+			const onChange = vi.fn()
+
+			render(
+				<Input
+					type="textarea"
+					onChange={onChange}
+				/>,
+			)
+
+			const textarea = screen.getByRole('textbox')
+			await user.type(textarea, 'Plan sprint tasks')
+
+			expect(onChange).toHaveBeenCalled()
+			expect(textarea).toHaveValue('Plan sprint tasks')
+		})
+
+		it('updates textarea value without onChange handler in uncontrolled mode', () => {
+			render(<Input type="textarea" />)
+
+			const textarea = screen.getByRole('textbox') as HTMLTextAreaElement
+			fireEvent.change(textarea, { target: { value: 'Write docs' } })
+
+			expect(textarea).toHaveValue('Write docs')
+		})
+
+		it('does not render date input for textarea type', () => {
+			render(<Input type="textarea" />)
+
+			expect(document.querySelector('input[type="date"]')).not.toBeInTheDocument()
+		})
+
+		it('does not render default input for textarea type', () => {
+			render(<Input type="textarea" />)
+
+			expect(document.querySelector('input')).not.toBeInTheDocument()
 		})
 	})
 })

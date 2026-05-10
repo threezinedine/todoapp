@@ -35,14 +35,55 @@
 		transition: border-color 0.3s ease;
 	}
 
+	& textarea {
+		width: 100%;
+		min-height: 7.5rem;
+		background: linear-gradient(
+			180deg,
+			rgba(8, 34, 34, 0.65),
+			rgba(7, 20, 28, 0.45)
+		);
+		border: 1px solid rgba(0, 242, 234, 0.25);
+		border-radius: 0.9rem;
+		padding: 1.8rem 0.95rem 0.8rem;
+		font-size: 0.98rem;
+		line-height: 1.5;
+		color: var(--text-color);
+		font-family: inherit;
+		outline: none;
+		resize: vertical;
+		transition:
+			border-color 0.25s ease,
+			box-shadow 0.25s ease,
+			background 0.25s ease;
+	}
+
 	& input:focus {
 		border-color: var(--primary-color);
+	}
+
+	& textarea:focus {
+		border-color: var(--primary-color);
+		box-shadow: 0 0 0 3px rgba(0, 242, 234, 0.14);
+		background: linear-gradient(
+			180deg,
+			rgba(9, 39, 39, 0.72),
+			rgba(8, 24, 33, 0.6)
+		);
 	}
 
 	& input:focus + .label,
 	& input:not(:placeholder-shown) + .label {
 		top: -1.2em;
 		font-size: 0.8rem;
+		opacity: 1;
+	}
+
+	& textarea:focus + .label,
+	& textarea:not(:placeholder-shown) + .label {
+		top: 0.55rem;
+		left: 0.8rem;
+		font-size: 0.68rem;
 		opacity: 1;
 	}
 
@@ -67,6 +108,18 @@
 		color: var(--primary-color);
 		animation: glitch-anim var(--glitch-anim-duration)
 			cubic-bezier(0.25, 0.46, 0.45, 0.94) reverse both;
+	}
+
+	& textarea:focus + .label::before,
+	& textarea:focus + .label::after {
+		content: none;
+	}
+}
+
+.textareaContainer {
+	.textareaLabel {
+		top: 1rem;
+		left: 1rem;
 	}
 }
 

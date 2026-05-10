@@ -19,6 +19,7 @@ export const Default: Story = {
 		const [birthDate, setBirthDate] = useState(
 			new Date().toISOString().split('T')[0],
 		)
+		const [description, setDescription] = useState('')
 
 		return (
 			<div
@@ -63,8 +64,8 @@ export const Default: Story = {
 
 				<Input
 					field="Description"
-					value={username}
-					onChange={(e) => setUsername(e.target.value)}
+					value={description}
+					onChange={(e) => setDescription(e.target.value)}
 					type="textarea"
 				/>
 			</div>
