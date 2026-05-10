@@ -8,6 +8,7 @@ export function Input({
 	onChange,
 	type = 'text',
 	dataTestId = undefined,
+	isLoading,
 }: InputProps) {
 	const valueProps = value !== undefined ? { value } : { defaultValue }
 
@@ -21,6 +22,7 @@ export function Input({
 					onChange={onChange}
 					placeholder=""
 					data-testid={dataTestId}
+					disabled={isLoading}
 				/>
 				<label
 					className={`${styles.label} ${styles.textareaLabel}`}
@@ -28,6 +30,12 @@ export function Input({
 				>
 					{field}
 				</label>
+				{isLoading && (
+					<>
+						<div className={styles.spinner}></div>
+						<div className={styles.overlay}></div>
+					</>
+				)}
 			</div>
 		)
 	}
@@ -50,6 +58,12 @@ export function Input({
 				>
 					{field}
 				</label>
+				{isLoading && (
+					<>
+						<div className={styles.spinner}></div>
+						<div className={styles.overlay}></div>
+					</>
+				)}
 			</div>
 		)
 	}
@@ -71,6 +85,12 @@ export function Input({
 			>
 				{field}
 			</label>
+			{isLoading && (
+				<>
+					<div className={styles.spinner}></div>
+					<div className={styles.overlay}></div>
+				</>
+			)}
 		</div>
 	)
 }

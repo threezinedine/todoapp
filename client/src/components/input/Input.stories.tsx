@@ -72,3 +72,38 @@ export const Default: Story = {
 		)
 	},
 }
+
+export const LoadingState: Story = {
+	render: () => {
+		return (
+			<div
+				style={{
+					display: 'flex',
+					flexDirection: 'column',
+					gap: '1rem',
+					backgroundColor: '#050505',
+					padding: '3rem',
+				}}
+			>
+				<Input
+					field="Username"
+					value={'Thao'}
+					type="text"
+					isLoading
+				/>
+				<Input
+					field="Description"
+					value={''}
+					type="textarea"
+					isLoading
+				/>
+				<Input
+					field="BirthDate"
+					type="date"
+					value={new Date().toISOString().split('T')[0]}
+					isLoading
+				/>
+			</div>
+		)
+	},
+}

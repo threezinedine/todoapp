@@ -5,33 +5,30 @@ import { Button } from './Button'
 
 // Mock the SCSS module so class names are predictable in jsdom
 vi.mock('./Button.module.scss', () => ({
-	default: Object.assign(
-		() => 'MockedButton',
-		{
-			normal: 'normal',
-			glick: 'glick',
-			'glick-black': 'glick-black',
-			'glass-morphism': 'glass-morphism',
-			glint: 'glint',
-			spinner: 'spinner',
-			overlay: 'overlay',
-			logo: 'logo',
-			text: 'text',
-			button: 'button',
-			'button-small': 'button-small',
-			'button-medium': 'button-medium',
-			'button-large': 'button-large',
-			'button-full': 'button-full',
-			'button-radius-none': 'button-radius-none',
-			'button-radius-small': 'button-radius-small',
-			'button-radius-medium': 'button-radius-medium',
-			'button-radius-large': 'button-radius-large',
-			'button-padding-none': 'button-padding-none',
-			'button-padding-small': 'button-padding-small',
-			'button-padding-medium': 'button-padding-medium',
-			'button-padding-large': 'button-padding-large',
-		},
-	),
+	default: Object.assign(() => 'MockedButton', {
+		normal: 'normal',
+		glick: 'glick',
+		'glick-black': 'glick-black',
+		'glass-morphism': 'glass-morphism',
+		glint: 'glint',
+		spinner: 'spinner',
+		overlay: 'overlay',
+		logo: 'logo',
+		text: 'text',
+		button: 'button',
+		'button-small': 'button-small',
+		'button-medium': 'button-medium',
+		'button-large': 'button-large',
+		'button-full': 'button-full',
+		'button-radius-none': 'button-radius-none',
+		'button-radius-small': 'button-radius-small',
+		'button-radius-medium': 'button-radius-medium',
+		'button-radius-large': 'button-radius-large',
+		'button-padding-none': 'button-padding-none',
+		'button-padding-small': 'button-padding-small',
+		'button-padding-medium': 'button-padding-medium',
+		'button-padding-large': 'button-padding-large',
+	}),
 }))
 
 const BUTTON_TEST_ID = 'my-button'
@@ -50,9 +47,7 @@ describe('Button', () => {
 	})
 
 	it('renders with ReactNode text', () => {
-		render(
-			<Button text={<span data-testid="node-text">Bold Text</span>} />,
-		)
+		render(<Button text={<span data-testid="node-text">Bold Text</span>} />)
 		expect(screen.getByTestId('node-text')).toBeInTheDocument()
 	})
 
@@ -85,7 +80,12 @@ describe('Button', () => {
 		const user = userEvent.setup()
 		const onClick = vi.fn()
 
-		render(<Button dataTestId={BUTTON_TEST_ID} onClick={onClick} />)
+		render(
+			<Button
+				dataTestId={BUTTON_TEST_ID}
+				onClick={onClick}
+			/>,
+		)
 
 		await user.click(screen.getByTestId(BUTTON_TEST_ID))
 
@@ -105,7 +105,12 @@ describe('Button', () => {
 		const user = userEvent.setup()
 		const onClick = vi.fn()
 
-		render(<Button dataTestId={BUTTON_TEST_ID} onClick={onClick} />)
+		render(
+			<Button
+				dataTestId={BUTTON_TEST_ID}
+				onClick={onClick}
+			/>,
+		)
 
 		await user.click(screen.getByTestId(BUTTON_TEST_ID))
 		await user.click(screen.getByTestId(BUTTON_TEST_ID))
@@ -117,7 +122,12 @@ describe('Button', () => {
 		const user = userEvent.setup()
 		const onClick = vi.fn().mockResolvedValue(undefined)
 
-		render(<Button dataTestId={BUTTON_TEST_ID} onClick={onClick} />)
+		render(
+			<Button
+				dataTestId={BUTTON_TEST_ID}
+				onClick={onClick}
+			/>,
+		)
 
 		await user.click(screen.getByTestId(BUTTON_TEST_ID))
 
@@ -139,9 +149,7 @@ describe('Button', () => {
 	})
 
 	it('does not render spinner or overlay when isLoading is false', () => {
-		const { container } = render(
-			<Button dataTestId={BUTTON_TEST_ID} />,
-		)
+		const { container } = render(<Button dataTestId={BUTTON_TEST_ID} />)
 
 		const button = screen.getByTestId(BUTTON_TEST_ID)
 		expect(button).not.toBeDisabled()
@@ -169,29 +177,52 @@ describe('Button', () => {
 	// ─── variant ───────────────────────────────────────────────────────────────
 
 	it('renders the normal variant with the "normal" class', () => {
-		render(<Button variant="normal" dataTestId={BUTTON_TEST_ID} />)
+		render(
+			<Button
+				variant="normal"
+				dataTestId={BUTTON_TEST_ID}
+			/>,
+		)
 		expect(screen.getByTestId(BUTTON_TEST_ID)).toHaveClass('normal')
 	})
 
 	it('renders the glick variant with the "glick" class', () => {
-		render(<Button variant="glick" dataTestId={BUTTON_TEST_ID} />)
+		render(
+			<Button
+				variant="glick"
+				dataTestId={BUTTON_TEST_ID}
+			/>,
+		)
 		expect(screen.getByTestId(BUTTON_TEST_ID)).toHaveClass('glick')
 	})
 
 	it('renders the glick-black variant with the "glick-black" class', () => {
-		render(<Button variant="glick-black" dataTestId={BUTTON_TEST_ID} />)
+		render(
+			<Button
+				variant="glick-black"
+				dataTestId={BUTTON_TEST_ID}
+			/>,
+		)
 		expect(screen.getByTestId(BUTTON_TEST_ID)).toHaveClass('glick-black')
 	})
 
 	it('renders the glass-morphism variant with the "glass-morphism" class', () => {
 		render(
-			<Button variant="glass-morphism" dataTestId={BUTTON_TEST_ID} />,
+			<Button
+				variant="glass-morphism"
+				dataTestId={BUTTON_TEST_ID}
+			/>,
 		)
 		expect(screen.getByTestId(BUTTON_TEST_ID)).toHaveClass('glass-morphism')
 	})
 
 	it('renders the glint variant with the "glint" class', () => {
-		render(<Button variant="glint" dataTestId={BUTTON_TEST_ID} />)
+		render(
+			<Button
+				variant="glint"
+				dataTestId={BUTTON_TEST_ID}
+			/>,
+		)
 		expect(screen.getByTestId(BUTTON_TEST_ID)).toHaveClass('glint')
 	})
 
@@ -204,28 +235,40 @@ describe('Button', () => {
 
 	it('renders with "button-small" class when size is "small"', () => {
 		render(
-			<Button size="small" dataTestId={BUTTON_TEST_ID} />,
+			<Button
+				size="small"
+				dataTestId={BUTTON_TEST_ID}
+			/>,
 		)
 		expect(screen.getByTestId(BUTTON_TEST_ID)).toHaveClass('button-small')
 	})
 
 	it('renders with "button-medium" class when size is "medium" (default)', () => {
 		render(
-			<Button size="medium" dataTestId={BUTTON_TEST_ID} />,
+			<Button
+				size="medium"
+				dataTestId={BUTTON_TEST_ID}
+			/>,
 		)
 		expect(screen.getByTestId(BUTTON_TEST_ID)).toHaveClass('button-medium')
 	})
 
 	it('renders with "button-large" class when size is "large"', () => {
 		render(
-			<Button size="large" dataTestId={BUTTON_TEST_ID} />,
+			<Button
+				size="large"
+				dataTestId={BUTTON_TEST_ID}
+			/>,
 		)
 		expect(screen.getByTestId(BUTTON_TEST_ID)).toHaveClass('button-large')
 	})
 
 	it('renders with "button-full" class when size is "full"', () => {
 		render(
-			<Button size="full" dataTestId={BUTTON_TEST_ID} />,
+			<Button
+				size="full"
+				dataTestId={BUTTON_TEST_ID}
+			/>,
 		)
 		expect(screen.getByTestId(BUTTON_TEST_ID)).toHaveClass('button-full')
 	})
@@ -246,8 +289,12 @@ describe('Button', () => {
 		)
 		// glick applies sizeClass and paddingClass, but NOT borderRadiusClass
 		expect(screen.getByTestId(BUTTON_TEST_ID)).toHaveClass('button-large')
-		expect(screen.getByTestId(BUTTON_TEST_ID)).not.toHaveClass('button-radius-large')
-		expect(screen.getByTestId(BUTTON_TEST_ID)).toHaveClass('button-padding-medium')
+		expect(screen.getByTestId(BUTTON_TEST_ID)).not.toHaveClass(
+			'button-radius-large',
+		)
+		expect(screen.getByTestId(BUTTON_TEST_ID)).toHaveClass(
+			'button-padding-medium',
+		)
 	})
 
 	it('does NOT apply size class for "glick-black" variant', () => {
@@ -258,7 +305,9 @@ describe('Button', () => {
 				dataTestId={BUTTON_TEST_ID}
 			/>,
 		)
-		expect(screen.getByTestId(BUTTON_TEST_ID)).not.toHaveClass('button-large')
+		expect(screen.getByTestId(BUTTON_TEST_ID)).not.toHaveClass(
+			'button-large',
+		)
 	})
 
 	it('does NOT apply size class for "glint" variant', () => {
@@ -269,7 +318,9 @@ describe('Button', () => {
 				dataTestId={BUTTON_TEST_ID}
 			/>,
 		)
-		expect(screen.getByTestId(BUTTON_TEST_ID)).not.toHaveClass('button-large')
+		expect(screen.getByTestId(BUTTON_TEST_ID)).not.toHaveClass(
+			'button-large',
+		)
 	})
 
 	// ─── borderRadius ──────────────────────────────────────────────────────────
@@ -341,7 +392,9 @@ describe('Button', () => {
 		expect(screen.getByTestId(BUTTON_TEST_ID)).not.toHaveClass(
 			'button-radius-large',
 		)
-		expect(screen.getByTestId(BUTTON_TEST_ID)).toHaveClass('button-padding-medium')
+		expect(screen.getByTestId(BUTTON_TEST_ID)).toHaveClass(
+			'button-padding-medium',
+		)
 	})
 
 	it('does NOT apply size class for "glint" variant (gets borderRadius + padding instead)', () => {
@@ -354,16 +407,25 @@ describe('Button', () => {
 			/>,
 		)
 		// glint applies borderRadiusClass and paddingClass, but NOT sizeClass
-		expect(screen.getByTestId(BUTTON_TEST_ID)).toHaveClass('button-radius-large')
-		expect(screen.getByTestId(BUTTON_TEST_ID)).toHaveClass('button-padding-medium')
-		expect(screen.getByTestId(BUTTON_TEST_ID)).not.toHaveClass('button-large')
+		expect(screen.getByTestId(BUTTON_TEST_ID)).toHaveClass(
+			'button-radius-large',
+		)
+		expect(screen.getByTestId(BUTTON_TEST_ID)).toHaveClass(
+			'button-padding-medium',
+		)
+		expect(screen.getByTestId(BUTTON_TEST_ID)).not.toHaveClass(
+			'button-large',
+		)
 	})
 
 	// ─── padding ───────────────────────────────────────────────────────────────
 
 	it('applies "button-padding-none" class when padding is "none"', () => {
 		render(
-			<Button padding="none" dataTestId={BUTTON_TEST_ID} />,
+			<Button
+				padding="none"
+				dataTestId={BUTTON_TEST_ID}
+			/>,
 		)
 		expect(screen.getByTestId(BUTTON_TEST_ID)).toHaveClass(
 			'button-padding-none',
@@ -372,7 +434,10 @@ describe('Button', () => {
 
 	it('applies "button-padding-small" class when padding is "small"', () => {
 		render(
-			<Button padding="small" dataTestId={BUTTON_TEST_ID} />,
+			<Button
+				padding="small"
+				dataTestId={BUTTON_TEST_ID}
+			/>,
 		)
 		expect(screen.getByTestId(BUTTON_TEST_ID)).toHaveClass(
 			'button-padding-small',
@@ -381,7 +446,10 @@ describe('Button', () => {
 
 	it('applies "button-padding-medium" class when padding is "medium"', () => {
 		render(
-			<Button padding="medium" dataTestId={BUTTON_TEST_ID} />,
+			<Button
+				padding="medium"
+				dataTestId={BUTTON_TEST_ID}
+			/>,
 		)
 		expect(screen.getByTestId(BUTTON_TEST_ID)).toHaveClass(
 			'button-padding-medium',
@@ -390,7 +458,10 @@ describe('Button', () => {
 
 	it('applies "button-padding-large" class when padding is "large"', () => {
 		render(
-			<Button padding="large" dataTestId={BUTTON_TEST_ID} />,
+			<Button
+				padding="large"
+				dataTestId={BUTTON_TEST_ID}
+			/>,
 		)
 		expect(screen.getByTestId(BUTTON_TEST_ID)).toHaveClass(
 			'button-padding-large',
@@ -448,7 +519,10 @@ describe('Button', () => {
 
 	it('renders glint without icon (icon defaults to null)', () => {
 		render(
-			<Button variant="glint" dataTestId={BUTTON_TEST_ID} />,
+			<Button
+				variant="glint"
+				dataTestId={BUTTON_TEST_ID}
+			/>,
 		)
 
 		// Should still render a glint button — icon is optional
@@ -476,7 +550,10 @@ describe('Button', () => {
 		// GlickBlackButton defaults text to "Glick", but Button itself defaults to "Button"
 		// and passes it down — so omitting text gives "Button" as data-text (Button's default)
 		render(
-			<Button variant="glick-black" dataTestId={BUTTON_TEST_ID} />,
+			<Button
+				variant="glick-black"
+				dataTestId={BUTTON_TEST_ID}
+			/>,
 		)
 
 		expect(screen.getByTestId(BUTTON_TEST_ID)).toHaveAttribute(
@@ -536,7 +613,9 @@ describe('Button', () => {
 						/>,
 					)
 					// All 64 combinations should render without crashing
-					expect(screen.getByTestId(BUTTON_TEST_ID)).toBeInTheDocument()
+					expect(
+						screen.getByTestId(BUTTON_TEST_ID),
+					).toBeInTheDocument()
 					count++
 					unmount()
 				})
@@ -549,7 +628,12 @@ describe('Button', () => {
 	// ─── Edge cases ─────────────────────────────────────────────────────────────
 
 	it('renders with empty string text without crashing', () => {
-		render(<Button text="" dataTestId={BUTTON_TEST_ID} />)
+		render(
+			<Button
+				text=""
+				dataTestId={BUTTON_TEST_ID}
+			/>,
+		)
 		expect(screen.getByTestId(BUTTON_TEST_ID)).toBeInTheDocument()
 	})
 
@@ -566,7 +650,10 @@ describe('Button', () => {
 
 		variants.forEach((variant) => {
 			const { unmount } = render(
-				<Button variant={variant} dataTestId={BUTTON_TEST_ID} />,
+				<Button
+					variant={variant}
+					dataTestId={BUTTON_TEST_ID}
+				/>,
 			)
 			expect(screen.getByTestId(BUTTON_TEST_ID)).toBeInTheDocument()
 			unmount()
@@ -583,7 +670,10 @@ describe('Button', () => {
 
 		sizes.forEach((size) => {
 			const { unmount } = render(
-				<Button size={size} dataTestId={BUTTON_TEST_ID} />,
+				<Button
+					size={size}
+					dataTestId={BUTTON_TEST_ID}
+				/>,
 			)
 			expect(screen.getByTestId(BUTTON_TEST_ID)).toBeInTheDocument()
 			unmount()
@@ -620,7 +710,10 @@ describe('Button', () => {
 
 		paddings.forEach((padding) => {
 			const { unmount } = render(
-				<Button padding={padding} dataTestId={BUTTON_TEST_ID} />,
+				<Button
+					padding={padding}
+					dataTestId={BUTTON_TEST_ID}
+				/>,
 			)
 			expect(screen.getByTestId(BUTTON_TEST_ID)).toBeInTheDocument()
 			unmount()
