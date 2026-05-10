@@ -9,8 +9,7 @@ export function Input({
 	type = 'text',
 	dataTestId = undefined,
 }: InputProps) {
-	const valueProps =
-		value !== undefined ? { value } : { defaultValue }
+	const valueProps = value !== undefined ? { value } : { defaultValue }
 
 	if (type === 'textarea') {
 		return (

@@ -15,7 +15,7 @@ export interface FormProps extends Omit<
 	fields: FieldProps[]
 	dataTestId?: string
 	submitButton?: React.ReactNode
-	onSubmit?: (values: Record<string, FieldValue>) => Promise<void>
+	onSubmit?: (values: Record<string, FieldValue>) => Promise<void> | void
 }
 
 export interface FormHandle {

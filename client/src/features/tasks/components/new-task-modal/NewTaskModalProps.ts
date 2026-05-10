@@ -1,4 +1,5 @@
 export interface NewTaskModalProps {
-	onCreate?: (title: string) => Promise<void> | void
+	onCreate?: (response: Response) => Promise<void> | void
+	onFailed?: (response: Response) => Promise<void> | void
 	isOpen: boolean
 }

@@ -82,7 +82,12 @@ describe('Form', () => {
 	})
 
 	it('renders with custom className on the <form> element', () => {
-		render(<Form fields={fields} className="my-custom-class" />)
+		render(
+			<Form
+				fields={fields}
+				className="my-custom-class"
+			/>,
+		)
 
 		expect(document.querySelector('form')).toHaveClass('my-custom-class')
 	})
@@ -183,7 +188,10 @@ describe('Form', () => {
 			/>,
 		)
 
-		await user.type(screen.getByTestId('input-Description'), 'Write release notes')
+		await user.type(
+			screen.getByTestId('input-Description'),
+			'Write release notes',
+		)
 		await user.click(screen.getByRole('button', { name: 'Submit' }))
 
 		expect(onSubmit).toHaveBeenCalledWith(
@@ -312,7 +320,11 @@ describe('Form', () => {
 				ref={ref}
 				fields={[
 					{ field: 'Username', type: 'text', defaultValue: 'alice' },
-					{ field: 'Description', type: 'textarea', defaultValue: 'Initial note' },
+					{
+						field: 'Description',
+						type: 'textarea',
+						defaultValue: 'Initial note',
+					},
 				]}
 			/>,
 		)
@@ -367,44 +379,28 @@ describe('Form', () => {
 	// ─── Input types ─────────────────────────────────────────────────────────────
 
 	it('renders text input type', () => {
-		render(
-			<Form
-				fields={[{ field: 'Name', type: 'text' }]}
-			/>,
-		)
+		render(<Form fields={[{ field: 'Name', type: 'text' }]} />)
 
 		const input = screen.getByTestId('input-Name')
 		expect(input).toHaveAttribute('type', 'text')
 	})
 
 	it('renders password input type', () => {
-		render(
-			<Form
-				fields={[{ field: 'Password', type: 'password' }]}
-			/>,
-		)
+		render(<Form fields={[{ field: 'Password', type: 'password' }]} />)
 
 		const input = screen.getByTestId('input-Password')
 		expect(input).toHaveAttribute('type', 'password')
 	})
 
 	it('renders email input type', () => {
-		render(
-			<Form
-				fields={[{ field: 'Email', type: 'email' }]}
-			/>,
-		)
+		render(<Form fields={[{ field: 'Email', type: 'email' }]} />)
 
 		const input = screen.getByTestId('input-Email')
 		expect(input).toHaveAttribute('type', 'email')
 	})
 
 	it('renders number input type', () => {
-		render(
-			<Form
-				fields={[{ field: 'Age', type: 'number' }]}
-			/>,
-		)
+		render(<Form fields={[{ field: 'Age', type: 'number' }]} />)
 
 		const input = screen.getByTestId('input-Age')
 		expect(input).toHaveAttribute('type', 'number')
@@ -419,11 +415,7 @@ describe('Form', () => {
 	})
 
 	it('renders with a single field', () => {
-		render(
-			<Form
-				fields={[{ field: 'Search', type: 'text' }]}
-			/>,
-		)
+		render(<Form fields={[{ field: 'Search', type: 'text' }]} />)
 
 		expect(screen.getByText('Search')).toBeInTheDocument()
 	})
@@ -484,7 +476,11 @@ describe('Form', () => {
 		render(
 			<Form
 				fields={[
-					{ field: 'Username', type: 'text', defaultValue: 'default-user' },
+					{
+						field: 'Username',
+						type: 'text',
+						defaultValue: 'default-user',
+					},
 					{ field: 'Age', type: 'number', defaultValue: 27 },
 					{ field: 'Notes', type: 'textarea', defaultValue: 'hello' },
 				]}
@@ -513,7 +509,13 @@ describe('Form', () => {
 
 		render(
 			<Form
-				fields={[{ field: 'DueDate', type: 'date', defaultValue: defaultDate }]}
+				fields={[
+					{
+						field: 'DueDate',
+						type: 'date',
+						defaultValue: defaultDate,
+					},
+				]}
 			/>,
 		)
 

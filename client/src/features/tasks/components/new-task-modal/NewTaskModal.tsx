@@ -1,9 +1,18 @@
+import { useRef } from 'react'
 import type { NewTaskModalProps } from './NewTaskModalProps'
 import { Button, Form, Modal } from '~/components'
+import type { FormHandle } from '~/components'
 import styles from './NewTaskModal.module.scss'
 import clsx from 'clsx'
 
-export function NewTaskModal({ isOpen, onCreate }: NewTaskModalProps) {
+export function NewTaskModal({ isOpen }: NewTaskModalProps) {
+	const formRef = useRef<FormHandle>(null)
+
+	function onSubmit(fields: Record<string, any>) {
+		//
+		formRef.current?.reset()
+	}
+
 	return (
 		<div className={clsx(styles.container)}>
 			<Modal
@@ -14,6 +23,7 @@ export function NewTaskModal({ isOpen, onCreate }: NewTaskModalProps) {
 					<h2 className={clsx(styles.title)}>Create New Task</h2>
 					<div className={clsx(styles.form)}>
 						<Form
+							ref={formRef}
 							fields={[
 								{
 									field: 'Name',
@@ -29,14 +39,19 @@ export function NewTaskModal({ isOpen, onCreate }: NewTaskModalProps) {
 									defaultValue: new Date(),
 								},
 							]}
+							onSubmit={onSubmit}
 						/>
 					</div>
 					<div className={clsx(styles.buttons)}>
 						<Button
 							text="Cancel"
 							variant="glick-black"
+							onClick={() => formRef?.current?.reset()}
 						/>
-						<Button text="Create" />
+						<Button
+							text="Create"
+							onClick={() => formRef?.current?.submit()}
+						/>
 					</div>
 				</div>
 			</Modal>

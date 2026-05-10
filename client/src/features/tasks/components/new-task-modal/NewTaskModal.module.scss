@@ -14,5 +14,12 @@
 	}
 
 	.form {
+		margin-bottom: 1rem;
+	}
+
+	.buttons {
+		display: flex;
+		gap: 1rem;
+		justify-content: flex-end;
 	}
 }
