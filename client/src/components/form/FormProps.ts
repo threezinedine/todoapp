@@ -1,8 +1,11 @@
 import type { FormHTMLAttributes } from 'react'
 
+type FieldValue = string | number | Date | undefined
+
 export interface FieldProps {
 	field: string
-	type: 'text' | 'password' | 'email' | 'number'
+	type: 'text' | 'password' | 'email' | 'number' | 'date' | 'textarea'
+	defaultValue?: FieldValue
 }
 
 export interface FormProps extends Omit<
@@ -12,7 +15,7 @@ export interface FormProps extends Omit<
 	fields: FieldProps[]
 	dataTestId?: string
 	submitButton?: React.ReactNode
-	onSubmit?: (values: Record<string, string>) => Promise<void>
+	onSubmit?: (values: Record<string, FieldValue>) => Promise<void>
 }
 
 export interface FormHandle {
