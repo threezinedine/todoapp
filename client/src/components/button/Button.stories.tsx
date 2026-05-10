@@ -76,6 +76,47 @@ export const DarkVariants: Story = {
 	),
 }
 
+export const LoadingState: Story = {
+	render: () => (
+		<div
+			style={{
+				display: 'flex',
+				gap: '1rem',
+				backgroundColor: '#333',
+				padding: '1rem',
+				height: '90vh',
+			}}
+		>
+			<Button
+				text="Normal"
+				variant="normal"
+				isLoading
+			/>
+			<Button
+				text="Glick"
+				variant="glick"
+				isLoading
+			/>
+			<Button
+				text="Glass"
+				variant="glass-morphism"
+				isLoading
+			/>
+			<Button
+				text="Glint"
+				variant="glint"
+				icon={<OpenAIIcon />}
+				isLoading
+			/>
+			<Button
+				text="Glick Black"
+				variant="glick-black"
+				isLoading
+			/>
+		</div>
+	),
+}
+
 export const AllSizes: Story = {
 	render: () => (
 		<div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>

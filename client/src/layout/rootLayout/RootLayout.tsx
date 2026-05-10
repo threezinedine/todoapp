@@ -18,7 +18,7 @@ export function RootLayout({
 	const validateModalRef = useRef<ValidateModalHandle>(null)
 
 	return (
-		<div className={clsx(styles.wrapper)}>
+		<div className={clsx(styles.wrapper, 'dark')}>
 			<div className={styles.navbar}>
 				<Navbar
 					onIconClick={async () => navigate('/')}

@@ -11,14 +11,18 @@ function NormalButton({
 	classNames = '',
 	onClick = undefined,
 	dataTestId = undefined,
+	isLoading,
 }: VariantButtonProps) {
 	return (
 		<button
 			className={clsx(styles.normal, classNames)}
 			onClick={onClick}
 			data-testid={dataTestId}
+			disabled={isLoading}
 		>
-			{text}
+			<span>{text}</span>
+			{isLoading && <div className={styles.spinner}></div>}
+			{isLoading && <div className={styles.overlay}></div>}
 		</button>
 	)
 }
@@ -28,14 +32,18 @@ function GlickButton({
 	classNames = '',
 	onClick = undefined,
 	dataTestId = undefined,
+	isLoading,
 }: VariantButtonProps) {
 	return (
 		<button
 			className={clsx(styles.glick, classNames)}
 			onClick={onClick}
 			data-testid={dataTestId}
+			disabled={isLoading}
 		>
-			{text}
+			<span>{text}</span>
+			{isLoading && <div className={styles.spinner}></div>}
+			{isLoading && <div className={styles.overlay}></div>}
 		</button>
 	)
 }
@@ -45,6 +53,7 @@ function GlickBlackButton({
 	classNames = '',
 	onClick = undefined,
 	dataTestId = undefined,
+	isLoading,
 }: VariantButtonProps) {
 	return (
 		<button
@@ -52,8 +61,11 @@ function GlickBlackButton({
 			onClick={onClick}
 			data-testid={dataTestId}
 			data-text={text}
+			disabled={isLoading}
 		>
 			<span>{text}</span>
+			{isLoading && <div className={styles.spinner}></div>}
+			{isLoading && <div className={styles.overlay}></div>}
 		</button>
 	)
 }
@@ -63,14 +75,18 @@ function GlassMorphismButton({
 	classNames = '',
 	onClick = undefined,
 	dataTestId = undefined,
+	isLoading,
 }: VariantButtonProps) {
 	return (
 		<button
 			className={clsx(styles['glass-morphism'], classNames)}
 			onClick={onClick}
 			data-testid={dataTestId}
+			disabled={isLoading}
 		>
-			{text}
+			<span>{text}</span>
+			{isLoading && <div className={styles.spinner}></div>}
+			{isLoading && <div className={styles.overlay}></div>}
 		</button>
 	)
 }
@@ -81,15 +97,19 @@ function GlintButton({
 	icon,
 	onClick = undefined,
 	dataTestId = undefined,
+	isLoading,
 }: IconVariantButtonProps) {
 	return (
 		<button
 			className={clsx(styles.glint, classNames)}
 			onClick={onClick}
 			data-testid={dataTestId}
+			disabled={isLoading}
 		>
 			<div className={styles.logo}>{icon}</div>
 			<div className={styles.text}>{text}</div>
+			{isLoading && <div className={styles.spinner}></div>}
+			{isLoading && <div className={styles.overlay}></div>}
 		</button>
 	)
 }

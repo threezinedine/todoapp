@@ -9,6 +9,7 @@ export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 	icon?: React.ReactNode
 	onClick?: () => Promise<void> | void
 	dataTestId?: string
+	isLoading?: boolean
 }
 
 export interface VariantButtonProps {
@@ -16,6 +17,7 @@ export interface VariantButtonProps {
 	text?: string | React.ReactNode
 	classNames?: string
 	onClick?: () => Promise<void> | void
+	isLoading?: boolean
 }
 
 export interface IconVariantButtonProps extends VariantButtonProps {

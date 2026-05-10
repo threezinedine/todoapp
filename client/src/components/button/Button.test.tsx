@@ -13,6 +13,8 @@ vi.mock('./Button.module.scss', () => ({
 			'glick-black': 'glick-black',
 			'glass-morphism': 'glass-morphism',
 			glint: 'glint',
+			spinner: 'spinner',
+			overlay: 'overlay',
 			logo: 'logo',
 			text: 'text',
 			button: 'button',
@@ -120,6 +122,48 @@ describe('Button', () => {
 		await user.click(screen.getByTestId(BUTTON_TEST_ID))
 
 		expect(onClick).toHaveBeenCalledTimes(1)
+	})
+
+	it('shows spinner and overlay and disables button when isLoading is true', () => {
+		const { container } = render(
+			<Button
+				dataTestId={BUTTON_TEST_ID}
+				isLoading
+			/>,
+		)
+
+		const button = screen.getByTestId(BUTTON_TEST_ID)
+		expect(button).toBeDisabled()
+		expect(container.querySelector('.spinner')).toBeInTheDocument()
+		expect(container.querySelector('.overlay')).toBeInTheDocument()
+	})
+
+	it('does not render spinner or overlay when isLoading is false', () => {
+		const { container } = render(
+			<Button dataTestId={BUTTON_TEST_ID} />,
+		)
+
+		const button = screen.getByTestId(BUTTON_TEST_ID)
+		expect(button).not.toBeDisabled()
+		expect(container.querySelector('.spinner')).not.toBeInTheDocument()
+		expect(container.querySelector('.overlay')).not.toBeInTheDocument()
+	})
+
+	it('does not call onClick when button is loading (disabled)', async () => {
+		const user = userEvent.setup()
+		const onClick = vi.fn()
+
+		render(
+			<Button
+				dataTestId={BUTTON_TEST_ID}
+				onClick={onClick}
+				isLoading
+			/>,
+		)
+
+		await user.click(screen.getByTestId(BUTTON_TEST_ID))
+
+		expect(onClick).not.toHaveBeenCalled()
 	})
 
 	// ─── variant ───────────────────────────────────────────────────────────────
