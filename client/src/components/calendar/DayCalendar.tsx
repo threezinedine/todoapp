@@ -243,7 +243,10 @@ export function DayCalendar({
 				</p>
 			</div>
 
-			<div className={clsx(styles.scrollViewport)}>
+			<div
+				className={clsx(styles.scrollViewport)}
+				data-calendar-day-viewport
+			>
 				<div
 					className={clsx(styles.dayView)}
 					style={{ height: `${timelineHeight}px` }}
@@ -272,6 +275,7 @@ export function DayCalendar({
 						{isToday && nowMinute !== null && (
 							<div
 								className={clsx(styles.currentTimeLine)}
+								data-calendar-current-time-marker
 								style={{
 									top: `${nowMinute * PIXELS_PER_MINUTE}px`,
 								}}

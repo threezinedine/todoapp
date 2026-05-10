@@ -1,5 +1,8 @@
+import { useRef } from 'react'
 import type { Meta, StoryObj } from '@storybook/react'
 import { Calendar } from './Calendar'
+import type { CalendarHandle } from './CalendarProps'
+import { Button } from '../button'
 
 const meta: Meta<typeof Calendar> = {
 	component: Calendar,
@@ -21,11 +24,24 @@ const styles: React.CSSProperties = {
 }
 
 export const DayCalendar: Story = {
-	render: () => (
-		<div style={styles}>
-			<Calendar variant="day" />
-		</div>
-	),
+	render: () => {
+		const ref = useRef<CalendarHandle>(null)
+
+		return (
+			<div style={styles}>
+				<Button
+					text="Focus"
+					onClick={() => {
+						ref?.current?.focus()
+					}}
+				/>
+				<Calendar
+					ref={ref}
+					variant="day"
+				/>
+			</div>
+		)
+	},
 }
 
 export const WeekCalendar: Story = {

@@ -16,3 +16,7 @@ export interface CalendarComponentProps {
 export interface CalendarProps {
 	variant?: 'month' | 'week' | 'day'
 }
+
+export interface CalendarHandle {
+	focus: () => void
+}
