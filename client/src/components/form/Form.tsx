@@ -29,7 +29,7 @@ function normalizeDefaultValue(
 }
 
 export const Form = forwardRef<FormHandle, FormProps>(function Form(
-	{ fields, submitButton, className, onSubmit, dataTestId },
+	{ fields, submitButton, className, onSubmit, dataTestId, isLoading },
 	ref,
 ) {
 	const formRef = useRef<HTMLFormElement>(null)
@@ -90,6 +90,7 @@ export const Form = forwardRef<FormHandle, FormProps>(function Form(
 					field={field}
 					type={type}
 					defaultValue={normalizeDefaultValue(type, defaultValue)}
+					isLoading={isLoading}
 				/>
 			))}
 			{submitButton}

@@ -16,6 +16,7 @@ export interface FormProps extends Omit<
 	dataTestId?: string
 	submitButton?: React.ReactNode
 	onSubmit?: (values: Record<string, FieldValue>) => Promise<void> | void
+	isLoading?: boolean
 }
 
 export interface FormHandle {

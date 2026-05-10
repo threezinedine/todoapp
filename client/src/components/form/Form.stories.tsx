@@ -103,3 +103,36 @@ export const WithRef: Story = {
 		)
 	},
 }
+
+export const LoadingState: Story = {
+	render: () => (
+		<div
+			style={{
+				display: 'flex',
+				flexDirection: 'column',
+				gap: '1rem',
+				backgroundColor: '#050505',
+				padding: '3rem',
+			}}
+		>
+			<Form
+				fields={[
+					{ field: 'Username', type: 'text', defaultValue: 'alice' },
+					{ field: 'Password', type: 'password' },
+					{ field: 'Email', type: 'email' },
+					{ field: 'Age', type: 'number' },
+				]}
+				submitButton={
+					<Button
+						variant="glick-black"
+						text="Submit"
+						borderRadius="none"
+						size="full"
+						isLoading
+					/>
+				}
+				isLoading={true}
+			/>
+		</div>
+	),
+}
