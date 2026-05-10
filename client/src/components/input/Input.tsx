@@ -31,9 +31,9 @@ export function Input({
 
 	if (type === 'date') {
 		return (
-			<div className={styles.container}>
+			<div className={`${styles.container} ${styles.dateContainer}`}>
 				<input
-					className={styles.input}
+					className={`${styles.input} ${styles.dateInput}`}
 					name={field}
 					value={value}
 					onChange={onChange}
@@ -42,7 +42,7 @@ export function Input({
 					data-testid={dataTestId}
 				/>
 				<label
-					className={styles.label}
+					className={`${styles.label} ${styles.dateLabel}`}
 					data-text={field}
 				>
 					{field}
