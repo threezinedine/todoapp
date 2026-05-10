@@ -51,6 +51,7 @@ export function Input({
 					type={type}
 					placeholder=""
 					data-testid={dataTestId}
+					disabled={isLoading}
 				/>
 				<label
 					className={`${styles.label} ${styles.dateLabel}`}
@@ -78,6 +79,7 @@ export function Input({
 				type={type}
 				placeholder=""
 				data-testid={dataTestId}
+				disabled={isLoading}
 			/>
 			<label
 				className={styles.label}

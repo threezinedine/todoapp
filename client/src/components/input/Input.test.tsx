@@ -9,6 +9,8 @@ vi.mock('./Input.module.scss', () => ({
 		container: 'container',
 		input: 'input',
 		label: 'label',
+		spinner: 'spinner',
+		overlay: 'overlay',
 		dateContainer: 'dateContainer',
 		dateInput: 'dateInput',
 		dateLabel: 'dateLabel',
@@ -87,6 +89,64 @@ describe('Input', () => {
 		await user.type(input, 'hello')
 
 		expect(input).toHaveValue('hello')
+	})
+
+	describe('loading state', () => {
+		it('renders spinner and overlay when isLoading is true', () => {
+			const { container } = render(
+				<Input
+					isLoading
+					dataTestId="loading-input"
+				/>,
+			)
+
+			expect(screen.getByTestId('loading-input')).toBeInTheDocument()
+			expect(container.querySelector('.spinner')).toBeInTheDocument()
+			expect(container.querySelector('.overlay')).toBeInTheDocument()
+		})
+
+		it('does not render spinner and overlay when isLoading is false', () => {
+			const { container } = render(<Input dataTestId="idle-input" />)
+
+			expect(screen.getByTestId('idle-input')).toBeInTheDocument()
+			expect(container.querySelector('.spinner')).not.toBeInTheDocument()
+			expect(container.querySelector('.overlay')).not.toBeInTheDocument()
+		})
+
+		it('disables text input when isLoading is true', () => {
+			render(
+				<Input
+					isLoading
+					dataTestId="loading-text"
+				/>,
+			)
+
+			expect(screen.getByTestId('loading-text')).toBeDisabled()
+		})
+
+		it('disables date input when isLoading is true', () => {
+			render(
+				<Input
+					type="date"
+					isLoading
+					dataTestId="loading-date"
+				/>,
+			)
+
+			expect(screen.getByTestId('loading-date')).toBeDisabled()
+		})
+
+		it('disables textarea when isLoading is true', () => {
+			render(
+				<Input
+					type="textarea"
+					isLoading
+					dataTestId="loading-textarea"
+				/>,
+			)
+
+			expect(screen.getByTestId('loading-textarea')).toBeDisabled()
+		})
 	})
 
 	// ─── type variants ───────────────────────────────────────────────────────────
