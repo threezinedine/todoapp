@@ -1,6 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react'
 import { NewTaskModal } from './NewTaskModal'
-import { useState } from 'storybook/internal/preview-api'
 
 const meta: Meta<typeof NewTaskModal> = {
 	component: NewTaskModal,
@@ -12,15 +11,18 @@ type Story = StoryObj<typeof NewTaskModal>
 
 export const Default: Story = {
 	render: () => {
-		const [isOpen, setIsOpen] = useState(true)
-
 		return (
 			<>
 				<NewTaskModal
-					isOpen={isOpen}
-					onCreate={(title) => {
-						console.log('Task Created:', title)
-						setIsOpen(false)
+					isOpen={true}
+					onSuccess={() => {
+						alert('Task created successfully!')
+					}}
+					onFailed={(response) => {
+						alert(`Failed to create task: ${response.json()}`)
+					}}
+					onError={(err) => {
+						alert(err)
 					}}
 				/>
 			</>

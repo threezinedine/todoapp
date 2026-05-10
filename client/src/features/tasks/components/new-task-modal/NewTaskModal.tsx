@@ -4,13 +4,34 @@ import { Button, Form, Modal } from '~/components'
 import type { FormHandle } from '~/components'
 import styles from './NewTaskModal.module.scss'
 import clsx from 'clsx'
+import { createTask } from '../../requests/createTask'
 
-export function NewTaskModal({ isOpen }: NewTaskModalProps) {
+export function NewTaskModal({
+	isOpen,
+	onSuccess,
+	onFailed,
+	onError,
+}: NewTaskModalProps) {
 	const formRef = useRef<FormHandle>(null)
 
-	function onSubmit(fields: Record<string, any>) {
+	async function onSubmit(fields: Record<string, any>) {
 		//
-		formRef.current?.reset()
+		try {
+			const res = await createTask(
+				fields.Name,
+				fields.Description,
+				fields['Due Date'],
+			)
+
+			if (res.ok) {
+				onSuccess?.(res)
+				formRef.current?.reset()
+			} else {
+				onFailed?.(res)
+			}
+		} catch (err) {
+			onError?.(err)
+		}
 	}
 
 	return (

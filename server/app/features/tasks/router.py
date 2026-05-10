@@ -202,7 +202,10 @@ async def create_task(
                 completed=new_task.isCompleted,
             )
         )
-    except:
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"Error creating task: {e}")
         raise HTTPException(status_code=500, detail="Internal Server Error")
 
 

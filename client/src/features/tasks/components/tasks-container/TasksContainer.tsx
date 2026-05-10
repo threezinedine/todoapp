@@ -1,9 +1,29 @@
+import { useState } from 'react'
 import { Button } from '~/components'
 import { TasksList } from '../tasks-list'
 import styles from './TasksContainer.module.scss'
+import { NewTaskModal } from '../new-task-modal/NewTaskModal'
 import clsx from 'clsx'
 
 export function TasksContainer() {
+	const [isModalOpen, setIsModalOpen] = useState(false)
+
+	function onCreateTaskSuccess() {
+		alert('Task created successfully!')
+		setIsModalOpen(false)
+	}
+
+	function onCreateTaskFailed(response: Response) {
+		response.json().then((data) => {
+			console.error('Failed to create task:', data)
+		})
+	}
+
+	function onCreateTaskError() {
+		alert('Task created error')
+		setIsModalOpen(false)
+	}
+
 	return (
 		<div className={clsx(styles.wrapper)}>
 			<div className={clsx(styles.container)}>
@@ -11,7 +31,7 @@ export function TasksContainer() {
 					<Button
 						variant="glass-morphism"
 						text="Add Task"
-						onClick={() => alert('Add Task')}
+						onClick={() => setIsModalOpen(true)}
 					/>
 				</div>
 				<div className={clsx(styles.list)}>
@@ -33,6 +53,12 @@ export function TasksContainer() {
 					/>
 				</div>
 			</div>
+			<NewTaskModal
+				isOpen={isModalOpen}
+				onSuccess={onCreateTaskSuccess}
+				onFailed={onCreateTaskFailed}
+				onError={onCreateTaskError}
+			/>
 		</div>
 	)
 }
