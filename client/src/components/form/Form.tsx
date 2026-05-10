@@ -5,6 +5,29 @@ import { Input } from '~/components/input'
 import styles from './Form.module.scss'
 import clsx from 'clsx'
 
+function normalizeDefaultValue(
+	type: 'text' | 'password' | 'email' | 'number' | 'date' | 'textarea',
+	defaultValue: string | number | Date | undefined,
+) {
+	if (defaultValue === undefined) {
+		return undefined
+	}
+
+	if (type === 'date' && defaultValue instanceof Date) {
+		if (Number.isNaN(defaultValue.getTime())) {
+			return undefined
+		}
+
+		return defaultValue.toISOString().slice(0, 10)
+	}
+
+	if (defaultValue instanceof Date) {
+		return defaultValue.toISOString()
+	}
+
+	return defaultValue
+}
+
 export const Form = forwardRef<FormHandle, FormProps>(function Form(
 	{ fields, submitButton, className, onSubmit, dataTestId },
 	ref,
@@ -13,12 +36,13 @@ export const Form = forwardRef<FormHandle, FormProps>(function Form(
 
 	function getFormValues() {
 		if (formRef.current) {
-			// get full input tags from form
-			const inputs = formRef.current.querySelectorAll('input')
+			const fields = formRef.current.querySelectorAll<
+				HTMLInputElement | HTMLTextAreaElement
+			>('input, textarea')
 			const formValues: { [key: string]: any } = {}
 
-			inputs.forEach((input) => {
-				formValues[input.name] = input.value
+			fields.forEach((field) => {
+				formValues[field.name] = field.value
 			})
 
 			return formValues
@@ -28,11 +52,7 @@ export const Form = forwardRef<FormHandle, FormProps>(function Form(
 
 	function resetForm() {
 		if (formRef.current) {
-			// Reset all input fields
-			const inputs = formRef.current.querySelectorAll('input')
-			inputs.forEach((input) => {
-				input.value = ''
-			})
+			formRef.current.reset()
 		}
 	}
 
@@ -63,12 +83,13 @@ export const Form = forwardRef<FormHandle, FormProps>(function Form(
 			data-testid={dataTestId}
 			className={clsx(styles.form, className)}
 		>
-			{fields.map(({ field, type }, index) => (
+			{fields.map(({ field, type, defaultValue }, index) => (
 				<Input
 					dataTestId={`${dataTestId}-${field}`}
 					key={index}
 					field={field}
 					type={type}
+					defaultValue={normalizeDefaultValue(type, defaultValue)}
 				/>
 			))}
 			{submitButton}

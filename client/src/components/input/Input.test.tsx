@@ -296,7 +296,8 @@ describe('Input', () => {
 			)
 
 			const textarea = screen.getByRole('textbox')
-			const textareaContainer = document.querySelector('.textareaContainer')
+			const textareaContainer =
+				document.querySelector('.textareaContainer')
 			const textareaLabel = document.querySelector('.textareaLabel')
 
 			expect(textarea).toBeInTheDocument()
@@ -314,7 +315,9 @@ describe('Input', () => {
 				/>,
 			)
 
-			expect(screen.getByRole('textbox')).toHaveValue('A detailed task description')
+			expect(screen.getByRole('textbox')).toHaveValue(
+				'A detailed task description',
+			)
 		})
 
 		it('sets textarea label data-text from field prop', () => {
@@ -337,7 +340,9 @@ describe('Input', () => {
 				/>,
 			)
 
-			expect(screen.getByTestId('new-task-description').tagName).toBe('TEXTAREA')
+			expect(screen.getByTestId('new-task-description').tagName).toBe(
+				'TEXTAREA',
+			)
 		})
 
 		it('uses field as textarea name attribute', () => {
@@ -348,7 +353,10 @@ describe('Input', () => {
 				/>,
 			)
 
-			expect(screen.getByRole('textbox')).toHaveAttribute('name', 'taskDetails')
+			expect(screen.getByRole('textbox')).toHaveAttribute(
+				'name',
+				'taskDetails',
+			)
 		})
 
 		it('calls onChange when typing in textarea', async () => {
@@ -381,7 +389,9 @@ describe('Input', () => {
 		it('does not render date input for textarea type', () => {
 			render(<Input type="textarea" />)
 
-			expect(document.querySelector('input[type="date"]')).not.toBeInTheDocument()
+			expect(
+				document.querySelector('input[type="date"]'),
+			).not.toBeInTheDocument()
 		})
 
 		it('does not render default input for textarea type', () => {

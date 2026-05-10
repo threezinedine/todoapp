@@ -13,19 +13,37 @@ vi.mock('./Form.module.scss', () => ({
 
 // Mock Input to avoid SCSS issues in tests
 vi.mock('~/components/input', () => ({
-	Input: ({ field, type }: { field: string; type: string }) => (
-		<div>
-			<input
-				name={field}
-				type={type}
-				data-testid={`input-${field}`}
-			/>
-			<label>{field}</label>
-		</div>
-	),
+	Input: ({
+		field,
+		type,
+		defaultValue,
+	}: {
+		field: string
+		type: string
+		defaultValue?: string | number
+	}) =>
+		type === 'textarea' ? (
+			<div>
+				<textarea
+					name={field}
+					defaultValue={defaultValue}
+					data-testid={`input-${field}`}
+				/>
+				<label>{field}</label>
+			</div>
+		) : (
+			<div>
+				<input
+					name={field}
+					type={type}
+					defaultValue={defaultValue}
+					data-testid={`input-${field}`}
+				/>
+				<label>{field}</label>
+			</div>
+		),
 }))
 
-const FORM_TEST_ID = 'form'
 const fields = [
 	{ field: 'Username', type: 'text' as const },
 	{ field: 'Password', type: 'password' as const },
@@ -153,6 +171,28 @@ describe('Form', () => {
 		)
 	})
 
+	it('calls onSubmit with textarea values', async () => {
+		const user = userEvent.setup()
+		const onSubmit = vi.fn().mockResolvedValue(undefined)
+
+		render(
+			<Form
+				fields={[{ field: 'Description', type: 'textarea' }]}
+				onSubmit={onSubmit}
+				submitButton={<button type="submit">Submit</button>}
+			/>,
+		)
+
+		await user.type(screen.getByTestId('input-Description'), 'Write release notes')
+		await user.click(screen.getByRole('button', { name: 'Submit' }))
+
+		expect(onSubmit).toHaveBeenCalledWith(
+			expect.objectContaining({
+				Description: 'Write release notes',
+			}),
+		)
+	})
+
 	it('calls onSubmit on native form submit (Enter key)', async () => {
 		const user = userEvent.setup()
 		const onSubmit = vi.fn().mockResolvedValue(undefined)
@@ -261,6 +301,34 @@ describe('Form', () => {
 
 		expect(screen.getByTestId('input-Username')).toHaveValue('')
 		expect(screen.getByTestId('input-Password')).toHaveValue('')
+	})
+
+	it('calls ref.current.reset() and restores default values', async () => {
+		const user = userEvent.setup()
+		const ref = { current: null as FormHandle | null }
+
+		render(
+			<Form
+				ref={ref}
+				fields={[
+					{ field: 'Username', type: 'text', defaultValue: 'alice' },
+					{ field: 'Description', type: 'textarea', defaultValue: 'Initial note' },
+				]}
+			/>,
+		)
+
+		const usernameInput = screen.getByTestId('input-Username')
+		const descriptionTextarea = screen.getByTestId('input-Description')
+
+		await user.clear(usernameInput)
+		await user.type(usernameInput, 'bob')
+		await user.clear(descriptionTextarea)
+		await user.type(descriptionTextarea, 'Updated note')
+
+		await ref.current?.reset()
+
+		expect(usernameInput).toHaveValue('alice')
+		expect(descriptionTextarea).toHaveValue('Initial note')
 	})
 
 	it('ref.current.reset() does not throw when called immediately (empty form)', async () => {
@@ -407,5 +475,48 @@ describe('Form', () => {
 		await user.click(screen.getByRole('button', { name: 'Submit' }))
 
 		expect(onSubmit).toHaveBeenCalledTimes(1)
+	})
+
+	it('applies defaultValue to fields and submits those initial values', async () => {
+		const user = userEvent.setup()
+		const onSubmit = vi.fn().mockResolvedValue(undefined)
+
+		render(
+			<Form
+				fields={[
+					{ field: 'Username', type: 'text', defaultValue: 'default-user' },
+					{ field: 'Age', type: 'number', defaultValue: 27 },
+					{ field: 'Notes', type: 'textarea', defaultValue: 'hello' },
+				]}
+				onSubmit={onSubmit}
+				submitButton={<button type="submit">Submit</button>}
+			/>,
+		)
+
+		expect(screen.getByTestId('input-Username')).toHaveValue('default-user')
+		expect(screen.getByTestId('input-Age')).toHaveValue(27)
+		expect(screen.getByTestId('input-Notes')).toHaveValue('hello')
+
+		await user.click(screen.getByRole('button', { name: 'Submit' }))
+
+		expect(onSubmit).toHaveBeenCalledWith(
+			expect.objectContaining({
+				Username: 'default-user',
+				Age: '27',
+				Notes: 'hello',
+			}),
+		)
+	})
+
+	it('normalizes Date defaultValue for date fields to yyyy-mm-dd', () => {
+		const defaultDate = new Date('2026-05-10T11:45:00.000Z')
+
+		render(
+			<Form
+				fields={[{ field: 'DueDate', type: 'date', defaultValue: defaultDate }]}
+			/>,
+		)
+
+		expect(screen.getByTestId('input-DueDate')).toHaveValue('2026-05-10')
 	})
 })

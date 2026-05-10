@@ -67,7 +67,11 @@ export const WithRef: Story = {
 				<Form
 					ref={ref}
 					fields={[
-						{ field: 'Username', type: 'text' },
+						{
+							field: 'Username',
+							type: 'text',
+							defaultValue: 'alice',
+						},
 						{ field: 'Password', type: 'password' },
 					]}
 					onSubmit={onSubmit}
