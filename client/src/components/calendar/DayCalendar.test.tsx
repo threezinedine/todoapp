@@ -21,6 +21,7 @@ vi.mock('./DayCalendar.module.scss', () => ({
 		emptyState: 'emptyState',
 		eventCard: 'eventCard',
 		eventTitle: 'eventTitle',
+		eventTime: 'eventTime',
 		eventDescription: 'eventDescription',
 	},
 }))
@@ -82,6 +83,26 @@ describe('DayCalendar', () => {
 		expect(
 			screen.queryByText('No events scheduled.'),
 		).not.toBeInTheDocument()
+	})
+
+	it('displays time range for events', () => {
+		const events: CalendarEventProps[] = [
+			{
+				id: 'e1',
+				name: 'Meeting',
+				startedAt: new Date(2026, 4, 10, 10, 0),
+				endedAt: new Date(2026, 4, 10, 11, 30),
+			},
+		]
+
+		render(
+			<DayCalendar
+				startDate={new Date(2026, 4, 10)}
+				events={events}
+			/>,
+		)
+
+		expect(screen.getByText('10:00 AM - 11:30 AM')).toBeInTheDocument()
 	})
 
 	it('filters out events that are not on the selected day', () => {

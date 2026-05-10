@@ -9,9 +9,12 @@ const DAY_VIEWPORT_SELECTOR = '[data-calendar-day-viewport]'
 const CURRENT_TIME_MARKER_SELECTOR = '[data-calendar-current-time-marker]'
 
 export const Calendar = forwardRef<CalendarHandle, CalendarProps>(
-	function Calendar({ variant = 'month' }, ref) {
+	function Calendar(
+		{ variant = 'month', events, startDate: providedStartDate },
+		ref,
+	) {
 		const containerRef = useRef<HTMLDivElement>(null)
-		const startDate = new Date()
+		const startDate = providedStartDate ?? new Date()
 		const endDate = new Date()
 		endDate.setDate(endDate.getDate() + 7) // Example: set end date to 7 days from start date
 
@@ -67,6 +70,7 @@ export const Calendar = forwardRef<CalendarHandle, CalendarProps>(
 					<DayCalendar
 						startDate={startDate}
 						endDate={endDate}
+						events={events}
 					/>
 				)}
 				{variant === 'week' && (

@@ -37,6 +37,38 @@ export const DayCalendar: Story = {
 				/>
 				<Calendar
 					ref={ref}
+					events={[
+						{
+							id: '1',
+							name: 'Meeting with Team',
+							startedAt: new Date(
+								new Date().getTime() - 120 * 60 * 1000,
+							),
+							endedAt: new Date(
+								new Date().getTime() - 75 * 60 * 1000,
+							),
+							color: '#8ab0ff',
+							gradientColor: '#5a8cff',
+							onEventClicked: (event) => {
+								alert(`Clicked on event: ${event.name}`)
+							},
+						},
+						{
+							id: '2',
+							name: 'Meeting with the customer',
+							startedAt: new Date(
+								new Date().getTime() - 60 * 60 * 1000,
+							),
+							endedAt: new Date(
+								new Date().getTime() - 30 * 60 * 1000,
+							),
+							color: '#58de94',
+							gradientColor: '#3ab678',
+							onEventClicked: (event) => {
+								alert(`Clicked on event: ${event.name}`)
+							},
+						},
+					]}
 					variant="day"
 				/>
 			</div>

@@ -46,6 +46,30 @@ function formatHourLabel(hour: number) {
 	}).format(dt)
 }
 
+function formatTimeRange(startMinute: number, endMinute: number): string {
+	const startHour = Math.floor(startMinute / 60)
+	const startMin = startMinute % 60
+	const endHour = Math.floor(endMinute / 60)
+	const endMin = endMinute % 60
+
+	const startDate = new Date(0, 0, 0, startHour, startMin)
+	const endDate = new Date(0, 0, 0, endHour, endMin)
+
+	const startTime = new Intl.DateTimeFormat('en-US', {
+		hour: 'numeric',
+		minute: '2-digit',
+		hour12: true,
+	}).format(startDate)
+
+	const endTime = new Intl.DateTimeFormat('en-US', {
+		hour: 'numeric',
+		minute: '2-digit',
+		hour12: true,
+	}).format(endDate)
+
+	return `${startTime} - ${endTime}`
+}
+
 function normalizeEvent(
 	event: CalendarEventProps,
 	day: Date,
@@ -224,6 +248,25 @@ export function DayCalendar({
 			setNow(new Date())
 		}, NOW_REFRESH_INTERVAL_MS)
 
+		// auto-scroll to current time on mount
+		const viewport = document.querySelector<HTMLElement>(
+			'[data-calendar-day-viewport]',
+		)
+		const marker = document.querySelector<HTMLElement>(
+			'[data-calendar-current-time-marker]',
+		)
+
+		if (viewport && marker) {
+			const centeredTop = Math.max(
+				0,
+				marker.offsetTop - viewport.clientHeight / 2,
+			)
+			viewport.scrollTo({
+				top: centeredTop,
+				behavior: 'smooth',
+			})
+		}
+
 		return () => {
 			window.clearInterval(intervalId)
 		}
@@ -304,7 +347,7 @@ export function DayCalendar({
 								</div>
 							)}
 
-							{positionedEvents.map((event) => {
+							{positionedEvents.map((event, index) => {
 								const durationMinutes = Math.max(
 									event.endMinute - event.startMinute,
 									EVENT_MIN_DURATION_MINUTES,
@@ -329,11 +372,30 @@ export function DayCalendar({
 											height: `${height}px`,
 											width: `${widthPercent}%`,
 											left: `${leftPercent}%`,
+											// @ts-ignore
+											'--color-first': event.color,
+											// @ts-ignore
+											'--color-second':
+												event.gradientColor,
+										}}
+										onClick={() => {
+											if (event.onEventClicked) {
+												event.onEventClicked(
+													event,
+													index,
+												)
+											}
 										}}
 									>
 										<h3 className={clsx(styles.eventTitle)}>
 											{event.name}
 										</h3>
+										<p className={clsx(styles.eventTime)}>
+											{formatTimeRange(
+												event.startMinute,
+												event.endMinute,
+											)}
+										</p>
 										{event.description && (
 											<p
 												className={clsx(

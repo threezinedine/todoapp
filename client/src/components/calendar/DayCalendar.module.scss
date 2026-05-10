@@ -147,18 +147,26 @@
 }
 
 .eventCard {
+	user-select: none;
+	cursor: pointer;
 	position: absolute;
 	padding: 0.45rem 0.5rem;
-	border-radius: 0.58rem;
-	border: 1px solid var(--event-border);
-	border-left: 4px solid #8ab0ff;
+	border-radius: 0.18rem;
+	border: 1px solid var(--color-second, #5a8cff);
+	border-left: 4px solid var(--color-first, #8ab0ff);
 	background: linear-gradient(
 		180deg,
-		rgba(39, 75, 145, 0.95),
-		rgba(29, 55, 110, 0.92)
+		var(--color-first, #8ab0ff) 0%,
+		var(--color-second, #5a8cff) 100%
 	);
 	box-shadow: 0 8px 16px rgba(0, 0, 0, 0.35);
 	overflow: hidden;
+	transition: all 0.2s ease;
+
+	&:hover {
+		box-shadow: 0 12px 24px rgba(0, 0, 0, 0.45);
+		transform: translateY(-2px);
+	}
 }
 
 .eventTitle {
@@ -167,6 +175,15 @@
 	font-weight: 700;
 	line-height: 1.2;
 	color: var(--event-title);
+}
+
+.eventTime {
+	margin: 0.15rem 0 0;
+	font-size: 0.65rem;
+	font-weight: 600;
+	line-height: 1.1;
+	color: #b5d0ff;
+	opacity: 0.9;
 }
 
 .eventDescription {

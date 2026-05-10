@@ -5,6 +5,12 @@ export interface CalendarEventProps {
 	dueDate?: Date
 	startedAt?: Date
 	endedAt?: Date
+	color?: string
+	gradientColor?: string
+	onEventClicked?: (
+		event: CalendarEventProps,
+		index: number,
+	) => Promise<void> | void
 }
 
 export interface CalendarComponentProps {
@@ -13,7 +19,7 @@ export interface CalendarComponentProps {
 	events?: CalendarEventProps[]
 }
 
-export interface CalendarProps {
+export interface CalendarProps extends CalendarComponentProps {
 	variant?: 'month' | 'week' | 'day'
 }
 
