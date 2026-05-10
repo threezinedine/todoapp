@@ -1,5 +1,5 @@
 import { describe, expect, it, vi, beforeEach, afterEach } from 'vitest'
-import { render, screen } from '@testing-library/react'
+import { act, render, screen } from '@testing-library/react'
 import { DayCalendar } from './DayCalendar'
 import type { CalendarEventProps } from './CalendarProps'
 
@@ -198,5 +198,28 @@ describe('DayCalendar', () => {
 		expect(
 			document.querySelector('.currentTimeLine'),
 		).not.toBeInTheDocument()
+	})
+
+	it('refreshes the current-time marker position on interval', () => {
+		vi.setSystemTime(new Date(2026, 4, 10, 10, 0, 0))
+
+		render(<DayCalendar startDate={new Date(2026, 4, 10)} />)
+
+		const currentLine = document.querySelector(
+			'.currentTimeLine',
+		) as HTMLDivElement
+		expect(currentLine).toBeInTheDocument()
+
+		const initialTop = parseFloat(currentLine.style.top)
+		expect(initialTop).toBeCloseTo(640, 3)
+
+		vi.setSystemTime(new Date(2026, 4, 10, 10, 5, 0))
+		act(() => {
+			vi.advanceTimersByTime(5000)
+		})
+
+		const updatedTop = parseFloat(currentLine.style.top)
+		expect(updatedTop).toBeGreaterThan(initialTop)
+		expect(updatedTop).toBeCloseTo(645.333, 2)
 	})
 })

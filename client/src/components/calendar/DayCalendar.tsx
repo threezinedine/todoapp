@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import type {
 	CalendarComponentProps,
 	CalendarEventProps,
@@ -11,6 +11,7 @@ const EVENT_MIN_DURATION_MINUTES = 15
 const HOUR_SLOT_HEIGHT = 64
 const DEFAULT_EVENT_DURATION_MINUTES = 60
 const PIXELS_PER_MINUTE = HOUR_SLOT_HEIGHT / 60
+const NOW_REFRESH_INTERVAL_MS = 5000
 
 interface PositionedEvent extends CalendarEventProps {
 	startMinute: number
@@ -216,6 +217,18 @@ export function DayCalendar({
 	startDate = new Date(),
 	events = [],
 }: CalendarComponentProps) {
+	const [now, setNow] = useState(() => new Date())
+
+	useEffect(() => {
+		const intervalId = window.setInterval(() => {
+			setNow(new Date())
+		}, NOW_REFRESH_INTERVAL_MS)
+
+		return () => {
+			window.clearInterval(intervalId)
+		}
+	}, [])
+
 	const hours = useMemo(
 		() => Array.from({ length: 24 }, (_, hour) => hour),
 		[],
@@ -225,8 +238,8 @@ export function DayCalendar({
 		[events, startDate],
 	)
 
-	const isToday = isSameDay(startDate, new Date())
-	const nowMinute = isToday ? toMinutes(new Date()) : null
+	const isToday = isSameDay(startDate, now)
+	const nowMinute = isToday ? toMinutes(now) : null
 	const timelineHeight = MINUTES_PER_DAY * PIXELS_PER_MINUTE
 
 	return (
