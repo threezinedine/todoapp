@@ -17,10 +17,12 @@ vi.mock('~/components/input', () => ({
 		field,
 		type,
 		defaultValue,
+		isLoading,
 	}: {
 		field: string
 		type: string
 		defaultValue?: string | number
+		isLoading?: boolean
 	}) =>
 		type === 'textarea' ? (
 			<div>
@@ -28,6 +30,7 @@ vi.mock('~/components/input', () => ({
 					name={field}
 					defaultValue={defaultValue}
 					data-testid={`input-${field}`}
+					disabled={isLoading}
 				/>
 				<label>{field}</label>
 			</div>
@@ -38,6 +41,7 @@ vi.mock('~/components/input', () => ({
 					type={type}
 					defaultValue={defaultValue}
 					data-testid={`input-${field}`}
+					disabled={isLoading}
 				/>
 				<label>{field}</label>
 			</div>
@@ -107,6 +111,49 @@ describe('Form', () => {
 		)
 
 		expect(screen.getByTestId('submit-btn')).toBeInTheDocument()
+	})
+
+	describe('loading state', () => {
+		it('disables all fields when isLoading is true', () => {
+			render(
+				<Form
+					fields={fields}
+					isLoading
+				/>,
+			)
+
+			expect(screen.getByTestId('input-Username')).toBeDisabled()
+			expect(screen.getByTestId('input-Password')).toBeDisabled()
+			expect(screen.getByTestId('input-Email')).toBeDisabled()
+		})
+
+		it('disables date and textarea fields when isLoading is true', () => {
+			render(
+				<Form
+					fields={[
+						{ field: 'DueDate', type: 'date' },
+						{ field: 'Description', type: 'textarea' },
+					]}
+					isLoading
+				/>,
+			)
+
+			expect(screen.getByTestId('input-DueDate')).toBeDisabled()
+			expect(screen.getByTestId('input-Description')).toBeDisabled()
+		})
+
+		it('keeps fields enabled when isLoading is false', () => {
+			render(
+				<Form
+					fields={fields}
+					isLoading={false}
+				/>,
+			)
+
+			expect(screen.getByTestId('input-Username')).not.toBeDisabled()
+			expect(screen.getByTestId('input-Password')).not.toBeDisabled()
+			expect(screen.getByTestId('input-Email')).not.toBeDisabled()
+		})
 	})
 
 	// ─── onSubmit callback ───────────────────────────────────────────────────────
