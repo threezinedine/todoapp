@@ -5,7 +5,7 @@ from fastapi import FastAPI
 from sqlalchemy import select
 
 from app.database import engine, async_session_maker
-from app.features import authenticate, tasks
+from app.features import authenticate, tasks, sessions
 from app.models import Base, User
 
 
@@ -48,10 +48,16 @@ async def lifespan(app: FastAPI):
     yield
 
 
-app = FastAPI(lifespan=lifespan)
+app = FastAPI(
+    lifespan=lifespan,
+    docs_url="/api/docs",
+    redoc_url="/api/redoc",
+    openapi_url="/api/openapi.json",
+)
 
 app.include_router(authenticate.router)
 app.include_router(tasks.router)
+app.include_router(sessions.router)
 
 app.add_api_route("/api/health", lambda: {"status": "ok"})
 

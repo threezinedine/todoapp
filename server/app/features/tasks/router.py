@@ -188,6 +188,9 @@ async def create_task(
             dueDate=task.due_date or datetime.date.today().isoformat(),
             userId=user.id,
             createdAt=datetime.date.today().isoformat(),
+            remainSeconds=(
+                task.seconds if task.seconds is not None else 60 * 45
+            ),  # default 45 mins
         )
         db.add(new_task)
         await db.commit()

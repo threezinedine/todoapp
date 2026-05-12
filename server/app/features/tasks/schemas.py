@@ -12,6 +12,7 @@ class TaskResponse(BaseModel):
     due_date: str | None = None
     completed: bool = False
     template_id: str | None = None
+    remain_seconds: int | None = None
 
 
 class AllTasksResponse(BaseModel):
@@ -35,6 +36,7 @@ class CreateTaskRequest(BaseModel):
     name: str
     description: str
     due_date: str | None = None
+    seconds: int | None = None
 
 
 class CreateTaskResponse(BaseModel):
