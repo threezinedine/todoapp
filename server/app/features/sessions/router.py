@@ -48,6 +48,7 @@ async def join_session(
 ):
     await websocket.accept()
 
+    task = None
     session = None
     timeoutTask = None
     state = "idle"
@@ -157,18 +158,17 @@ async def join_session(
     except Exception as e:
         logging.info(f"Error in session {session.id}: {e}")
     finally:
-        if session:
-            session.stopTime = datetime.datetime.utcnow()
-
-        if timeoutTask:
-            timeoutTask.cancel()
-
-        if task and not task.isCompleted:
+        if task is not None and session is not None and not task.isCompleted:
             elapsed_seconds = (
                 datetime.datetime.utcnow() - session.startTime
             ).total_seconds()
             task.remainSeconds = max(0, task.remainSeconds - int(elapsed_seconds))
             if task.remainSeconds == 0:
                 task.isCompleted = True
+        if session:
+            session.stopTime = datetime.datetime.utcnow()
+
+        if timeoutTask:
+            timeoutTask.cancel()
 
         await db.commit()

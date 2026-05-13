@@ -1,10 +1,13 @@
 import os
+from fastapi.testclient import TestClient
+import pytest
 import uuid
 from typing import AsyncGenerator
 
 import pytest_asyncio
 from httpx import ASGITransport, AsyncClient
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sessionmaker
+from sqlalchemy.pool import StaticPool
 from .contants import *
 
 os.environ.setdefault("DEFAULT_TOKEN", "valid-test-token")
@@ -25,6 +28,7 @@ async def test_engine():
         TEST_DATABASE_URL,
         echo=False,
         connect_args={"check_same_thread": False},
+        poolclass=StaticPool,
     )
 
     async with engine.begin() as conn:
@@ -32,8 +36,10 @@ async def test_engine():
 
     yield engine
 
-    async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.drop_all)
+    # For in-memory SQLite, disposing the engine is sufficient cleanup.
+    # Calling drop_all here can fail if the underlying async connection
+    # has already been terminated by the test client's event loop teardown.
+    await engine.dispose()
 
 
 @pytest_asyncio.fixture
@@ -44,7 +50,7 @@ async def test_session_maker(test_engine):
 
 @pytest_asyncio.fixture
 async def test_db_session(test_session_maker):
-    """Create a database session and a default user."""
+    """Seed default users for tests without holding a DB session open."""
     async with test_session_maker() as session:
         # Create default user
         default_user = User(
@@ -62,7 +68,30 @@ async def test_db_session(test_session_maker):
         session.add(default_user)
         session.add(default_user_2)
         await session.commit()
-        yield session
+
+    yield
+
+
+@pytest_asyncio.fixture
+async def test_task_ids(test_db_session, client: AsyncClient):
+    """Create some test tasks for the default user."""
+    task_ids = []
+
+    for i in range(3):
+        response = await client.post(
+            "/api/tasks",
+            json={
+                "name": f"Test Task {i+1}",
+                "description": f"Description for task {i+1}",
+                "due_date": None,
+                "completed": False,
+            },
+            headers={"Authorization": "Bearer valid-test-token"},
+        )
+        assert response.status_code == 200
+        task_ids.append(response.json()["task"]["id"])
+
+    yield task_ids
 
 
 @pytest_asyncio.fixture
@@ -82,5 +111,23 @@ async def client(
         transport=ASGITransport(app=app), base_url="http://test"
     ) as ac:
         yield ac
+
+    app.dependency_overrides.clear()
+
+
+@pytest.fixture
+def ws_client(test_session_maker, test_db_session):
+    """Create a test client for WebSocket testing."""
+    from main import app
+
+    async def override_get_db():
+        async with test_session_maker() as session:
+            yield session
+
+    app.dependency_overrides[get_db] = override_get_db
+
+    client = TestClient(app)
+    yield client
+    client.close()
 
     app.dependency_overrides.clear()
