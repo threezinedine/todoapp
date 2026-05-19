@@ -18,6 +18,8 @@
 
 		.list {
 			flex: 1;
+			display: flex;
+			flex-direction: column;
 			border: 1px solid #02b9b371;
 			padding: 0.5rem;
 			border-radius: 0.7rem;

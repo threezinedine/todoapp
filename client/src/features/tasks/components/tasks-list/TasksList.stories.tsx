@@ -53,3 +53,32 @@ export const Default: Story = {
 		)
 	},
 }
+
+export const Loading: Story = {
+	render: () => {
+		return (
+			<div
+				style={{
+					backgroundColor: '#353535',
+					width: '100%',
+					height: '100vh',
+					padding: '3rem',
+					display: 'flex',
+					justifyContent: 'center',
+				}}
+			>
+				<TasksList
+					tasks={[
+						{
+							taskId: '1',
+							taskName: 'Task 1',
+							isComplete: false,
+						},
+					]}
+					isLoading
+					onTaskReorder={() => {}}
+				/>
+			</div>
+		)
+	},
+}

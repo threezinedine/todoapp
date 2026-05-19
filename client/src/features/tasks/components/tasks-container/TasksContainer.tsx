@@ -1,16 +1,23 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Button } from '~/components'
 import { TasksList } from '../tasks-list'
 import styles from './TasksContainer.module.scss'
 import { NewTaskModal } from '../new-task-modal/NewTaskModal'
 import clsx from 'clsx'
+import { useTasksStore } from '../../stores/TaskStore'
 
 export function TasksContainer() {
 	const [isModalOpen, setIsModalOpen] = useState(false)
+	const { tasks, isTasksLoading, fetchTasks } = useTasksStore()
+
+	useEffect(() => {
+		fetchTasks()
+	}, [])
 
 	function onCreateTaskSuccess() {
 		alert('Task created successfully!')
 		setIsModalOpen(false)
+		fetchTasks()
 	}
 
 	function onCreateTaskFailed(response: Response) {
@@ -37,18 +44,8 @@ export function TasksContainer() {
 				</div>
 				<div className={clsx(styles.list)}>
 					<TasksList
-						tasks={[
-							{
-								taskId: '1',
-								taskName: 'Task 1',
-								isComplete: false,
-							},
-							{
-								taskId: '2',
-								taskName: 'Task 2',
-								isComplete: true,
-							},
-						]}
+						isLoading={isTasksLoading}
+						tasks={tasks}
 						testId="tasks-list"
 						onTaskReorder={() => {}}
 					/>

@@ -4,7 +4,12 @@ import clsx from 'clsx'
 import { TaskCard } from '../task-card'
 import { useRef } from 'react'
 
-export function TasksList({ tasks, testId, onTaskReorder }: TasksListProps) {
+export function TasksList({
+	tasks,
+	testId,
+	onTaskReorder,
+	isLoading,
+}: TasksListProps) {
 	const draggedTaskIdRef = useRef<HTMLElement | null>(null)
 	const hoverRef = useRef<HTMLElement | null>(null)
 
@@ -94,14 +99,14 @@ export function TasksList({ tasks, testId, onTaskReorder }: TasksListProps) {
 
 	return (
 		<div
-			className={clsx(styles.container)}
+			className={clsx(styles.container, isLoading && styles.loading)}
 			data-testid={testId}
 			onDrag={handleDragging}
 			onDragEnd={handleDragEnd}
 		>
-			{tasks.map((task) => (
+			{tasks.map((task, index) => (
 				<div
-					key={task.taskId}
+					key={index}
 					className={clsx(styles.taskWrapper)}
 					task-id={task.taskId}
 				>
