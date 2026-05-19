@@ -25,11 +25,12 @@ export const Default: Story = {
 		>
 			<Form
 				fields={[
-					{ field: 'Username', type: 'text' },
+					{ field: 'Username', type: 'text', enterTrigger: true },
 					{ field: 'Password', type: 'password' },
 					{ field: 'Email', type: 'email' },
 					{ field: 'Age', type: 'number' },
 				]}
+				onSubmit={() => alert('Submit')}
 				submitButton={
 					<Button
 						variant="glick-black"

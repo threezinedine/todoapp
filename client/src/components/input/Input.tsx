@@ -9,7 +9,14 @@ export function Input({
 	type = 'text',
 	dataTestId = undefined,
 	isLoading,
+	enterTrigger,
 }: InputProps) {
+	function handleKeyDown(event: React.KeyboardEvent<HTMLInputElement>) {
+		if (event.key === 'Enter') {
+			event.preventDefault()
+			enterTrigger?.()
+		}
+	}
 	const valueProps = value !== undefined ? { value } : { defaultValue }
 
 	if (type === 'textarea') {
@@ -76,6 +83,7 @@ export function Input({
 				name={field}
 				{...valueProps}
 				onChange={onChange}
+				onKeyDown={enterTrigger ? handleKeyDown : undefined}
 				type={type}
 				placeholder=""
 				data-testid={dataTestId}

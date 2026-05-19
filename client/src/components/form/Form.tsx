@@ -91,6 +91,11 @@ export const Form = forwardRef<FormHandle, FormProps>(function Form(
 					type={type}
 					defaultValue={normalizeDefaultValue(type, defaultValue)}
 					isLoading={isLoading}
+					enterTrigger={
+						submitButton
+							? () => formRef.current?.requestSubmit()
+							: undefined
+					}
 				/>
 			))}
 			{submitButton}

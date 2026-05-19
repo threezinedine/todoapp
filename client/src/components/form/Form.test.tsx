@@ -18,11 +18,13 @@ vi.mock('~/components/input', () => ({
 		type,
 		defaultValue,
 		isLoading,
+		enterTrigger,
 	}: {
 		field: string
 		type: string
 		defaultValue?: string | number
 		isLoading?: boolean
+		enterTrigger?: () => void
 	}) =>
 		type === 'textarea' ? (
 			<div>
@@ -42,6 +44,12 @@ vi.mock('~/components/input', () => ({
 					defaultValue={defaultValue}
 					data-testid={`input-${field}`}
 					disabled={isLoading}
+					onKeyDown={(e) => {
+						if (e.key === 'Enter') {
+							e.preventDefault()
+							enterTrigger?.()
+						}
+					}}
 				/>
 				<label>{field}</label>
 			</div>
@@ -567,5 +575,82 @@ describe('Form', () => {
 		)
 
 		expect(screen.getByTestId('input-DueDate')).toHaveValue('2026-05-10')
+	})
+
+	// ─── enterTrigger ─────────────────────────────────────────────────────────────
+
+	describe('enterTrigger', () => {
+		it('pressing Enter on a field calls onSubmit once when submitButton is present', async () => {
+			const user = userEvent.setup()
+			const onSubmit = vi.fn().mockResolvedValue(undefined)
+
+			render(
+				<Form
+					fields={[{ field: 'Username', type: 'text' }]}
+					onSubmit={onSubmit}
+					submitButton={<button type="submit">Submit</button>}
+				/>,
+			)
+
+			await user.type(screen.getByTestId('input-Username'), '{Enter}')
+
+			expect(onSubmit).toHaveBeenCalledTimes(1)
+		})
+
+		it('does not submit twice — enterTrigger and native submit do not double-fire', async () => {
+			const user = userEvent.setup()
+			const onSubmit = vi.fn().mockResolvedValue(undefined)
+
+			render(
+				<Form
+					fields={[{ field: 'Username', type: 'text' }]}
+					onSubmit={onSubmit}
+					submitButton={<button type="submit">Submit</button>}
+				/>,
+			)
+
+			await user.type(screen.getByTestId('input-Username'), '{Enter}')
+
+			expect(onSubmit).toHaveBeenCalledTimes(1)
+		})
+
+		it('pressing Enter submits with the currently typed values', async () => {
+			const user = userEvent.setup()
+			const onSubmit = vi.fn().mockResolvedValue(undefined)
+
+			render(
+				<Form
+					fields={[
+						{ field: 'Username', type: 'text' },
+						{ field: 'Password', type: 'password' },
+					]}
+					onSubmit={onSubmit}
+					submitButton={<button type="submit">Submit</button>}
+				/>,
+			)
+
+			await user.type(screen.getByTestId('input-Username'), 'alice')
+			await user.type(screen.getByTestId('input-Username'), '{Enter}')
+
+			expect(onSubmit).toHaveBeenCalledWith(
+				expect.objectContaining({ Username: 'alice', Password: '' }),
+			)
+		})
+
+		it('does not call onSubmit when Enter is pressed and no submitButton is present', async () => {
+			const user = userEvent.setup()
+			const onSubmit = vi.fn().mockResolvedValue(undefined)
+
+			render(
+				<Form
+					fields={[{ field: 'Username', type: 'text' }]}
+					onSubmit={onSubmit}
+				/>,
+			)
+
+			await user.type(screen.getByTestId('input-Username'), '{Enter}')
+
+			expect(onSubmit).not.toHaveBeenCalled()
+		})
 	})
 })

@@ -8,4 +8,5 @@ export interface InputProps {
 	type?: 'text' | 'password' | 'email' | 'number' | 'date' | 'textarea'
 	dataTestId?: string
 	isLoading?: boolean
+	enterTrigger?: () => void
 }

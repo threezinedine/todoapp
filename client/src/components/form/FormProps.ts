@@ -6,6 +6,7 @@ export interface FieldProps {
 	field: string
 	type: 'text' | 'password' | 'email' | 'number' | 'date' | 'textarea'
 	defaultValue?: FieldValue
+	enterTrigger?: boolean
 }
 
 export interface FormProps extends Omit<

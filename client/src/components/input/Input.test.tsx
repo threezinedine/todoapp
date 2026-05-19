@@ -460,4 +460,68 @@ describe('Input', () => {
 			expect(document.querySelector('input')).not.toBeInTheDocument()
 		})
 	})
+
+	// ─── enterTrigger ────────────────────────────────────────────────────────────
+
+	describe('enterTrigger', () => {
+		it('calls enterTrigger when Enter is pressed', async () => {
+			const user = userEvent.setup()
+			const enterTrigger = vi.fn()
+
+			render(<Input enterTrigger={enterTrigger} />)
+
+			await user.type(screen.getByRole('textbox'), '{Enter}')
+
+			expect(enterTrigger).toHaveBeenCalledTimes(1)
+		})
+
+		it('does not call enterTrigger when a non-Enter key is pressed', async () => {
+			const user = userEvent.setup()
+			const enterTrigger = vi.fn()
+
+			render(<Input enterTrigger={enterTrigger} />)
+
+			await user.type(screen.getByRole('textbox'), 'abc')
+
+			expect(enterTrigger).not.toHaveBeenCalled()
+		})
+
+		it('does not throw when Enter is pressed and enterTrigger is not provided', async () => {
+			const user = userEvent.setup()
+
+			render(<Input />)
+
+			// Should not throw
+			await user.type(screen.getByRole('textbox'), '{Enter}')
+		})
+
+		it('prevents native form submission when Enter is pressed', async () => {
+			const user = userEvent.setup()
+			const enterTrigger = vi.fn()
+			const onFormSubmit = vi.fn()
+
+			render(
+				<form onSubmit={onFormSubmit}>
+					<Input enterTrigger={enterTrigger} />
+					<button type="submit">Submit</button>
+				</form>,
+			)
+
+			await user.type(screen.getByRole('textbox'), '{Enter}')
+
+			expect(enterTrigger).toHaveBeenCalledTimes(1)
+			expect(onFormSubmit).not.toHaveBeenCalled()
+		})
+
+		it('calls enterTrigger on every Enter press', async () => {
+			const user = userEvent.setup()
+			const enterTrigger = vi.fn()
+
+			render(<Input enterTrigger={enterTrigger} />)
+
+			await user.type(screen.getByRole('textbox'), '{Enter}{Enter}{Enter}')
+
+			expect(enterTrigger).toHaveBeenCalledTimes(3)
+		})
+	})
 })
