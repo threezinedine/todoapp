@@ -40,6 +40,7 @@ export function TasksContainer() {
 						variant="glass-morphism"
 						text="Add Task"
 						onClick={() => setIsModalOpen(true)}
+						dataTestId="create-task-button"
 					/>
 				</div>
 				<div className={clsx(styles.list)}>

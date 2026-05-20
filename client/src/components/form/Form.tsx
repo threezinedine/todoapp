@@ -85,7 +85,7 @@ export const Form = forwardRef<FormHandle, FormProps>(function Form(
 		>
 			{fields.map(({ field, type, defaultValue }, index) => (
 				<Input
-					dataTestId={`${dataTestId}-${field}`}
+					dataTestId={`${dataTestId}-${field.toLowerCase()}`}
 					key={index}
 					field={field}
 					type={type}

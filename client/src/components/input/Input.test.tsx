@@ -519,7 +519,10 @@ describe('Input', () => {
 
 			render(<Input enterTrigger={enterTrigger} />)
 
-			await user.type(screen.getByRole('textbox'), '{Enter}{Enter}{Enter}')
+			await user.type(
+				screen.getByRole('textbox'),
+				'{Enter}{Enter}{Enter}',
+			)
 
 			expect(enterTrigger).toHaveBeenCalledTimes(3)
 		})

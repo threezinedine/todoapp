@@ -63,6 +63,7 @@ export function NewTaskModal({
 								},
 							]}
 							onSubmit={onSubmit}
+							dataTestId={`new-task-form`}
 						/>
 					</div>
 					<div className={clsx(styles.buttons)}>

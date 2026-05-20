@@ -123,5 +123,36 @@ test.describe('App Walkthrough', () => {
 		await page.goto('/dashboard') // try to visit protected page again to confirm we are logged out
 		await page.waitForTimeout(100)
 		await expect(page.url()).toContain('/login')
+
+		// login and return the home page for the next test
+		await page.goto('/login')
+		await page
+			.locator('[data-testid="login-form-token"]')
+			.fill('dev-token-only')
+		await page.locator('[data-testid="login-form-submit"]').click()
+		await page.waitForTimeout(100)
+		await page.goto('/')
+
+		// test create a new task -> it shows up in the task list.
+		await page.click('[data-testid="create-task-button"]')
+
+		// assert the new-task-modal is visible
+		await expect(
+			page.locator('[data-testid="new-task-modal-overlay"]'),
+		).toBeVisible()
+
+		// fill the form fields and type enter to submit
+		const randomTaskName = `test-task-${Math.floor(Math.random() * 1000)}`
+		await page
+			.locator('[data-testid="new-task-form-name"]')
+			.fill(randomTaskName)
+		await page.locator('[data-testid="new-task-form-name"]').press('Enter')
+
+		// wait for the new task to appear in the task list
+		await expect(
+			page.locator(`[data-testid="task-card-${randomTaskName}"]`),
+		).toBeVisible({
+			timeout: 5000,
+		})
 	})
 })

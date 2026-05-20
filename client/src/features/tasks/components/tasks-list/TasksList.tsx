@@ -110,7 +110,10 @@ export function TasksList({
 					className={clsx(styles.taskWrapper)}
 					task-id={task.taskId}
 				>
-					<TaskCard {...task} />
+					<TaskCard
+						testId={`task-card-${task.taskName}`}
+						{...task}
+					/>
 				</div>
 			))}
 		</div>
