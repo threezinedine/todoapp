@@ -1,8 +1,14 @@
 import { Calendar, type CalendarHandle } from '~/components'
-import { ViewSwitch } from '../view-switch'
+import { ViewSwitch } from '~/state-components'
 import styles from './CalendarViewContainer.module.scss'
 import { useRef } from 'react'
 import clsx from 'clsx'
+
+const CALENDAR_VIEW_OPTIONS = [
+	{ value: 'day', label: 'Day' },
+	{ value: 'week', label: 'Week' },
+	{ value: 'month', label: 'Month' },
+] as const
 
 export function CalendarViewContainer() {
 	const calendarRef = useRef<CalendarHandle>(null)
@@ -11,8 +17,9 @@ export function CalendarViewContainer() {
 		<div className={clsx(styles.wrapper)}>
 			<div className={clsx(styles.viewSwitchWrapper)}>
 				<ViewSwitch
-					defaultView="day"
-					onViewChange={(view) => {
+					defaultValue="day"
+					options={[...CALENDAR_VIEW_OPTIONS]}
+					onValueChange={(view) => {
 						console.log(`Switched to ${view} view`)
 					}}
 				/>

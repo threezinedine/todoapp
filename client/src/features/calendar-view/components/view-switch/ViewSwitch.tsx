@@ -1,54 +1,33 @@
-import { useState } from 'react'
 import styles from './ViewSwitch.module.scss'
-import clsx from 'clsx'
 import type { ViewSwitchProps } from './ViewSwitchPropts'
+import { ViewSwitch as SharedViewSwitch } from '~/state-components'
+
+const VIEW_OPTIONS = [
+	{ value: 'day', label: 'Day' },
+	{ value: 'week', label: 'Week' },
+	{ value: 'month', label: 'Month' },
+] as const
 
 export function ViewSwitch({
 	defaultView = 'day',
 	onViewChange,
 }: ViewSwitchProps) {
-	const [activeView, setActiveView] = useState<'day' | 'week' | 'month'>(
-		defaultView,
-	)
-
-	function handleViewChange(view: 'day' | 'week' | 'month') {
-		setActiveView(view)
-		onViewChange?.(view)
-	}
-
 	return (
-		<div className={clsx(styles.wrapper)}>
-			<div
-				className={clsx(styles.viewButton, {
-					[styles.activeButton]: activeView === 'day',
-				})}
-				onClick={() => handleViewChange('day')}
-			>
-				Day
-			</div>
-			<div
-				className={clsx(styles.viewButton, {
-					[styles.activeButton]: activeView === 'week',
-				})}
-				onClick={() => handleViewChange('week')}
-			>
-				Week
-			</div>
-			<div
-				className={clsx(styles.viewButton, {
-					[styles.activeButton]: activeView === 'month',
-				})}
-				onClick={() => handleViewChange('month')}
-			>
-				Month
-			</div>
-			<div
-				className={clsx(styles.indicator, {
-					[styles['day-active']]: activeView === 'day',
-					[styles['week-active']]: activeView === 'week',
-					[styles['month-active']]: activeView === 'month',
-				})}
-			></div>
-		</div>
+		<SharedViewSwitch
+			defaultValue={defaultView}
+			onValueChange={onViewChange}
+			options={[...VIEW_OPTIONS]}
+			classNames={{
+				wrapper: styles.wrapper,
+				button: styles.viewButton,
+				activeButton: styles.activeButton,
+				indicator: styles.indicator,
+				indicatorByValue: {
+					day: styles['day-active'],
+					week: styles['week-active'],
+					month: styles['month-active'],
+				},
+			}}
+		/>
 	)
 }

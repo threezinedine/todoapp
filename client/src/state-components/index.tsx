@@ -1,3 +1,5 @@
 export { Dropdown } from './dropdown'
 export { ValidateModal } from './validate-modal'
+export { ViewSwitch } from './view-switch'
 export type { ValidateModalHandle } from './validate-modal'
+export type { ViewSwitchOption } from './view-switch'

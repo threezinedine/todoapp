@@ -1,0 +1,93 @@
+.wrapper {
+	--switch-bg: #101a2d;
+	--switch-border: #2d3a58;
+	--switch-text: #b5c4e0;
+	--switch-text-active: #f4f8ff;
+	--indicator-bg: linear-gradient(135deg, #3e78ff 0%, #18b6cb 100%);
+	--indicator-shadow: 0 6px 16px rgba(24, 182, 203, 0.35);
+	--switch-count: 3;
+
+	position: relative;
+	display: grid;
+	grid-template-columns: repeat(var(--switch-count), minmax(0, 1fr));
+	align-items: center;
+	width: min(360px, 100%);
+	padding: 4px;
+	border-radius: 14px;
+	background:
+		radial-gradient(
+			circle at 20% 0%,
+			rgba(62, 120, 255, 0.14),
+			transparent 45%
+		),
+		var(--switch-bg);
+	border: 1px solid var(--switch-border);
+	box-shadow:
+		inset 0 1px 0 rgba(255, 255, 255, 0.06),
+		0 12px 28px rgba(0, 0, 0, 0.28);
+	overflow: hidden;
+	user-select: none;
+}
+
+.viewButton {
+	position: relative;
+	z-index: 2;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	height: 38px;
+	padding: 0 0.8rem;
+	border-radius: 10px;
+	font-size: 0.82rem;
+	font-weight: 700;
+	letter-spacing: 0.045em;
+	text-transform: uppercase;
+	color: var(--switch-text);
+	cursor: pointer;
+	transition: color 180ms ease;
+	background: transparent;
+	border: 0;
+}
+
+.viewButton:hover {
+	color: #d8e5ff;
+}
+
+.activeButton {
+	color: var(--switch-text-active);
+	text-shadow: 0 1px 6px rgba(12, 27, 52, 0.5);
+}
+
+.wrapper:focus-within {
+	box-shadow:
+		0 0 0 2px rgba(62, 120, 255, 0.45),
+		0 12px 28px rgba(0, 0, 0, 0.28);
+}
+
+.indicator {
+	position: absolute;
+	top: 4px;
+	left: 4px;
+	height: calc(100% - 8px);
+	width: calc((100% - 8px) / var(--switch-count));
+	border-radius: 10px;
+	background: var(--indicator-bg);
+	box-shadow: var(--indicator-shadow);
+	transition:
+		transform 240ms cubic-bezier(0.22, 1, 0.36, 1),
+		background 220ms ease;
+	will-change: transform;
+	z-index: 1;
+}
+
+@media (max-width: 520px) {
+	.wrapper {
+		width: 100%;
+	}
+
+	.viewButton {
+		font-size: 0.74rem;
+		letter-spacing: 0.03em;
+		height: 34px;
+	}
+}
