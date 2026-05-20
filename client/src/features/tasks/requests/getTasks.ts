@@ -1,6 +1,6 @@
 import { get } from '~/utils'
 
-export async function getTasks(date?: Date) {
+export function getTasks(date?: Date) {
 	const dateParam = date ? `date=${date.toISOString()}` : ''
 
 	return get(`/tasks?${dateParam}`)
