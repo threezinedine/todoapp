@@ -98,6 +98,7 @@ export const TimeModal = forwardRef<TimeModalHandle, TimeModalProps>(
 			<Modal
 				isOpen={isOpen}
 				onClose={onClose}
+				dataTestId="time-modal"
 			>
 				<div className={clsx(styles.container)}>
 					<ViewSwitch

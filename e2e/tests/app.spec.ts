@@ -154,5 +154,15 @@ test.describe('App Walkthrough', () => {
 		).toBeVisible({
 			timeout: 5000,
 		})
+
+		// click on the new task to open the time modal
+		await page
+			.locator(`[data-testid="task-card-${randomTaskName}"]`)
+			.click()
+
+		// assert the time modal is visible
+		await expect(
+			page.locator('[data-testid="time-modal-overlay"]'),
+		).toBeVisible()
 	})
 })
