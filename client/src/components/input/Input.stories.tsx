@@ -20,6 +20,7 @@ export const Default: Story = {
 			new Date().toISOString().split('T')[0],
 		)
 		const [description, setDescription] = useState('')
+		const [isAdmin, setAdmin] = useState(false)
 
 		return (
 			<div
@@ -48,6 +49,12 @@ export const Default: Story = {
 					value={email}
 					onChange={(e) => setEmail(e.target.value)}
 					type="email"
+				/>
+				<Input
+					field="Is Admin"
+					value={isAdmin}
+					onChange={(e) => setAdmin((e.target as HTMLInputElement).checked)}
+					type="boolean"
 				/>
 				<Input
 					field="Age"

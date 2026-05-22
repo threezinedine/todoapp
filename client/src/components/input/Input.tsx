@@ -17,7 +17,53 @@ export function Input({
 			enterTrigger?.()
 		}
 	}
-	const valueProps = value !== undefined ? { value } : { defaultValue }
+	const textValueProps =
+		value !== undefined
+			? { value: value as string | number }
+			: { defaultValue: defaultValue as string | number | undefined }
+
+	if (type === 'boolean') {
+		const booleanProps =
+			value !== undefined
+				? { checked: Boolean(value) }
+				: { defaultChecked: Boolean(defaultValue) }
+		const toggleId = `${field.toLowerCase().replace(/\s+/g, '-')}-toggle`
+
+		return (
+			<div className={`${styles.container} ${styles.booleanContainer}`}>
+				<label
+					className={styles.booleanControl}
+					htmlFor={toggleId}
+				>
+					<input
+						id={toggleId}
+						className={styles.booleanInput}
+						name={field}
+						{...booleanProps}
+						onChange={onChange}
+						type="checkbox"
+						data-testid={dataTestId}
+						disabled={isLoading}
+					/>
+					<span className={styles.booleanTrack}>
+						<span className={styles.booleanThumb} />
+					</span>
+				</label>
+				<label
+					className={`${styles.label} ${styles.booleanLabel}`}
+					htmlFor={toggleId}
+				>
+					{field}
+				</label>
+				{isLoading && (
+					<>
+						<div className={styles.spinner}></div>
+						<div className={styles.overlay}></div>
+					</>
+				)}
+			</div>
+		)
+	}
 
 	if (type === 'textarea') {
 		return (
@@ -25,7 +71,7 @@ export function Input({
 				<textarea
 					className={styles.textarea}
 					name={field}
-					{...valueProps}
+					{...textValueProps}
 					onChange={onChange}
 					placeholder=""
 					data-testid={dataTestId}
@@ -53,7 +99,7 @@ export function Input({
 				<input
 					className={`${styles.input} ${styles.dateInput}`}
 					name={field}
-					{...valueProps}
+					{...textValueProps}
 					onChange={onChange}
 					type={type}
 					placeholder=""
@@ -81,7 +127,7 @@ export function Input({
 			<input
 				className={styles.input}
 				name={field}
-				{...valueProps}
+				{...textValueProps}
 				onChange={onChange}
 				onKeyDown={enterTrigger ? handleKeyDown : undefined}
 				type={type}

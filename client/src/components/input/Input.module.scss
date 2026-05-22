@@ -116,6 +116,98 @@
 	}
 }
 
+.booleanContainer {
+	display: flex;
+	align-items: center;
+	gap: 0.9rem;
+	min-height: 3.5rem;
+
+	.booleanControl {
+		position: relative;
+		display: inline-flex;
+		align-items: center;
+		cursor: pointer;
+		user-select: none;
+	}
+
+	.booleanInput {
+		position: absolute;
+		opacity: 0;
+		width: 0;
+		height: 0;
+	}
+
+	.booleanTrack {
+		position: relative;
+		display: inline-flex;
+		align-items: center;
+		width: 3.8rem;
+		height: 2.1rem;
+		border-radius: 999px;
+		border: 1px solid rgba(0, 242, 234, 0.35);
+		background: linear-gradient(
+			180deg,
+			rgba(0, 242, 234, 0.12),
+			rgba(8, 20, 28, 0.55)
+		);
+		box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+		transition:
+			background 0.25s ease,
+			border-color 0.25s ease,
+			box-shadow 0.25s ease;
+	}
+
+	.booleanThumb {
+		width: 1.55rem;
+		height: 1.55rem;
+		margin-left: 0.18rem;
+		border-radius: 50%;
+		background: linear-gradient(180deg, #ffffff, #bfd6d5);
+		box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
+		transform: translateX(0);
+		transition: transform 0.25s ease;
+	}
+
+	.booleanLabel {
+		position: static;
+		font-size: 0.95rem;
+		font-weight: 500;
+		letter-spacing: 0.02em;
+		text-transform: none;
+		opacity: 1;
+		pointer-events: auto;
+		cursor: pointer;
+	}
+
+	.booleanInput:checked + .booleanTrack {
+		background: linear-gradient(
+			180deg,
+			rgba(0, 242, 234, 0.28),
+			rgba(0, 242, 234, 0.18)
+		);
+		border-color: var(--primary-color);
+		box-shadow:
+			0 0 0 3px rgba(0, 242, 234, 0.12),
+			inset 0 1px 0 rgba(255, 255, 255, 0.08);
+	}
+
+	.booleanInput:checked + .booleanTrack .booleanThumb {
+		transform: translateX(1.7rem);
+	}
+
+	.booleanInput:focus-visible + .booleanTrack {
+		box-shadow:
+			0 0 0 3px rgba(0, 242, 234, 0.18),
+			inset 0 1px 0 rgba(255, 255, 255, 0.08);
+	}
+
+	.booleanInput:disabled + .booleanTrack,
+	.booleanInput:disabled ~ .booleanLabel {
+		opacity: 0.55;
+		cursor: not-allowed;
+	}
+}
+
 .textareaContainer {
 	.textareaLabel {
 		top: 1rem;
