@@ -26,3 +26,18 @@ async def test_session_lifecycle_with_valid_task(
     ) as websocket:
         websocket.send_text("ping")
         assert websocket.receive_text() == "pong"
+
+
+@pytest.mark.asyncio
+async def test_session_lifecycle_with_token_query_param(
+    ws_client,
+    test_db_session,
+    test_task_ids,
+):
+    task_id = test_task_ids[0]
+
+    with ws_client.websocket_connect(
+        f"/api/sessions/{task_id}?token=valid-test-token",
+    ) as websocket:
+        websocket.send_text("ping")
+        assert websocket.receive_text() == "pong"

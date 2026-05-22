@@ -6,4 +6,5 @@ export interface TaskCardProps {
 	onCompleteChange?: (isComplete: boolean) => Promise<void> | void
 	onDelete?: () => Promise<void> | void
 	onSettings?: () => Promise<void> | void
+	onOpenPomodoro?: () => Promise<void> | void
 }

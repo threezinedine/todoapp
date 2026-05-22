@@ -26,6 +26,9 @@ export const Default: Story = {
 							`Reorder task ${sourceTaskId} ${position} task ${targetTaskId}`,
 						)
 					}}
+					onTaskOpen={(taskId) => {
+						alert(`Open task id ${taskId}`)
+					}}
 					tasks={[
 						{
 							taskId: '1',

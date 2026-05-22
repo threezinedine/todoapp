@@ -14,6 +14,7 @@ import styles from './TimeModal.module.scss'
 import clsx from 'clsx'
 import { Button, Modal } from '~/components'
 import { ViewSwitch } from '~/state-components'
+import { useTimeStore } from '../../stores/time-store'
 
 const MODE_SECONDS: Record<PomodoroMode, number> = {
 	work: 25 * 60,
@@ -37,41 +38,55 @@ export const TimeModal = forwardRef<TimeModalHandle, TimeModalProps>(
 			MODE_SECONDS.work,
 		)
 
+		const {
+			taskRemainSeconds,
+			start,
+			stop,
+			ping,
+			connectWebSocket,
+			disconnectWebSocket,
+		} = useTimeStore()
+		const displayedSeconds =
+			mode === 'work'
+				? (taskRemainSeconds ?? remainingSeconds)
+				: MODE_SECONDS[mode]
+
 		useImperativeHandle(ref, () => ({
 			toggle: () => setIsOpen((prev) => !prev),
+			toWork: () => onChangeMode('work'),
+			toShortBreak: () => onChangeMode('shortBreak'),
+			toLongBreak: () => onChangeMode('longBreak'),
 		}))
 
 		useEffect(() => {
-			if (!isOpen || !isRunning) {
+			if (!isRunning) {
 				return
 			}
 
-			const timer = window.setInterval(() => {
-				setRemainingSeconds((current) => {
-					if (current <= 1) {
-						window.clearInterval(timer)
-						setIsRunning(false)
-						return 0
-					}
-
-					return current - 1
-				})
+			const interval = window.setInterval(() => {
+				void ping()
 			}, 1000)
 
-			return () => window.clearInterval(timer)
-		}, [isOpen, isRunning])
+			return () => window.clearInterval(interval)
+		}, [isRunning, ping])
 
 		const timeLabel = useMemo(() => {
-			const minutes = Math.floor(remainingSeconds / 60)
-			const seconds = remainingSeconds % 60
+			const minutes = Math.floor(displayedSeconds / 60)
+			const seconds = displayedSeconds % 60
 
 			return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`
-		}, [remainingSeconds])
+		}, [displayedSeconds])
 
 		function onChangeMode(selectedMode: PomodoroMode) {
 			setMode(selectedMode)
 			setIsRunning(false)
 			setRemainingSeconds(MODE_SECONDS[selectedMode])
+
+			if (selectedMode === 'work') {
+				connectWebSocket()
+			} else {
+				disconnectWebSocket()
+			}
 		}
 
 		function onClose() {
@@ -104,7 +119,15 @@ export const TimeModal = forwardRef<TimeModalHandle, TimeModalProps>(
 					<div className={clsx(styles.controls)}>
 						<Button
 							text={isRunning ? 'Stop' : 'Start'}
-							onClick={() => setIsRunning((current) => !current)}
+							onClick={async () => {
+								if (isRunning) {
+									await stop()
+									setIsRunning(false)
+								} else {
+									await start()
+									setIsRunning(true)
+								}
+							}}
 							variant="glick"
 							className={clsx(styles.startStopButton)}
 						/>

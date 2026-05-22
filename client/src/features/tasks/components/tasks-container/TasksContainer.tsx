@@ -6,7 +6,11 @@ import { NewTaskModal } from '../new-task-modal/NewTaskModal'
 import clsx from 'clsx'
 import { useTasksStore } from '../../stores/TaskStore'
 
-export function TasksContainer() {
+export function TasksContainer({
+	onTaskOpen,
+}: {
+	onTaskOpen?: (taskId: string) => Promise<void> | void
+}) {
 	const [isModalOpen, setIsModalOpen] = useState(false)
 	const { tasks, isTasksLoading, fetchTasks } = useTasksStore()
 
@@ -49,6 +53,7 @@ export function TasksContainer() {
 						tasks={tasks}
 						testId="tasks-list"
 						onTaskReorder={() => {}}
+						onTaskOpen={onTaskOpen}
 					/>
 				</div>
 			</div>

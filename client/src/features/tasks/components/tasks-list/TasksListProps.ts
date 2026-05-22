@@ -4,6 +4,7 @@ export interface TasksListProps {
 	testId?: string
 	isLoading?: boolean
 	tasks: TaskCardProps[]
+	onTaskOpen?: (taskId: string) => Promise<void> | void
 	onTaskReorder?: (
 		sourceTaskId: string,
 		targetTaskId: string,

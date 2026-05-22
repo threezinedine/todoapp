@@ -15,13 +15,19 @@ router = APIRouter(prefix="/api", tags=["sessions"])
 
 async def _get_current_user_ws(websocket: WebSocket, db: AsyncSession) -> User | None:
     auth_header = websocket.headers.get("Authorization", "")
-    if not auth_header.startswith("Bearer "):
+    token = None
+
+    if auth_header.startswith("Bearer "):
+        token = auth_header[len("Bearer ") :]
+    else:
+        token = websocket.query_params.get("token")
+
+    if not token:
         await websocket.close(
-            code=1008, reason="Missing or invalid Authorization header"
+            code=1008, reason="Missing or invalid Authorization header or token"
         )
         return None
 
-    token = auth_header[len("Bearer ") :]
     secret_key = os.getenv("DEFAULT_TOKEN")
     secret_key_2 = os.getenv("DEFAULT_TOKEN_2")
 
@@ -89,7 +95,15 @@ async def join_session(
             data = await websocket.receive_text()
 
             if data == "ping":
-                await websocket.send_text("pong")
+                curr_remaiin = task.remainSeconds
+
+                if session:
+                    elapsed_seconds = (
+                        datetime.datetime.utcnow() - session.startTime
+                    ).total_seconds()
+                    curr_remaiin = max(0, curr_remaiin - int(elapsed_seconds))
+
+                await websocket.send_text(str(curr_remaiin))
             elif data == "start":
                 if state == "started":
                     continue

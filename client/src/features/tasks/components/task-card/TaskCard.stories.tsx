@@ -37,6 +37,7 @@ export const Default: Story = {
 					}}
 					onSettings={() => alert('Setting')}
 					onDelete={() => alert('Delete')}
+					onOpenPomodoro={() => alert('Open Pomodoro')}
 				/>
 			</div>
 		)

@@ -18,9 +18,16 @@ export function TaskCard({
 	onCompleteChange,
 	onDelete,
 	onSettings,
+	onOpenPomodoro,
 }: TaskCardProps) {
-	const handleCompleteChange = () => {
+	const handleCompleteChange = (e: React.MouseEvent<HTMLDivElement>) => {
+		e.stopPropagation()
 		void onCompleteChange?.(!isComplete)
+	}
+
+	const handleCardClick = (e: React.MouseEvent<HTMLDivElement>) => {
+		e.stopPropagation()
+		void onOpenPomodoro?.()
 	}
 
 	const containerRef = useRef<HTMLDivElement>(null)
@@ -30,6 +37,7 @@ export function TaskCard({
 			data-testid={testId}
 			className={clsx(styles.container)}
 			ref={containerRef}
+			onClick={handleCardClick}
 		>
 			<input
 				type="checkbox"
@@ -41,7 +49,6 @@ export function TaskCard({
 					[styles.content]: true,
 					[styles.completed]: isComplete,
 				})}
-				onClick={handleCompleteChange}
 			>
 				<div
 					className={clsx(styles.icon)}
@@ -62,7 +69,10 @@ export function TaskCard({
 				>
 					<DragHandleIcon />
 				</div>
-				<div className={clsx(styles.checkbox)}>
+				<div
+					className={clsx(styles.checkbox)}
+					onClick={handleCompleteChange}
+				>
 					<div className={clsx(styles.rect)}></div>
 					<div className={clsx(styles.mark)}>
 						<CheckMarkIcon />

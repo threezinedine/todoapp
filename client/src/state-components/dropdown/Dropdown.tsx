@@ -41,7 +41,8 @@ export function Dropdown({ children, items }: DropdownProps) {
 		>
 			<div
 				className={clsx(styles.trigger)}
-				onClick={() => {
+				onClick={(e) => {
+					e.stopPropagation()
 					setIsOpen(!isOpen)
 				}}
 			>

@@ -8,6 +8,7 @@ export function TasksList({
 	tasks,
 	testId,
 	onTaskReorder,
+	onTaskOpen,
 	isLoading,
 }: TasksListProps) {
 	const draggedTaskIdRef = useRef<HTMLElement | null>(null)
@@ -113,6 +114,7 @@ export function TasksList({
 					<TaskCard
 						testId={`task-card-${task.taskName}`}
 						{...task}
+						onOpenPomodoro={() => onTaskOpen?.(task.taskId ?? '')}
 					/>
 				</div>
 			))}
