@@ -5,6 +5,7 @@ import styles from './TasksContainer.module.scss'
 import { NewTaskModal } from '../new-task-modal/NewTaskModal'
 import clsx from 'clsx'
 import { useTasksStore } from '../../stores/TaskStore'
+import { toast } from '~/stores'
 
 export function TasksContainer({
 	onTaskOpen,
@@ -19,20 +20,39 @@ export function TasksContainer({
 	}, [])
 
 	function onCreateTaskSuccess() {
-		alert('Task created successfully!')
+		toast.success('Task created successfully!', {
+			title: 'Success',
+		})
 		setIsModalOpen(false)
 		fetchTasks()
 	}
 
 	function onCreateTaskFailed(response: Response) {
-		response.json().then((data) => {
-			console.error('Failed to create task:', data)
-		})
+		response
+			.json()
+			.then((data) => {
+				console.error('Failed to create task:', data)
+				toast.error(
+					data?.message ||
+						response.statusText ||
+						'Failed to create task',
+					{
+						title: 'Create Task Failed',
+					},
+				)
+			})
+			.catch(() => {
+				toast.error(response.statusText || 'Failed to create task', {
+					title: 'Create Task Failed',
+				})
+			})
 		setIsModalOpen(false)
 	}
 
 	function onCreateTaskError() {
-		alert('Task created error')
+		toast.error('An unexpected error occurred while creating task.', {
+			title: 'Create Task Error',
+		})
 		setIsModalOpen(false)
 	}
 

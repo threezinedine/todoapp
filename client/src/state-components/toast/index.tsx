@@ -1,4 +1,5 @@
 export { Toast } from './Toast'
+export { ToastHost } from './ToastHost'
 export type {
 	ToastHandle,
 	ToastProps,
