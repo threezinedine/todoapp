@@ -187,15 +187,18 @@ test.describe('App Walkthrough', () => {
 				.innerText(),
 		).toBe('Stop')
 
-		// await expect(
-		// 	page.locator('[data-testid="time-modal-label"]'),
-		// ).toHaveText('00:00', {
-		// 	timeout: 5000,
-		// })
-
 		await expect(
 			page.locator('[data-testid="time-modal-start-stop-button"]'),
 		).toHaveText('Start', {
+			timeout: 5000,
+		})
+
+		// assert the test task card has a "completed" badge after the timer ends
+		await expect(
+			page.locator(
+				`[data-testid="task-card-${randomTaskName}-checkbox"]`,
+			),
+		).toBeChecked({
 			timeout: 5000,
 		})
 
@@ -229,5 +232,32 @@ test.describe('App Walkthrough', () => {
 				'[data-testid="time-modal-view-switch-btn-shortBreak"]',
 			),
 		).toHaveAttribute('aria-checked', 'true')
+
+		// close the time modal
+		await page
+			.locator('[data-testid="time-modal-overlay"]')
+			.click({ position: { x: 10, y: 10 } })
+
+		// create 2 other tasks for testing the order of tasks
+		const taskNames = []
+		for (let i = 0; i < 2; i++) {
+			const taskName = `test-task-${Math.floor(Math.random() * 1000)}`
+			taskNames.push(taskName)
+			await page.click('[data-testid="create-task-button"]')
+			await page
+				.locator('[data-testid="new-task-form-name"]')
+				.fill(taskName)
+			await page
+				.locator('[data-testid="new-task-form-seconds"]')
+				.fill('3')
+			await page
+				.locator('[data-testid="new-task-modal-create-btn"]')
+				.click()
+			await expect(
+				page.locator(`[data-testid="task-card-${taskName}"]`),
+			).toBeVisible({
+				timeout: 5000,
+			})
+		}
 	})
 })

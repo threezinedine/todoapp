@@ -16,6 +16,7 @@ import { Button, Modal } from '~/components'
 import { ViewSwitch } from '~/state-components'
 import { useTimeStore } from '../../stores/time-store'
 import { toast } from '~/stores'
+import { useTasksStore } from '~/features/tasks'
 
 let MODE_SECONDS: Record<PomodoroMode, number> = {
 	work: 25 * 60,
@@ -45,6 +46,7 @@ export const TimeModal = forwardRef<TimeModalHandle, TimeModalProps>(
 			MODE_SECONDS.work,
 		)
 
+		const { completeTask } = useTasksStore()
 		const {
 			taskRemainSeconds,
 			state,
@@ -104,6 +106,9 @@ export const TimeModal = forwardRef<TimeModalHandle, TimeModalProps>(
 						title: 'Break Time',
 					},
 				)
+				if (taskId) {
+					completeTask?.(taskId)
+				}
 			}
 		}, [state])
 

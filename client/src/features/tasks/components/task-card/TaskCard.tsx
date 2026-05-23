@@ -42,6 +42,7 @@ export function TaskCard({
 			<input
 				type="checkbox"
 				checked={isComplete}
+				data-testid={`${testId}-checkbox`}
 				readOnly
 			/>
 			<div

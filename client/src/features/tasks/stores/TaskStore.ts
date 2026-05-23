@@ -11,6 +11,7 @@ interface TasksState {
 	tasks: Task[]
 	isTasksLoading: boolean
 	fetchTasks: () => Promise<void>
+	completeTask?: (taskId: string) => Promise<void>
 }
 
 export const useTasksStore = create<TasksState>()((set) => ({
@@ -63,5 +64,14 @@ export const useTasksStore = create<TasksState>()((set) => ({
 		} finally {
 			set({ isTasksLoading: false })
 		}
+	},
+
+	completeTask: async (taskId) => {
+		// optimistically update the task as completed
+		set((state) => ({
+			tasks: state.tasks.map((task) =>
+				task.taskId === taskId ? { ...task, isComplete: true } : task,
+			),
+		}))
 	},
 }))

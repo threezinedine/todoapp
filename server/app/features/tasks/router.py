@@ -42,6 +42,7 @@ async def get_all_tasks(
                 name=task.name,
                 description=task.description,
                 due_date=task.dueDate,
+                completed=task.isCompleted,
             )
             for task in tasks
         ]

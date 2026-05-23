@@ -141,7 +141,6 @@ export const useTimeStore = create<TimeState>((set, get) => ({
 	reset: async () => {
 		set({
 			state: 'work',
-			taskId: null,
 			taskRemainSeconds: null,
 			websocket: null,
 			isLoading: false,
