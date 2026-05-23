@@ -5,6 +5,7 @@ import type { FormHandle } from '~/components'
 import styles from './NewTaskModal.module.scss'
 import clsx from 'clsx'
 import { createTask } from '../../requests/createTask'
+import type { FieldProps } from '~/components/form'
 
 export function NewTaskModal({
 	isOpen,
@@ -16,12 +17,16 @@ export function NewTaskModal({
 	const formRef = useRef<FormHandle>(null)
 
 	async function onSubmit(fields: Record<string, any>) {
-		//
+		if (fields.Seconds === '') {
+			fields.Seconds = undefined
+		}
+
 		try {
 			const res = await createTask(
 				fields.Name,
 				fields.Description,
 				fields['Due Date'],
+				fields.Seconds,
 			)
 
 			if (res.ok) {
@@ -33,6 +38,29 @@ export function NewTaskModal({
 		} catch (err) {
 			onError?.(err)
 		}
+	}
+
+	const modalFields: FieldProps[] = [
+		{
+			field: 'Name',
+			type: 'text',
+		},
+		{
+			field: 'Description',
+			type: 'textarea',
+		},
+		{
+			field: 'Due Date',
+			type: 'date',
+			defaultValue: new Date(),
+		},
+	]
+
+	if (import.meta.env.VITE_API_ENVIRONMENT === 'development') {
+		modalFields.push({
+			field: 'Seconds',
+			type: 'number',
+		})
 	}
 
 	return (
@@ -47,21 +75,7 @@ export function NewTaskModal({
 					<div className={clsx(styles.form)}>
 						<Form
 							ref={formRef}
-							fields={[
-								{
-									field: 'Name',
-									type: 'text',
-								},
-								{
-									field: 'Description',
-									type: 'textarea',
-								},
-								{
-									field: 'Due Date',
-									type: 'date',
-									defaultValue: new Date(),
-								},
-							]}
+							fields={modalFields}
 							onSubmit={onSubmit}
 							dataTestId={`new-task-form`}
 						/>

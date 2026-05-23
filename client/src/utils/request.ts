@@ -1,7 +1,7 @@
 import { getToken } from './storage'
 
 export async function get(url: string) {
-	let headers = {}
+	let headers: Record<string, string> = {}
 
 	const token = await getToken()
 
@@ -9,6 +9,10 @@ export async function get(url: string) {
 		headers = {
 			Authorization: `Bearer ${token}`,
 		}
+	}
+
+	if (import.meta.env.VITE_API_ENVIRONMENT === 'development') {
+		headers['X-Test-Environment'] = 'true'
 	}
 
 	const response = await fetch(`${import.meta.env.VITE_API_URL}${url}`, {
@@ -29,6 +33,10 @@ export async function post(url: string, data?: any) {
 			...headers,
 			Authorization: `Bearer ${token}`,
 		}
+	}
+
+	if (import.meta.env.VITE_API_ENVIRONMENT === 'development') {
+		headers['X-Test-Environment'] = 'true'
 	}
 
 	const response = await fetch(`${import.meta.env.VITE_API_URL}${url}`, {
@@ -53,6 +61,10 @@ export async function put(url: string, data?: any) {
 		}
 	}
 
+	if (import.meta.env.VITE_API_ENVIRONMENT === 'development') {
+		headers['X-Test-Environment'] = 'true'
+	}
+
 	const response = await fetch(`${import.meta.env.VITE_API_URL}${url}`, {
 		method: 'PUT',
 		headers,
@@ -70,6 +82,10 @@ export async function del(url: string) {
 		headers = {
 			Authorization: `Bearer ${token}`,
 		}
+	}
+
+	if (import.meta.env.VITE_API_ENVIRONMENT === 'development') {
+		headers['X-Test-Environment'] = 'true'
 	}
 
 	const response = await fetch(`${import.meta.env.VITE_API_URL}${url}`, {

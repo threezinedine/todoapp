@@ -1,2 +1,2 @@
 export { Form } from './Form'
-export type { FormHandle } from './FormProps'
+export type { FormHandle, FieldProps } from './FormProps'
