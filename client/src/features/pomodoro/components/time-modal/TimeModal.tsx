@@ -15,11 +15,18 @@ import clsx from 'clsx'
 import { Button, Modal } from '~/components'
 import { ViewSwitch } from '~/state-components'
 import { useTimeStore } from '../../stores/time-store'
+import { toast } from '~/stores'
 
-const MODE_SECONDS: Record<PomodoroMode, number> = {
+let MODE_SECONDS: Record<PomodoroMode, number> = {
 	work: 25 * 60,
 	shortBreak: 5 * 60,
 	longBreak: 15 * 60,
+}
+
+if (import.meta.env.VITE_API_ENVIRONMENT === 'development') {
+	MODE_SECONDS.work = 30
+	MODE_SECONDS.shortBreak = 2
+	MODE_SECONDS.longBreak = 3
 }
 
 const MODE_LABELS: Record<PomodoroMode, string> = {
@@ -45,6 +52,7 @@ export const TimeModal = forwardRef<TimeModalHandle, TimeModalProps>(
 			start,
 			stop,
 			ping,
+			taskId,
 			connectWebSocket,
 			disconnectWebSocket,
 		} = useTimeStore()
@@ -87,6 +95,15 @@ export const TimeModal = forwardRef<TimeModalHandle, TimeModalProps>(
 			} else if (state === 'longBreak') {
 				setIsRunning(true)
 				setMode('longBreak')
+			}
+
+			if (state !== 'work' && taskId) {
+				toast.success(
+					'Time for a break! Take a rest before the next session.',
+					{
+						title: 'Break Time',
+					},
+				)
 			}
 		}, [state])
 

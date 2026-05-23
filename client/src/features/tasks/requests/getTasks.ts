@@ -5,3 +5,9 @@ export function getTasks(date?: Date) {
 
 	return get(`/tasks?${dateParam}`)
 }
+
+export function getTasksOrder(date?: Date) {
+	const dateParam = date ? `date=${date.toISOString()}` : ''
+
+	return get(`/tasks/orders?${dateParam}`)
+}

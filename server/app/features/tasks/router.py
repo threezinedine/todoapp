@@ -73,9 +73,9 @@ async def get_task_orders(
                 .where(Task.userId == user.id, Task.dueDate == today)
                 .order_by(Task.createdAt)
             )
-            return TaskOrderResponse(
-                order_task_ids=[task.id for task in tasks.scalars().all()]
-            )
+
+            tasks_order = [task for task in tasks.scalars().all()]
+            return TaskOrderResponse(order_task_ids=[task.id for task in tasks_order])
 
         order_task_ids = (
             task_order.orderTaskIds.split(",") if task_order.orderTaskIds else []
@@ -187,7 +187,7 @@ async def create_task(
             description=task.description,
             dueDate=task.due_date or datetime.date.today().isoformat(),
             userId=user.id,
-            createdAt=datetime.date.today().isoformat(),
+            createdAt=datetime.datetime.now().isoformat(),
             remainSeconds=(
                 task.seconds if task.seconds is not None else 60 * 45
             ),  # default 45 mins

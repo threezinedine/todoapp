@@ -1,5 +1,5 @@
 import { create } from 'zustand'
-import { getTasks } from '../requests/getTasks'
+import { getTasks, getTasksOrder } from '../requests/getTasks'
 
 export interface Task {
 	taskId: string
@@ -20,18 +20,32 @@ export const useTasksStore = create<TasksState>()((set) => ({
 		set({ isTasksLoading: true })
 		try {
 			const data = await getTasks()
-			if (data instanceof Response) {
-				if (!data.ok) {
+			const orderData = await getTasksOrder()
+
+			if (data instanceof Response && orderData instanceof Response) {
+				if (!data.ok || !orderData.ok) {
 					const errorData = await data.json()
 					console.error('Failed to fetch tasks:', errorData)
 					return
 				}
-				// sleep for 2 seconds to show loading state
-				await new Promise((resolve) => setTimeout(resolve, 200))
 				const tasksData = await data.json()
+				const orderDataJson = await orderData.json()
+
+				// assert orderData has taskIds array which matches tasksData.tasks
 
 				const finalTasks = []
-				for (const task of tasksData.tasks) {
+				for (const taskId of orderDataJson.order_task_ids) {
+					// for (const task of tasksData.tasks) {
+					const task = tasksData.tasks.find(
+						(t: any) => t.id === taskId,
+					)
+					if (!task) {
+						console.warn(
+							`Task with id ${taskId} from order data not found in tasks data`,
+						)
+						continue
+					}
+
 					finalTasks.push({
 						taskId: task.id,
 						taskName: task.name,
