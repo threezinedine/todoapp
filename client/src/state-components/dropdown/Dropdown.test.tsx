@@ -262,7 +262,7 @@ describe('Dropdown', () => {
 		expect(screen.getByTestId('drop-menu')).toBeInTheDocument()
 	})
 
-	it('multiple dropdowns are independent — opening one closes the other', async () => {
+	it('multiple dropdowns are independent — opening one does not close the other', async () => {
 		const user = userEvent.setup()
 		render(
 			<>
@@ -279,10 +279,11 @@ describe('Dropdown', () => {
 		expect(screen.getByTestId('drop-menu')).toBeInTheDocument()
 		expect(screen.getByText('A1')).toBeInTheDocument()
 
-		// Clicking B's trigger closes A's menu (it acts as an outside click on A)
+		// Clicking B's trigger should not close A because each instance handles
+		// its own open/close state and trigger clicks stop propagation.
 		await user.click(screen.getByTestId('dropdown-b-trigger'))
-		expect(screen.queryByText('A1')).not.toBeInTheDocument()
-		expect(screen.getByTestId('drop-menu')).toBeInTheDocument()
+		expect(screen.getByText('A1')).toBeInTheDocument()
 		expect(screen.getByText('B1')).toBeInTheDocument()
+		expect(screen.getAllByTestId('drop-menu')).toHaveLength(2)
 	})
 })
