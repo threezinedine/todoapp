@@ -40,6 +40,8 @@ export const TimeModal = forwardRef<TimeModalHandle, TimeModalProps>(
 
 		const {
 			taskRemainSeconds,
+			state,
+			reset,
 			start,
 			stop,
 			ping,
@@ -59,6 +61,14 @@ export const TimeModal = forwardRef<TimeModalHandle, TimeModalProps>(
 		}))
 
 		useEffect(() => {
+			if (isOpen) {
+				ping()
+			} else {
+				reset()
+			}
+		}, [isOpen])
+
+		useEffect(() => {
 			if (!isRunning) {
 				return
 			}
@@ -69,6 +79,16 @@ export const TimeModal = forwardRef<TimeModalHandle, TimeModalProps>(
 
 			return () => window.clearInterval(interval)
 		}, [isRunning, ping])
+
+		useEffect(() => {
+			if (state === 'break') {
+				setIsRunning(false)
+				setMode('shortBreak')
+			} else if (state === 'longBreak') {
+				setIsRunning(true)
+				setMode('longBreak')
+			}
+		}, [state])
 
 		const timeLabel = useMemo(() => {
 			const minutes = Math.floor(displayedSeconds / 60)
@@ -111,9 +131,15 @@ export const TimeModal = forwardRef<TimeModalHandle, TimeModalProps>(
 							value: buttonMode,
 							label: MODE_LABELS[buttonMode],
 						}))}
+						testId="time-modal-view-switch"
 					/>
 
-					<div className={clsx(styles.clock)}>{timeLabel}</div>
+					<div
+						className={clsx(styles.clock)}
+						data-testid="time-modal-label"
+					>
+						{timeLabel}
+					</div>
 
 					<p className={clsx(styles.taskName)}>{taskName}</p>
 
@@ -131,6 +157,7 @@ export const TimeModal = forwardRef<TimeModalHandle, TimeModalProps>(
 							}}
 							variant="glick"
 							className={clsx(styles.startStopButton)}
+							dataTestId="time-modal-start-stop-button"
 						/>
 					</div>
 				</div>

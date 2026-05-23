@@ -10,6 +10,7 @@ export function ViewSwitch<T extends string = string>({
 	onValueChange,
 	className,
 	classNames,
+	testId,
 }: ViewSwitchProps<T>) {
 	const fallbackValue = options[0]?.value
 	const [internalValue, setInternalValue] = useState<T | undefined>(
@@ -44,6 +45,7 @@ export function ViewSwitch<T extends string = string>({
 			style={{
 				['--switch-count' as string]: String(options.length),
 			}}
+			data-testid={testId}
 		>
 			{options.map((option) => (
 				<button
@@ -54,6 +56,8 @@ export function ViewSwitch<T extends string = string>({
 						[classNames?.activeButton ?? '']:
 							activeValue === option.value,
 					})}
+					aria-checked={activeValue === option.value}
+					data-testid={`${testId}-btn-${option.value}`}
 					onClick={() => handleClick(option.value)}
 				>
 					{option.label}
@@ -67,6 +71,7 @@ export function ViewSwitch<T extends string = string>({
 				style={{
 					transform: `translateX(${activeIndex * 100}%)`,
 				}}
+				data-testid={`${testId}-indicator`}
 			></div>
 		</div>
 	)

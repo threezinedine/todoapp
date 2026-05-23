@@ -28,6 +28,7 @@ interface TimeState {
 	stop: () => Promise<void>
 	disconnectWebSocket: () => void
 	ping: () => Promise<void>
+	reset: () => Promise<void>
 }
 
 export const useTimeStore = create<TimeState>((set, get) => ({
@@ -62,7 +63,33 @@ export const useTimeStore = create<TimeState>((set, get) => ({
 			const parsedRemainSeconds = Number.parseInt(event.data, 10)
 
 			if (!Number.isNaN(parsedRemainSeconds)) {
-				set({ taskRemainSeconds: parsedRemainSeconds })
+				if (parsedRemainSeconds > 0) {
+					set({ taskRemainSeconds: parsedRemainSeconds })
+				} else {
+					const newCulmulativeBreaks = get().culmulativeBreaks + 1
+					const currentState = get().state
+					const ws = get().websocket
+
+					if (ws) {
+						ws.send('stop')
+					}
+
+					if (newCulmulativeBreaks >= 4 && currentState === 'work') {
+						set({
+							websocket: null,
+							isLoading: false,
+							culmulativeBreaks: 0,
+							state: 'longBreak',
+						})
+					} else {
+						set({
+							websocket: null,
+							isLoading: false,
+							culmulativeBreaks: newCulmulativeBreaks,
+							state: 'break',
+						})
+					}
+				}
 			}
 		}
 		ws.onclose = () => {
@@ -110,5 +137,15 @@ export const useTimeStore = create<TimeState>((set, get) => ({
 		if (ws && ws.readyState === WebSocket.OPEN) {
 			await ws.send('ping')
 		}
+	},
+	reset: async () => {
+		set({
+			state: 'work',
+			taskId: null,
+			taskRemainSeconds: null,
+			websocket: null,
+			isLoading: false,
+			culmulativeBreaks: 0,
+		})
 	},
 }))

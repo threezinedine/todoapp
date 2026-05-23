@@ -91,6 +91,7 @@ export function NewTaskModal({
 						/>
 						<Button
 							text="Create"
+							dataTestId="new-task-modal-create-btn"
 							onClick={() => formRef?.current?.submit()}
 						/>
 					</div>

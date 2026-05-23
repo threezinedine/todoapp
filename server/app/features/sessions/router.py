@@ -89,7 +89,8 @@ async def join_session(
                     await db.commit()
                     task = None
 
-                await websocket.close(code=1000, reason="Task time expired")
+                websocket.send("completed")
+                # await websocket.close(code=1000, reason="Task time expired")
 
         while True:
             data = await websocket.receive_text()

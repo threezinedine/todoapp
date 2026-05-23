@@ -146,7 +146,11 @@ test.describe('App Walkthrough', () => {
 		await page
 			.locator('[data-testid="new-task-form-name"]')
 			.fill(randomTaskName)
-		await page.locator('[data-testid="new-task-form-name"]').press('Enter')
+
+		// set seconds field to 3 seconds
+		await page.locator('[data-testid="new-task-form-seconds"]').fill('2')
+
+		await page.locator('[data-testid="new-task-modal-create-btn"]').click()
 
 		// wait for the new task to appear in the task list
 		await expect(
@@ -164,5 +168,66 @@ test.describe('App Walkthrough', () => {
 		await expect(
 			page.locator('[data-testid="time-modal-overlay"]'),
 		).toBeVisible()
+
+		// assert the time modal label shows 00:03
+		await expect(
+			page.locator('[data-testid="time-modal-label"]'),
+		).toHaveText('00:02', {
+			timeout: 5000,
+		})
+
+		// click on start button -> assert the label starts counting down
+		await page
+			.locator('[data-testid="time-modal-start-stop-button"]')
+			.click()
+
+		expect(
+			await page
+				.locator('[data-testid="time-modal-start-stop-button"]')
+				.innerText(),
+		).toBe('Stop')
+
+		// await expect(
+		// 	page.locator('[data-testid="time-modal-label"]'),
+		// ).toHaveText('00:00', {
+		// 	timeout: 5000,
+		// })
+
+		await expect(
+			page.locator('[data-testid="time-modal-start-stop-button"]'),
+		).toHaveText('Start', {
+			timeout: 5000,
+		})
+
+		// check the aria-activate attribute of the short break button in the view switch is true (signals the mode switched to short break after the work timer ended)
+		await expect(
+			page.locator(
+				'[data-testid="time-modal-view-switch-btn-shortBreak"]',
+			),
+		).toHaveAttribute('aria-checked', 'true')
+
+		// close the time modal
+		await page
+			.locator('[data-testid="time-modal-overlay"]')
+			.click({ position: { x: 10, y: 10 } })
+
+		// assert the time modal is closed
+		await expect(
+			page.locator('[data-testid="time-modal-overlay"]'),
+		).not.toBeVisible({
+			timeout: 5000,
+		})
+
+		// open the time modal again by clicking the task card
+		await page
+			.locator(`[data-testid="task-card-${randomTaskName}"]`)
+			.click()
+
+		// assert the mode is shortBreak
+		await expect(
+			page.locator(
+				'[data-testid="time-modal-view-switch-btn-shortBreak"]',
+			),
+		).toHaveAttribute('aria-checked', 'true')
 	})
 })

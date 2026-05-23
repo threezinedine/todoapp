@@ -18,4 +18,5 @@ export interface ViewSwitchProps<T extends string = string> {
 	onValueChange?: (value: T) => Promise<void> | void
 	className?: string
 	classNames?: ViewSwitchClassNames<T>
+	testId?: string
 }
