@@ -202,6 +202,22 @@ test.describe('App Walkthrough', () => {
 			timeout: 5000,
 		})
 
+		// reload the page and assert the task is still completed (signals the task completion state is persisted)
+		await page.reload()
+
+		await expect(
+			page.locator(
+				`[data-testid="task-card-${randomTaskName}-checkbox"]`,
+			),
+		).toBeChecked({
+			timeout: 5000,
+		})
+
+		// click on the task card again to open the time modal and assert the mode is switched to short break after the work timer ended
+		await page
+			.locator(`[data-testid="task-card-${randomTaskName}"]`)
+			.click()
+
 		// check the aria-activate attribute of the short break button in the view switch is true (signals the mode switched to short break after the work timer ended)
 		await expect(
 			page.locator(
