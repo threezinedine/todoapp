@@ -43,7 +43,19 @@ export function TaskCard({
 
 	const handleCardClick = (e: React.MouseEvent<HTMLDivElement>) => {
 		e.stopPropagation()
+
+		if (isNameSelectVariant) {
+			void onSelectedChange?.(!isSelected)
+			return
+		}
+
 		void onOpenPomodoro?.()
+	}
+
+	const handleNameClick = (e: React.MouseEvent<HTMLDivElement>) => {
+		if (!isNameSelectVariant) return
+
+		handleCompleteChange(e)
 	}
 
 	const containerRef = useRef<HTMLDivElement>(null)
@@ -105,7 +117,12 @@ export function TaskCard({
 						<CheckMarkIcon />
 					</div>
 				</div>
-				<div className={clsx(styles.name)}>{taskName}</div>
+				<div
+					className={clsx(styles.name)}
+					onClick={handleNameClick}
+				>
+					{taskName}
+				</div>
 			</div>
 			<div
 				className={clsx(styles.option, {
