@@ -1,5 +1,7 @@
 import { create } from 'zustand'
 import { getTasks, getTasksOrder } from '../requests/getTasks'
+import { deleteTask } from '../requests/createTask'
+import { toast } from '~/stores'
 
 export interface Task {
 	taskId: string
@@ -12,6 +14,7 @@ interface TasksState {
 	isTasksLoading: boolean
 	fetchTasks: () => Promise<void>
 	completeTask?: (taskId: string) => Promise<void>
+	deleteTask?: (taskId: string) => Promise<void>
 }
 
 export const useTasksStore = create<TasksState>()((set) => ({
@@ -72,6 +75,41 @@ export const useTasksStore = create<TasksState>()((set) => ({
 			tasks: state.tasks.map((task) =>
 				task.taskId === taskId ? { ...task, isComplete: true } : task,
 			),
+		}))
+	},
+
+	deleteTask: async (taskId) => {
+		// optimistically remove the task from the list
+		const response = await deleteTask(taskId)
+
+		if (response instanceof Response) {
+			if (!response.ok) {
+				const errorData = await response.json()
+				console.error('Failed to delete task:', errorData)
+				toast.error(
+					errorData?.message ||
+						response.statusText ||
+						'Failed to delete task',
+					{
+						title: 'Delete Task Failed',
+					},
+				)
+				return
+			} else {
+				toast.success('Task deleted successfully!', {
+					title: 'Success',
+				})
+			}
+		} else {
+			console.error('Unexpected response type:', response)
+			toast.error('An unexpected error occurred while deleting task.', {
+				title: 'Delete Task Error',
+			})
+			return
+		}
+
+		set((state) => ({
+			tasks: state.tasks.filter((task) => task.taskId !== taskId),
 		}))
 	},
 }))

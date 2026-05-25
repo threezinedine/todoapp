@@ -10,4 +10,5 @@ export interface TasksListProps {
 		targetTaskId: string,
 		position: 'above' | 'below',
 	) => Promise<void> | void
+	onTaskDelete?: (taskId: string) => Promise<void> | void
 }

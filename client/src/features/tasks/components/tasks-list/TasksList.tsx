@@ -9,6 +9,7 @@ export function TasksList({
 	testId,
 	onTaskReorder,
 	onTaskOpen,
+	onTaskDelete,
 	isLoading,
 }: TasksListProps) {
 	const draggedTaskIdRef = useRef<HTMLElement | null>(null)
@@ -115,6 +116,7 @@ export function TasksList({
 						testId={`task-card-${task.taskName}`}
 						{...task}
 						onOpenPomodoro={() => onTaskOpen?.(task.taskId ?? '')}
+						onDelete={() => onTaskDelete?.(task.taskId ?? '')}
 					/>
 				</div>
 			))}

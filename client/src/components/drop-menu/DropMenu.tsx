@@ -17,6 +17,7 @@ export function DropMenu({ items, isOpen }: DropMenuProps) {
 							key={index}
 							className={clsx(styles['menu-item'])}
 							onMouseDown={item.onClick}
+							data-testid={item.testId}
 						>
 							<label className={styles['menu-item-label']}>
 								{item.icon && (

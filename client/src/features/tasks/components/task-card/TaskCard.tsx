@@ -81,12 +81,16 @@ export function TaskCard({
 				</div>
 				<div className={clsx(styles.name)}>{taskName}</div>
 			</div>
-			<div className={clsx(styles.option)}>
+			<div
+				className={clsx(styles.option)}
+				data-testid={`${testId}-option`}
+			>
 				<Dropdown
 					items={[
 						{
 							icon: <SettingsIcon />,
 							label: 'Setting',
+							testId: `${testId}-settings`,
 							onClick: async () => {
 								await onSettings?.()
 							},
@@ -94,6 +98,7 @@ export function TaskCard({
 						{
 							icon: <DeleteIcon />,
 							label: 'Delete',
+							testId: `${testId}-delete`,
 							onClick: async () => {
 								await onDelete?.()
 							},

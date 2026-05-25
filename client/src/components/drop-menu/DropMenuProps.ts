@@ -3,6 +3,7 @@ export interface DropMenuItem {
 	label?: string
 	onClick?: () => Promise<void> | void
 	isSeparator?: boolean
+	testId?: string
 }
 
 export interface DropMenuProps {

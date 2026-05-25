@@ -275,5 +275,27 @@ test.describe('App Walkthrough', () => {
 				timeout: 5000,
 			})
 		}
+
+		// delete all 3 test tasks
+		for (const taskName of [randomTaskName, ...taskNames]) {
+			await page
+				.locator(`[data-testid="task-card-${taskName}-option"]`)
+				.click()
+			await page
+				.locator(`[data-testid="task-card-${taskName}-delete"]`)
+				.click()
+
+			// // confirm the delete action in the modal
+			// await page
+			// 	.locator('[data-testid="delete-validate-modal-confirm"]')
+			// 	.click()
+
+			// assert the task card is removed from the DOM
+			await expect(
+				page.locator(`[data-testid="task-card-${taskName}"]`),
+			).not.toBeVisible({
+				timeout: 5000,
+			})
+		}
 	})
 })

@@ -3,12 +3,12 @@ from typing import Annotated
 import uuid
 
 from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy import select
+from sqlalchemy import delete, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.middlewares import get_current_user
 from app.dependencies import get_db
-from app.models import User, Task, TaskOrder
+from app.models import User, Task, TaskOrder, Session
 from .schemas import (
     AllTasksResponse,
     TaskOrderResponse,
@@ -306,11 +306,15 @@ async def delete_task(
         if not existing_task:
             raise HTTPException(status_code=404, detail="Task not found")
 
+        # delete all sessions related to the task
+        await db.execute(delete(Session).where(Session.taskId == task_id))
+
         await db.delete(existing_task)
         await db.commit()
 
         return {"detail": "Task deleted successfully"}
     except HTTPException:
         raise
-    except:
+    except Exception as e:
+        print(f"Error deleting task: {e}")
         raise HTTPException(status_code=500, detail="Internal Server Error")

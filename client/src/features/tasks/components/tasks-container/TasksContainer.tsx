@@ -13,7 +13,7 @@ export function TasksContainer({
 	onTaskOpen?: (taskId: string) => Promise<void> | void
 }) {
 	const [isModalOpen, setIsModalOpen] = useState(false)
-	const { tasks, isTasksLoading, fetchTasks } = useTasksStore()
+	const { tasks, isTasksLoading, fetchTasks, deleteTask } = useTasksStore()
 
 	useEffect(() => {
 		fetchTasks()
@@ -74,6 +74,7 @@ export function TasksContainer({
 						testId="tasks-list"
 						onTaskReorder={() => {}}
 						onTaskOpen={onTaskOpen}
+						onTaskDelete={deleteTask}
 					/>
 				</div>
 			</div>

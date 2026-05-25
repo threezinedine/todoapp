@@ -1,4 +1,4 @@
-import { post } from '~/utils'
+import { post, del } from '~/utils'
 
 export function createTask(
 	title: string,
@@ -12,4 +12,8 @@ export function createTask(
 		due_date: dueDate,
 		seconds,
 	})
+}
+
+export function deleteTask(id: string) {
+	return del(`/tasks/${id}`)
 }
