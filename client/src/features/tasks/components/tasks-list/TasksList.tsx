@@ -7,9 +7,11 @@ import { useRef } from 'react'
 export function TasksList({
 	tasks,
 	testId,
+	variant = 'default',
 	onTaskReorder,
 	onTaskOpen,
 	onTaskDelete,
+	onTaskSelectedChange,
 	isLoading,
 }: TasksListProps) {
 	const draggedTaskIdRef = useRef<HTMLElement | null>(null)
@@ -115,8 +117,22 @@ export function TasksList({
 					<TaskCard
 						testId={`task-card-${task.taskName}`}
 						{...task}
+						variant={variant}
 						onOpenPomodoro={() => onTaskOpen?.(task.taskId ?? '')}
 						onDelete={() => onTaskDelete?.(task.taskId ?? '')}
+						onSelectedChange={(isSelected) => {
+							if (task.onSelectedChange) {
+								void task.onSelectedChange(isSelected)
+								return
+							}
+
+							if (task.taskId) {
+								void onTaskSelectedChange?.(
+									task.taskId,
+									isSelected,
+								)
+							}
+						}}
 					/>
 				</div>
 			))}
