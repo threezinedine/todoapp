@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Button } from '~/components'
 import { TasksList } from '../tasks-list'
 import styles from './TasksContainer.module.scss'
@@ -6,6 +6,7 @@ import { NewTaskModal } from '../new-task-modal/NewTaskModal'
 import clsx from 'clsx'
 import { useTasksStore } from '../../stores/TaskStore'
 import { toast } from '~/stores'
+import { ValidateModal, type ValidateModalHandle } from '~/state-components'
 
 export function TasksContainer({
 	onTaskOpen,
@@ -13,7 +14,16 @@ export function TasksContainer({
 	onTaskOpen?: (taskId: string) => Promise<void> | void
 }) {
 	const [isModalOpen, setIsModalOpen] = useState(false)
-	const { tasks, isTasksLoading, fetchTasks, deleteTask } = useTasksStore()
+	const {
+		tasks,
+		isTasksLoading,
+		fetchTasks,
+		deleteTask,
+		resetSelected,
+		selectTask,
+	} = useTasksStore()
+	const [isSelectMode, setIsSelectMode] = useState(false)
+	const selectedModalRef = useRef<ValidateModalHandle>(null)
 
 	useEffect(() => {
 		fetchTasks()
@@ -62,10 +72,40 @@ export function TasksContainer({
 				<div className={clsx(styles.header)}>
 					<Button
 						variant="glass-morphism"
-						text="Add Task"
-						onClick={() => setIsModalOpen(true)}
-						dataTestId="create-task-button"
+						text={
+							isSelectMode ? 'Exit Select Mode' : 'Select Tasks'
+						}
+						dataTestId="select-tasks-button"
+						onClick={() => {
+							setIsSelectMode((current) => !current)
+							resetSelected()
+
+							console.log(tasks)
+						}}
 					/>
+					{isSelectMode && (
+						<Button
+							variant="glass-morphism"
+							text="Delete Selected"
+							dataTestId="delete-selected-tasks-button"
+							onClick={() => {
+								if (
+									isSelectMode &&
+									tasks.some((task) => task.isSelected)
+								) {
+									selectedModalRef.current?.open()
+								}
+							}}
+						/>
+					)}
+					{!isSelectMode && (
+						<Button
+							variant="glass-morphism"
+							text="Add Task"
+							onClick={() => setIsModalOpen(true)}
+							dataTestId="create-task-button"
+						/>
+					)}
 				</div>
 				<div className={clsx(styles.list)}>
 					<TasksList
@@ -75,6 +115,12 @@ export function TasksContainer({
 						onTaskReorder={() => {}}
 						onTaskOpen={onTaskOpen}
 						onTaskDelete={deleteTask}
+						variant={isSelectMode ? 'name-select' : 'default'}
+						onTaskSelectedChange={(taskId, isSelected) => {
+							if (isSelectMode) {
+								selectTask?.(taskId, isSelected)
+							}
+						}}
 					/>
 				</div>
 			</div>
@@ -84,6 +130,27 @@ export function TasksContainer({
 				onFailed={onCreateTaskFailed}
 				onError={onCreateTaskError}
 				onClose={() => setIsModalOpen(false)}
+			/>
+			<ValidateModal
+				ref={selectedModalRef}
+				content={'Delete selected tasks?'}
+				dataTestId="delete-selected-tasks-confirm-modal"
+				onCancel={() => {
+					resetSelected()
+					selectedModalRef.current?.close()
+				}}
+				onConfirm={async () => {
+					resetSelected()
+					selectedModalRef.current?.close()
+
+					for (const task of tasks) {
+						if (task.isSelected) {
+							await deleteTask?.(task.taskId)
+						}
+					}
+
+					await fetchTasks()
+				}}
 			/>
 		</div>
 	)

@@ -7,6 +7,7 @@ export interface Task {
 	taskId: string
 	taskName: string
 	isComplete: boolean
+	isSelected: boolean
 }
 
 interface TasksState {
@@ -15,6 +16,9 @@ interface TasksState {
 	fetchTasks: () => Promise<void>
 	completeTask?: (taskId: string) => Promise<void>
 	deleteTask?: (taskId: string) => Promise<void>
+
+	resetSelected: () => void
+	selectTask?: (taskId: string, isSelected: boolean) => Promise<void>
 }
 
 export const useTasksStore = create<TasksState>()((set) => ({
@@ -54,6 +58,7 @@ export const useTasksStore = create<TasksState>()((set) => ({
 						taskId: task.id,
 						taskName: task.name,
 						isComplete: task.completed,
+						isSelected: false,
 					})
 				}
 
@@ -110,6 +115,23 @@ export const useTasksStore = create<TasksState>()((set) => ({
 
 		set((state) => ({
 			tasks: state.tasks.filter((task) => task.taskId !== taskId),
+		}))
+	},
+
+	resetSelected: () =>
+		set((state) => ({
+			tasks: state.tasks.map((task) => ({
+				...task,
+				isSelected: false,
+			})),
+		})),
+
+	selectTask: async (taskId, isSelected) => {
+		// optimistically update the task as selected/unselected
+		set((state) => ({
+			tasks: state.tasks.map((task) =>
+				task.taskId === taskId ? { ...task, isSelected } : task,
+			),
 		}))
 	},
 }))

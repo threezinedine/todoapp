@@ -79,7 +79,7 @@ export function TaskCard({
 				className={clsx({
 					[styles.content]: true,
 					[styles.nameSelect]: isNameSelectVariant,
-					[styles.completed]: isComplete,
+					[styles.completed]: !isNameSelectVariant && isComplete,
 					[styles.selected]: isNameSelectVariant && isSelected,
 				})}
 			>

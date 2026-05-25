@@ -306,29 +306,22 @@ test.describe('App Walkthrough', () => {
 		})
 
 		// delete all 2 remain test tasks by multiple choice
+		await page.click('[data-testid="select-tasks-button"]') // switch to select mode
+
 		for (const taskName of taskNames) {
-			await page
-				.locator(`[data-testid="task-card-${taskName}-option"]`)
-				.click()
-			await page
-				.locator(`[data-testid="task-card-${taskName}-delete"]`)
-				.click()
+			await page.locator(`[data-testid="task-card-${taskName}"]`).click()
+		}
 
-			// confirm the delete action in the modal
-			await page
-				.locator(
-					`[data-testid="task-card-${taskName}-delete-validate-modal-confirm"]`,
-				)
-				.click()
+		await page.click('[data-testid="delete-selected-tasks-button"]')
 
-			// assert no visible time modal exists (signals the modal is closed after confirming delete)
-			await expect(
-				page.locator('[data-testid="time-modal-overlay"]'),
-			).not.toBeVisible({
-				timeout: 5000,
-			})
+		// confirm the delete action in the modal
+		await page
+			.locator(
+				'[data-testid="delete-selected-tasks-confirm-modal-confirm"]',
+			)
+			.click()
 
-			// assert the task card is removed from the DOM
+		for (const taskName of taskNames) {
 			await expect(
 				page.locator(`[data-testid="task-card-${taskName}"]`),
 			).not.toBeVisible({
