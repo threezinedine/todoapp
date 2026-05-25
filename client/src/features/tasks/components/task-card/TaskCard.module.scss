@@ -201,7 +201,7 @@
 		padding-bottom: 0.25rem;
 		border-radius: 0.5rem;
 		max-width: 3rem;
-		overflow: hidden;
+		overflow: visible;
 		transition:
 			opacity 0.22s ease,
 			transform 0.22s ease,
@@ -216,6 +216,7 @@
 			opacity: 0;
 			transform: translateX(8px);
 			max-width: 0;
+			overflow: hidden;
 			padding-top: 0;
 			padding-bottom: 0;
 			pointer-events: none;
