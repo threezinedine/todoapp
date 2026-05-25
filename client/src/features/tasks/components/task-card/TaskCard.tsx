@@ -8,7 +8,11 @@ import {
 	SettingsIcon,
 	DeleteIcon,
 } from '~/icons'
-import { Dropdown } from '~/state-components'
+import {
+	Dropdown,
+	ValidateModal,
+	type ValidateModalHandle,
+} from '~/state-components'
 import { useRef } from 'react'
 
 export function TaskCard({
@@ -20,6 +24,8 @@ export function TaskCard({
 	onSettings,
 	onOpenPomodoro,
 }: TaskCardProps) {
+	const deleteModalRef = useRef<ValidateModalHandle>(null)
+
 	const handleCompleteChange = (e: React.MouseEvent<HTMLDivElement>) => {
 		e.stopPropagation()
 		void onCompleteChange?.(!isComplete)
@@ -84,6 +90,7 @@ export function TaskCard({
 			<div
 				className={clsx(styles.option)}
 				data-testid={`${testId}-option`}
+				onClick={(e) => e.stopPropagation()}
 			>
 				<Dropdown
 					items={[
@@ -100,13 +107,23 @@ export function TaskCard({
 							label: 'Delete',
 							testId: `${testId}-delete`,
 							onClick: async () => {
-								await onDelete?.()
+								deleteModalRef.current?.open()
 							},
 						},
 					]}
 				>
 					<OptionIcon />
 				</Dropdown>
+				<ValidateModal
+					content="Do you wanna delete the task"
+					ref={deleteModalRef}
+					dataTestId={`${testId}-delete-validate-modal`}
+					onCancel={() => {}}
+					onConfirm={() => {
+						console.log('Task deleted')
+						onDelete?.()
+					}}
+				/>
 			</div>
 		</div>
 	)

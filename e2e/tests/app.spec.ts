@@ -285,10 +285,19 @@ test.describe('App Walkthrough', () => {
 				.locator(`[data-testid="task-card-${taskName}-delete"]`)
 				.click()
 
-			// // confirm the delete action in the modal
-			// await page
-			// 	.locator('[data-testid="delete-validate-modal-confirm"]')
-			// 	.click()
+			// confirm the delete action in the modal
+			await page
+				.locator(
+					`[data-testid="task-card-${taskName}-delete-validate-modal-confirm"]`,
+				)
+				.click()
+
+			// assert no visible time modal exists (signals the modal is closed after confirming delete)
+			await expect(
+				page.locator('[data-testid="time-modal-overlay"]'),
+			).not.toBeVisible({
+				timeout: 5000,
+			})
 
 			// assert the task card is removed from the DOM
 			await expect(
