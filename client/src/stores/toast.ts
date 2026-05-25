@@ -7,6 +7,8 @@ import type {
 
 interface ToastStoreState {
 	handler: ToastHandle | null
+	lastToastMessage: string | null
+	lastToastId: string | null
 	setHandler: (handler: ToastHandle | null) => void
 	show: (toast: ToastItemInput) => string
 	success: (message: string, options?: ToastQuickOptions) => string
@@ -21,54 +23,135 @@ function fallbackId() {
 	return `toast-fallback-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`
 }
 
+function getDuplicateToastId(state: ToastStoreState, message: string) {
+	if (state.lastToastMessage === message && state.lastToastId) {
+		return state.lastToastId
+	}
+
+	return null
+}
+
 export const useToastStore = create<ToastStoreState>()((set, get) => ({
 	handler: null,
+	lastToastMessage: null,
+	lastToastId: null,
 	setHandler: (handler) => set({ handler }),
 	show: (toast) => {
-		const handler = get().handler
+		const state = get()
+		const duplicateToastId = getDuplicateToastId(state, toast.message)
+		if (duplicateToastId) {
+			return duplicateToastId
+		}
+
+		const handler = state.handler
 		if (!handler) {
 			return fallbackId()
 		}
 
-		return handler.show(toast)
+		const toastId = handler.show(toast)
+		set({
+			lastToastMessage: toast.message,
+			lastToastId: toastId,
+		})
+
+		return toastId
 	},
 	success: (message, options) => {
-		const handler = get().handler
+		const state = get()
+		const duplicateToastId = getDuplicateToastId(state, message)
+		if (duplicateToastId) {
+			return duplicateToastId
+		}
+
+		const handler = state.handler
 		if (!handler) {
 			return fallbackId()
 		}
 
-		return handler.success(message, options)
+		const toastId = handler.success(message, options)
+		set({
+			lastToastMessage: message,
+			lastToastId: toastId,
+		})
+
+		return toastId
 	},
 	error: (message, options) => {
-		const handler = get().handler
+		const state = get()
+		const duplicateToastId = getDuplicateToastId(state, message)
+		if (duplicateToastId) {
+			return duplicateToastId
+		}
+
+		const handler = state.handler
 		if (!handler) {
 			return fallbackId()
 		}
 
-		return handler.error(message, options)
+		const toastId = handler.error(message, options)
+		set({
+			lastToastMessage: message,
+			lastToastId: toastId,
+		})
+
+		return toastId
 	},
 	warning: (message, options) => {
-		const handler = get().handler
+		const state = get()
+		const duplicateToastId = getDuplicateToastId(state, message)
+		if (duplicateToastId) {
+			return duplicateToastId
+		}
+
+		const handler = state.handler
 		if (!handler) {
 			return fallbackId()
 		}
 
-		return handler.warning(message, options)
+		const toastId = handler.warning(message, options)
+		set({
+			lastToastMessage: message,
+			lastToastId: toastId,
+		})
+
+		return toastId
 	},
 	info: (message, options) => {
-		const handler = get().handler
+		const state = get()
+		const duplicateToastId = getDuplicateToastId(state, message)
+		if (duplicateToastId) {
+			return duplicateToastId
+		}
+
+		const handler = state.handler
 		if (!handler) {
 			return fallbackId()
 		}
 
-		return handler.info(message, options)
+		const toastId = handler.info(message, options)
+		set({
+			lastToastMessage: message,
+			lastToastId: toastId,
+		})
+
+		return toastId
 	},
 	close: (id) => {
 		get().handler?.close(id)
+
+		if (get().lastToastId === id) {
+			set({
+				lastToastMessage: null,
+				lastToastId: null,
+			})
+		}
 	},
 	clear: () => {
 		get().handler?.clear()
+		set({
+			lastToastMessage: null,
+			lastToastId: null,
+		})
 	},
 }))
 

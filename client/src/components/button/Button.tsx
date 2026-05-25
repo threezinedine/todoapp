@@ -136,7 +136,7 @@ export function Button({
 	let paddingClass = `button-padding-${padding}`
 
 	return (
-		<div className={(clsx(className), styles[sizeClass])}>
+		<div className={clsx(className, styles[sizeClass])}>
 			{finalVariant === 'normal' && (
 				<NormalButton
 					text={text}

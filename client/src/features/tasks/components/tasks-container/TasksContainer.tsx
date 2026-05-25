@@ -79,8 +79,6 @@ export function TasksContainer({
 						onClick={() => {
 							setIsSelectMode((current) => !current)
 							resetSelected()
-
-							console.log(tasks)
 						}}
 					/>
 					{isSelectMode && (
@@ -94,6 +92,10 @@ export function TasksContainer({
 									tasks.some((task) => task.isSelected)
 								) {
 									selectedModalRef.current?.open()
+								} else {
+									toast.warning('No tasks selected', {
+										title: 'Delete Selected Tasks',
+									})
 								}
 							}}
 						/>
