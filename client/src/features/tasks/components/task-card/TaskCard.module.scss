@@ -6,12 +6,25 @@
 	font-size: 1.24rem;
 	border-radius: 0.55rem;
 	display: flex;
+	width: 100%;
+	height: 58px;
+	min-height: 58px;
+	box-sizing: border-box;
 	align-items: center;
 	justify-content: space-between;
 	border: 1px solid #02b9b371;
+	transition:
+		background-color 0.28s ease,
+		border-color 0.28s ease,
+		box-shadow 0.28s ease;
 
 	&.dragging {
 		opacity: 0.1;
+	}
+
+	&.selectedTask {
+		background-color: #dff7f54b;
+		border-color: #02b9b3;
 	}
 
 	input {
@@ -31,6 +44,21 @@
 		gap: 0.3rem;
 		align-items: center;
 		flex: 1;
+		transition: gap 0.24s ease;
+
+		&.nameSelect {
+			.name {
+				padding-right: 0.5rem;
+			}
+
+			&.completed {
+				.name {
+					&::after {
+						width: 0;
+					}
+				}
+			}
+		}
 
 		.icon,
 		.checkbox,
@@ -41,10 +69,25 @@
 
 		.icon {
 			margin-right: 1rem;
+			max-width: 2rem;
+			overflow: hidden;
+			transition:
+				opacity 0.22s ease,
+				transform 0.22s ease,
+				margin-right 0.22s ease,
+				max-width 0.22s ease;
 
 			&:hover {
 				cursor: grab;
 			}
+		}
+
+		.icon.collapsed {
+			opacity: 0;
+			transform: translateX(-8px);
+			margin-right: 0;
+			max-width: 0;
+			pointer-events: none;
 		}
 
 		&.completed {
@@ -66,6 +109,21 @@
 
 				&::after {
 					width: 100%;
+				}
+			}
+		}
+
+		&.selected {
+			.checkbox {
+				.rect {
+					transform: scale(1);
+					opacity: 1;
+				}
+
+				.mark {
+					opacity: 1;
+					transform: scale(1) rotate(0deg);
+					animation: checkPop 0.3s ease-out 0.2s;
 				}
 			}
 		}
@@ -142,9 +200,25 @@
 		padding-top: 0.25rem;
 		padding-bottom: 0.25rem;
 		border-radius: 0.5rem;
+		max-width: 3rem;
+		overflow: hidden;
+		transition:
+			opacity 0.22s ease,
+			transform 0.22s ease,
+			max-width 0.22s ease,
+			padding 0.22s ease;
 
 		&:hover {
 			background-color: var(--primary-hover-color-darker);
+		}
+
+		&.collapsed {
+			opacity: 0;
+			transform: translateX(8px);
+			max-width: 0;
+			padding-top: 0;
+			padding-bottom: 0;
+			pointer-events: none;
 		}
 	}
 }

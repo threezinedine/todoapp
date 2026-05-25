@@ -43,3 +43,89 @@ export const Default: Story = {
 		)
 	},
 }
+
+export const NameAndSelectOnly: Story = {
+	render: () => {
+		const [isSelected, setIsSelected] = useState(false)
+
+		return (
+			<div
+				style={{
+					backgroundColor: '#353535',
+					width: '100%',
+					height: '100vh',
+					padding: '3rem',
+				}}
+			>
+				<TaskCard
+					taskName="Select-only task"
+					variant="name-select"
+					isSelected={isSelected}
+					onSelectedChange={(newIsSelected) => {
+						setIsSelected(newIsSelected)
+					}}
+				/>
+			</div>
+		)
+	},
+}
+
+export const ToggleVariants: Story = {
+	render: () => {
+		const [variant, setVariant] = useState<'default' | 'name-select'>(
+			'default',
+		)
+		const [isComplete, setIsComplete] = useState(false)
+		const [isSelected, setIsSelected] = useState(false)
+
+		return (
+			<div
+				style={{
+					backgroundColor: '#353535',
+					width: '100%',
+					height: '100vh',
+					padding: '3rem',
+					display: 'flex',
+					flexDirection: 'column',
+					gap: '1rem',
+				}}
+			>
+				<button
+					type="button"
+					onClick={() => {
+						setVariant((currentVariant) =>
+							currentVariant === 'default'
+								? 'name-select'
+								: 'default',
+						)
+					}}
+					style={{
+						width: 'fit-content',
+						padding: '0.5rem 0.75rem',
+						borderRadius: '0.5rem',
+						border: 'none',
+						cursor: 'pointer',
+					}}
+				>
+					Toggle variant (current: {variant})
+				</button>
+
+				<TaskCard
+					taskName="Task variant demo"
+					variant={variant}
+					isComplete={isComplete}
+					isSelected={isSelected}
+					onCompleteChange={(newIsComplete) => {
+						setIsComplete(newIsComplete)
+					}}
+					onSelectedChange={(newIsSelected) => {
+						setIsSelected(newIsSelected)
+					}}
+					onSettings={() => alert('Setting')}
+					onDelete={() => alert('Delete')}
+					onOpenPomodoro={() => alert('Open Pomodoro')}
+				/>
+			</div>
+		)
+	},
+}

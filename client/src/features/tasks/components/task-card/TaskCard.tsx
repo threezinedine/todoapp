@@ -18,16 +18,26 @@ import { useRef } from 'react'
 export function TaskCard({
 	testId,
 	taskName,
+	variant = 'default',
 	isComplete = false,
+	isSelected = false,
 	onCompleteChange,
+	onSelectedChange,
 	onDelete,
 	onSettings,
 	onOpenPomodoro,
 }: TaskCardProps) {
+	const isNameSelectVariant = variant === 'name-select'
+	const isChecked = isNameSelectVariant ? isSelected : isComplete
 	const deleteModalRef = useRef<ValidateModalHandle>(null)
 
 	const handleCompleteChange = (e: React.MouseEvent<HTMLDivElement>) => {
 		e.stopPropagation()
+		if (isNameSelectVariant) {
+			void onSelectedChange?.(!isSelected)
+			return
+		}
+
 		void onCompleteChange?.(!isComplete)
 	}
 
@@ -41,32 +51,42 @@ export function TaskCard({
 	return (
 		<div
 			data-testid={testId}
-			className={clsx(styles.container)}
+			className={clsx(styles.container, {
+				[styles.selectedTask]: isNameSelectVariant && isSelected,
+			})}
 			ref={containerRef}
 			onClick={handleCardClick}
 		>
 			<input
 				type="checkbox"
-				checked={isComplete}
+				checked={isChecked}
 				data-testid={`${testId}-checkbox`}
 				readOnly
 			/>
 			<div
 				className={clsx({
 					[styles.content]: true,
+					[styles.nameSelect]: isNameSelectVariant,
 					[styles.completed]: isComplete,
+					[styles.selected]: isNameSelectVariant && isSelected,
 				})}
 			>
 				<div
-					className={clsx(styles.icon)}
+					className={clsx(styles.icon, {
+						[styles.collapsed]: isNameSelectVariant,
+					})}
 					onClick={(event) => event.stopPropagation()}
-					draggable={true}
+					draggable={!isNameSelectVariant}
 					onDragStart={() => {
+						if (isNameSelectVariant) return
+
 						if (containerRef.current) {
 							containerRef.current.classList.add(styles.dragging)
 						}
 					}}
 					onDragEnd={() => {
+						if (isNameSelectVariant) return
+
 						if (containerRef.current) {
 							containerRef.current.classList.remove(
 								styles.dragging,
@@ -88,9 +108,17 @@ export function TaskCard({
 				<div className={clsx(styles.name)}>{taskName}</div>
 			</div>
 			<div
-				className={clsx(styles.option)}
+				className={clsx(styles.option, {
+					[styles.collapsed]: isNameSelectVariant,
+				})}
 				data-testid={`${testId}-option`}
-				onClick={(e) => e.stopPropagation()}
+				onClick={(e) => {
+					if (isNameSelectVariant) {
+						return
+					}
+
+					e.stopPropagation()
+				}}
 			>
 				<Dropdown
 					items={[
