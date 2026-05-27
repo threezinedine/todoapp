@@ -1,4 +1,56 @@
-import { test, expect } from '@playwright/test'
+import { test, expect, type Page } from '@playwright/test'
+
+async function openCreateTaskModal(page: Page) {
+	await page.click('[data-testid="add-button"]')
+	await page.click('[data-testid="add-task-dropdown-item"]')
+
+	await expect(
+		page.locator('[data-testid="new-task-modal-overlay"]'),
+	).toBeVisible()
+}
+
+async function createNewTask(page: Page, taskName: string, seconds?: number) {
+	await openCreateTaskModal(page)
+
+	await page.locator('[data-testid="new-task-form-name"]').fill(taskName)
+
+	if (typeof seconds === 'number') {
+		await page
+			.locator('[data-testid="new-task-form-seconds"]')
+			.fill(String(seconds))
+	}
+
+	await page.locator('[data-testid="new-task-modal-create-btn"]').click()
+
+	await expect(
+		page.locator(`[data-testid="task-card-${taskName}"]`),
+	).toBeVisible({
+		timeout: 5000,
+	})
+}
+
+function createRandomTaskName() {
+	return `test-task-${Math.floor(Math.random() * 1000)}`
+}
+
+async function openTimeModalByTaskName(page: Page, taskName: string) {
+	await page.locator(`[data-testid="task-card-${taskName}"]`).click()
+	await expect(
+		page.locator('[data-testid="time-modal-overlay"]'),
+	).toBeVisible()
+}
+
+async function closeTimeModal(page: Page) {
+	await page
+		.locator('[data-testid="time-modal-overlay"]')
+		.click({ position: { x: 10, y: 10 } })
+
+	await expect(
+		page.locator('[data-testid="time-modal-overlay"]'),
+	).not.toBeVisible({
+		timeout: 5000,
+	})
+}
 
 /**
  * Walkthrough test: visits home, about, login pages directly,
@@ -134,41 +186,11 @@ test.describe('App Walkthrough', () => {
 		await page.goto('/')
 
 		// test create a new task -> it shows up in the task list.
-		await page.click('[data-testid="add-button"]')
-		await page.click('[data-testid="add-task-dropdown-item"]')
-
-		// assert the new-task-modal is visible
-		await expect(
-			page.locator('[data-testid="new-task-modal-overlay"]'),
-		).toBeVisible()
-
-		// fill the form fields and type enter to submit
-		const randomTaskName = `test-task-${Math.floor(Math.random() * 1000)}`
-		await page
-			.locator('[data-testid="new-task-form-name"]')
-			.fill(randomTaskName)
-
-		// set seconds field to 3 seconds
-		await page.locator('[data-testid="new-task-form-seconds"]').fill('2')
-
-		await page.locator('[data-testid="new-task-modal-create-btn"]').click()
-
-		// wait for the new task to appear in the task list
-		await expect(
-			page.locator(`[data-testid="task-card-${randomTaskName}"]`),
-		).toBeVisible({
-			timeout: 5000,
-		})
+		const randomTaskName = createRandomTaskName()
+		await createNewTask(page, randomTaskName, 2)
 
 		// click on the new task to open the time modal
-		await page
-			.locator(`[data-testid="task-card-${randomTaskName}"]`)
-			.click()
-
-		// assert the time modal is visible
-		await expect(
-			page.locator('[data-testid="time-modal-overlay"]'),
-		).toBeVisible()
+		await openTimeModalByTaskName(page, randomTaskName)
 
 		// assert the time modal label shows 00:03
 		await expect(
@@ -215,9 +237,7 @@ test.describe('App Walkthrough', () => {
 		})
 
 		// click on the task card again to open the time modal and assert the mode is switched to short break after the work timer ended
-		await page
-			.locator(`[data-testid="task-card-${randomTaskName}"]`)
-			.click()
+		await openTimeModalByTaskName(page, randomTaskName)
 
 		// check the aria-activate attribute of the short break button in the view switch is true (signals the mode switched to short break after the work timer ended)
 		await expect(
@@ -226,22 +246,10 @@ test.describe('App Walkthrough', () => {
 			),
 		).toHaveAttribute('aria-checked', 'true')
 
-		// close the time modal
-		await page
-			.locator('[data-testid="time-modal-overlay"]')
-			.click({ position: { x: 10, y: 10 } })
-
-		// assert the time modal is closed
-		await expect(
-			page.locator('[data-testid="time-modal-overlay"]'),
-		).not.toBeVisible({
-			timeout: 5000,
-		})
+		await closeTimeModal(page)
 
 		// open the time modal again by clicking the task card
-		await page
-			.locator(`[data-testid="task-card-${randomTaskName}"]`)
-			.click()
+		await openTimeModalByTaskName(page, randomTaskName)
 
 		// assert the mode is shortBreak
 		await expect(
@@ -250,32 +258,14 @@ test.describe('App Walkthrough', () => {
 			),
 		).toHaveAttribute('aria-checked', 'true')
 
-		// close the time modal
-		await page
-			.locator('[data-testid="time-modal-overlay"]')
-			.click({ position: { x: 10, y: 10 } })
+		await closeTimeModal(page)
 
 		// create 2 other tasks for testing the order of tasks
 		const taskNames = []
 		for (let i = 0; i < 2; i++) {
-			const taskName = `test-task-${Math.floor(Math.random() * 1000)}`
+			const taskName = createRandomTaskName()
 			taskNames.push(taskName)
-			await page.click('[data-testid="add-button"]')
-			await page.click('[data-testid="add-task-dropdown-item"]')
-			await page
-				.locator('[data-testid="new-task-form-name"]')
-				.fill(taskName)
-			await page
-				.locator('[data-testid="new-task-form-seconds"]')
-				.fill('3')
-			await page
-				.locator('[data-testid="new-task-modal-create-btn"]')
-				.click()
-			await expect(
-				page.locator(`[data-testid="task-card-${taskName}"]`),
-			).toBeVisible({
-				timeout: 5000,
-			})
+			await createNewTask(page, taskName, 3)
 		}
 
 		// delete the first task by single task card interaction
