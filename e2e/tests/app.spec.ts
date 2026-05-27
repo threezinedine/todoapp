@@ -40,6 +40,18 @@ async function openTimeModalByTaskName(page: Page, taskName: string) {
 	).toBeVisible()
 }
 
+async function clickStartButtonInTimeModal(page: Page, waitForLabel?: string) {
+	await page.locator('[data-testid="time-modal-start-stop-button"]').click()
+
+	if (waitForLabel) {
+		await expect(
+			page.locator('[data-testid="time-modal-start-stop-button"]'),
+		).toHaveText(waitForLabel, {
+			timeout: 5000,
+		})
+	}
+}
+
 async function closeTimeModal(page: Page) {
 	await page
 		.locator('[data-testid="time-modal-overlay"]')
@@ -260,9 +272,11 @@ test.describe('App Walkthrough', () => {
 
 		await closeTimeModal(page)
 
-		// create 2 other tasks for testing the order of tasks
+		const TEST_CARD_COUNT = 4
+
+		// create remain TEST_CARD_COUNT - 1 other tasks for testing the order of tasks
 		const taskNames = []
-		for (let i = 0; i < 2; i++) {
+		for (let i = 0; i < TEST_CARD_COUNT - 1; i++) {
 			const taskName = createRandomTaskName()
 			taskNames.push(taskName)
 			await createNewTask(page, taskName, 3)
@@ -297,7 +311,43 @@ test.describe('App Walkthrough', () => {
 			timeout: 5000,
 		})
 
-		// delete all 2 remain test tasks by multiple choice
+		openTimeModalByTaskName(page, taskNames[1]) // open the second task
+
+		// start the second task's timer
+		await page
+			.locator('[data-testid="time-modal-start-stop-button"]')
+			.click()
+
+		// wait until move to short break
+		await expect(
+			page.locator(
+				'[data-testid="time-modal-view-switch-btn-shortBreak"]',
+			),
+		).toHaveAttribute('aria-checked', 'true', {
+			timeout: 10000,
+		})
+
+		// start the short break timer
+		await page
+			.locator('[data-testid="time-modal-start-stop-button"]')
+			.click()
+
+		// wait until move to work with the name of the third task
+		await expect(
+			page.locator('[data-testid="time-modal-label"]'),
+		).toHaveText('00:03', {
+			timeout: 10000,
+		})
+
+		await expect(
+			page.locator('[data-testid="time-modal-task-name"]'),
+		).toHaveText(taskNames[2], {
+			timeout: 5000,
+		})
+
+		closeTimeModal(page)
+
+		// delete all remaining test tasks by multiple choice
 		await page.click('[data-testid="select-tasks-button"]') // switch to select mode
 
 		for (const taskName of taskNames) {

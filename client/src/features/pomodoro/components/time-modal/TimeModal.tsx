@@ -230,7 +230,12 @@ export const TimeModal = forwardRef<TimeModalHandle, TimeModalProps>(
 						{timeLabel}
 					</div>
 
-					<p className={clsx(styles.taskName)}>{taskName}</p>
+					<p
+						className={clsx(styles.taskName)}
+						data-testid="time-modal-task-name"
+					>
+						{taskName}
+					</p>
 
 					<div className={clsx(styles.controls)}>
 						<Button
