@@ -1,4 +1,5 @@
 import {
+	useCallback,
 	forwardRef,
 	useEffect,
 	useImperativeHandle,
@@ -41,15 +42,15 @@ export const TimeModal = forwardRef<TimeModalHandle, TimeModalProps>(
 		const [isOpen, setIsOpen] = useState(false)
 		const [mode, setMode] = useState<PomodoroMode>('work')
 		const [isRunning, setIsRunning] = useState(false)
-		const [taskName] = useState('Pomodoro Task')
 		const [remainingSeconds, setRemainingSeconds] = useState(
 			MODE_SECONDS.work,
 		)
 
-		const { completeTask } = useTasksStore()
+		const { completeTask, tasks } = useTasksStore()
 		const {
 			taskRemainSeconds,
 			state,
+			assignTask,
 			reset,
 			start,
 			stop,
@@ -61,7 +62,46 @@ export const TimeModal = forwardRef<TimeModalHandle, TimeModalProps>(
 		const displayedSeconds =
 			mode === 'work'
 				? (taskRemainSeconds ?? remainingSeconds)
-				: MODE_SECONDS[mode]
+				: remainingSeconds
+		const taskName = useMemo(() => {
+			if (!taskId) {
+				return 'Pomodoro Task'
+			}
+
+			return (
+				tasks.find((task) => task.taskId === taskId)?.taskName ??
+				'Pomodoro Task'
+			)
+		}, [taskId, tasks])
+
+		const moveToNextUnfinishedTaskOrClose = useCallback(async () => {
+			const incompleteTasks = tasks.filter((task) => !task.isComplete)
+
+			if (incompleteTasks.length === 0) {
+				setIsOpen(false)
+				setIsRunning(false)
+				return
+			}
+
+			const currentTaskIndex = tasks.findIndex(
+				(task) => task.taskId === taskId,
+			)
+
+			const nextTask =
+				tasks
+					.slice(currentTaskIndex + 1)
+					.find((task) => !task.isComplete) ??
+				tasks
+					.slice(0, Math.max(currentTaskIndex, 0))
+					.find((task) => !task.isComplete) ??
+				incompleteTasks[0]
+
+			assignTask(nextTask.taskId)
+			setMode('work')
+			setIsRunning(false)
+			setRemainingSeconds(MODE_SECONDS.work)
+			await connectWebSocket()
+		}, [assignTask, connectWebSocket, taskId, tasks])
 
 		useImperativeHandle(ref, () => ({
 			toggle: () => setIsOpen((prev) => !prev),
@@ -83,20 +123,45 @@ export const TimeModal = forwardRef<TimeModalHandle, TimeModalProps>(
 				return
 			}
 
+			if (mode === 'work') {
+				const interval = window.setInterval(() => {
+					void ping()
+				}, 1000)
+
+				return () => window.clearInterval(interval)
+			}
+
 			const interval = window.setInterval(() => {
-				void ping()
+				setRemainingSeconds((previousSeconds) =>
+					Math.max(0, previousSeconds - 1),
+				)
 			}, 1000)
 
 			return () => window.clearInterval(interval)
-		}, [isRunning, ping])
+		}, [isRunning, mode, ping])
+
+		useEffect(() => {
+			if (
+				mode === 'work' ||
+				isRunning === false ||
+				remainingSeconds > 0
+			) {
+				return
+			}
+
+			setIsRunning(false)
+			void moveToNextUnfinishedTaskOrClose()
+		}, [isRunning, mode, remainingSeconds, moveToNextUnfinishedTaskOrClose])
 
 		useEffect(() => {
 			if (state === 'break') {
 				setIsRunning(false)
 				setMode('shortBreak')
+				setRemainingSeconds(MODE_SECONDS.shortBreak)
 			} else if (state === 'longBreak') {
-				setIsRunning(true)
+				setIsRunning(false)
 				setMode('longBreak')
+				setRemainingSeconds(MODE_SECONDS.longBreak)
 			}
 
 			if (state !== 'work' && taskId) {
@@ -134,6 +199,8 @@ export const TimeModal = forwardRef<TimeModalHandle, TimeModalProps>(
 		function onClose() {
 			setIsOpen(false)
 			setIsRunning(false)
+			setMode('work')
+			setRemainingSeconds(MODE_SECONDS.work)
 		}
 
 		return (
@@ -170,10 +237,14 @@ export const TimeModal = forwardRef<TimeModalHandle, TimeModalProps>(
 							text={isRunning ? 'Stop' : 'Start'}
 							onClick={async () => {
 								if (isRunning) {
-									await stop()
+									if (mode === 'work') {
+										await stop()
+									}
 									setIsRunning(false)
 								} else {
-									await start()
+									if (mode === 'work') {
+										await start()
+									}
 									setIsRunning(true)
 								}
 							}}
