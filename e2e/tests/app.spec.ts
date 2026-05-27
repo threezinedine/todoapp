@@ -134,7 +134,8 @@ test.describe('App Walkthrough', () => {
 		await page.goto('/')
 
 		// test create a new task -> it shows up in the task list.
-		await page.click('[data-testid="create-task-button"]')
+		await page.click('[data-testid="add-button"]')
+		await page.click('[data-testid="add-task-dropdown-item"]')
 
 		// assert the new-task-modal is visible
 		await expect(
@@ -259,7 +260,8 @@ test.describe('App Walkthrough', () => {
 		for (let i = 0; i < 2; i++) {
 			const taskName = `test-task-${Math.floor(Math.random() * 1000)}`
 			taskNames.push(taskName)
-			await page.click('[data-testid="create-task-button"]')
+			await page.click('[data-testid="add-button"]')
+			await page.click('[data-testid="add-task-dropdown-item"]')
 			await page
 				.locator('[data-testid="new-task-form-name"]')
 				.fill(taskName)

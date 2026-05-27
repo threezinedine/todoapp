@@ -6,7 +6,12 @@ import { NewTaskModal } from '../new-task-modal/NewTaskModal'
 import clsx from 'clsx'
 import { useTasksStore } from '../../stores/TaskStore'
 import { toast } from '~/stores'
-import { ValidateModal, type ValidateModalHandle } from '~/state-components'
+import {
+	Dropdown,
+	ValidateModal,
+	type ValidateModalHandle,
+} from '~/state-components'
+import { AddIcon } from '~/icons'
 
 export function TasksContainer({
 	onTaskOpen,
@@ -72,9 +77,7 @@ export function TasksContainer({
 				<div className={clsx(styles.header)}>
 					<Button
 						variant="glass-morphism"
-						text={
-							isSelectMode ? 'Exit Select Mode' : 'Select Tasks'
-						}
+						text={isSelectMode ? 'Exit' : 'Select'}
 						dataTestId="select-tasks-button"
 						onClick={() => {
 							setIsSelectMode((current) => !current)
@@ -84,7 +87,7 @@ export function TasksContainer({
 					{isSelectMode && (
 						<Button
 							variant="glass-morphism"
-							text="Delete Selected"
+							text="Delete"
 							dataTestId="delete-selected-tasks-button"
 							onClick={() => {
 								if (
@@ -101,12 +104,22 @@ export function TasksContainer({
 						/>
 					)}
 					{!isSelectMode && (
-						<Button
-							variant="glass-morphism"
-							text="Add Task"
-							onClick={() => setIsModalOpen(true)}
-							dataTestId="create-task-button"
-						/>
+						<Dropdown
+							items={[
+								{
+									label: 'Add Task',
+									onClick: () => setIsModalOpen(true),
+									testId: 'add-task-dropdown-item',
+									icon: <AddIcon />,
+								},
+							]}
+						>
+							<Button
+								variant="glass-morphism"
+								text="Add"
+								dataTestId="add-button"
+							/>
+						</Dropdown>
 					)}
 				</div>
 				<div className={clsx(styles.list)}>

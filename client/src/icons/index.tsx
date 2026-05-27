@@ -1,3 +1,4 @@
+export { AddIcon } from './AddIcon'
 export { GoogleChromeIcon } from './GoogleChromeIcon'
 export { CheckMarkIcon } from './CheckMarkIcon'
 export { DeleteIcon } from './DeleteIcon'
