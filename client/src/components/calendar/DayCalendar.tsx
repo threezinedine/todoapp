@@ -50,10 +50,7 @@ export function nextPeriod(startDate: Date, endDate?: Date): PeriodRange {
 	}
 }
 
-export function previousPeriod(
-	startDate: Date,
-	endDate?: Date,
-): PeriodRange {
+export function previousPeriod(startDate: Date, endDate?: Date): PeriodRange {
 	const newStartDate = addDays(startDate, -1)
 	const newEndDate = addDays(endDate ?? startDate, -1)
 
@@ -280,245 +277,259 @@ function getPositionedEvents(
 	}))
 }
 
-export const DayCalendar = forwardRef<
-	CalendarHandle,
-	CalendarComponentProps
->(function DayCalendar(
-	{
-		startDate = new Date(),
-		endDate,
-		events = [],
-		onPreviousPeriod,
-		onNextPeriod,
-	},
-	ref,
-) {
-	const [now, setNow] = useState(() => new Date())
-	const viewportRef = useRef<HTMLDivElement>(null)
-	const currentTimeMarkerRef = useRef<HTMLDivElement>(null)
+export const DayCalendar = forwardRef<CalendarHandle, CalendarComponentProps>(
+	function DayCalendar(
+		{
+			startDate = new Date(),
+			endDate,
+			events = [],
+			onPreviousPeriod,
+			onNextPeriod,
+		},
+		ref,
+	) {
+		const [now, setNow] = useState(() => new Date())
+		const viewportRef = useRef<HTMLDivElement>(null)
+		const currentTimeMarkerRef = useRef<HTMLDivElement>(null)
 
-	const scrollToCurrentTime = useCallback(() => {
-		const viewport = viewportRef.current
-		const marker = currentTimeMarkerRef.current
+		const scrollToCurrentTime = useCallback(() => {
+			const viewport = viewportRef.current
+			const marker = currentTimeMarkerRef.current
 
-		if (!viewport || !marker) {
-			return
-		}
+			if (!viewport || !marker) {
+				return
+			}
 
-		const centeredTop = Math.max(
-			0,
-			marker.offsetTop - viewport.clientHeight / 2,
+			const centeredTop = Math.max(
+				0,
+				marker.offsetTop - viewport.clientHeight / 2,
+			)
+
+			if (typeof viewport.scrollTo === 'function') {
+				viewport.scrollTo({
+					top: centeredTop,
+					behavior: 'smooth',
+				})
+				return
+			}
+
+			viewport.scrollTop = centeredTop
+		}, [])
+
+		useImperativeHandle(
+			ref,
+			() => ({
+				focus: () => {
+					viewportRef.current?.focus()
+					scrollToCurrentTime()
+				},
+				nextPeriod: () => {
+					if (!onNextPeriod) {
+						return
+					}
+
+					const { newStartDate, newEndDate } = nextPeriod(
+						startDate,
+						endDate,
+					)
+
+					return onNextPeriod(newStartDate, newEndDate)
+				},
+				previousPeriod: () => {
+					if (!onPreviousPeriod) {
+						return
+					}
+
+					const { newStartDate, newEndDate } = previousPeriod(
+						startDate,
+						endDate,
+					)
+
+					return onPreviousPeriod(newStartDate, newEndDate)
+				},
+			}),
+			[
+				endDate,
+				onNextPeriod,
+				onPreviousPeriod,
+				scrollToCurrentTime,
+				startDate,
+			],
 		)
 
-		if (typeof viewport.scrollTo === 'function') {
-			viewport.scrollTo({
-				top: centeredTop,
-				behavior: 'smooth',
-			})
-			return
-		}
+		useEffect(() => {
+			const intervalId = window.setInterval(() => {
+				setNow(new Date())
+			}, NOW_REFRESH_INTERVAL_MS)
 
-		viewport.scrollTop = centeredTop
-	}, [])
+			scrollToCurrentTime()
 
-	useImperativeHandle(
-		ref,
-		() => ({
-			focus: () => {
-				viewportRef.current?.focus()
-				scrollToCurrentTime()
-			},
-			nextPeriod: () => {
-				if (!onNextPeriod) {
-					return
-				}
+			return () => {
+				window.clearInterval(intervalId)
+			}
+		}, [scrollToCurrentTime])
 
-				const { newStartDate, newEndDate } = nextPeriod(
-					startDate,
-					endDate,
-				)
+		const hours = useMemo(
+			() => Array.from({ length: 24 }, (_, hour) => hour),
+			[],
+		)
+		const positionedEvents = useMemo(
+			() => getPositionedEvents(events, startDate),
+			[events, startDate],
+		)
 
-				return onNextPeriod(newStartDate, newEndDate)
-			},
-			previousPeriod: () => {
-				if (!onPreviousPeriod) {
-					return
-				}
+		const isToday = isSameDay(startDate, now)
+		const nowMinute = isToday ? toMinutes(now) : null
+		const timelineHeight = MINUTES_PER_DAY * PIXELS_PER_MINUTE
 
-				const { newStartDate, newEndDate } = previousPeriod(
-					startDate,
-					endDate,
-				)
+		return (
+			<div className={clsx(styles.container)}>
+				<div className={clsx(styles.header)}>
+					<h2 className={clsx(styles.title)}>Day</h2>
+					<p className={clsx(styles.dateLabel)}>
+						{new Intl.DateTimeFormat('en-US', {
+							weekday: 'long',
+							month: 'long',
+							day: 'numeric',
+							year: 'numeric',
+						}).format(startDate)}
+					</p>
+				</div>
 
-				return onPreviousPeriod(newStartDate, newEndDate)
-			},
-		}),
-		[
-			endDate,
-			onNextPeriod,
-			onPreviousPeriod,
-			scrollToCurrentTime,
-			startDate,
-		],
-	)
-
-	useEffect(() => {
-		const intervalId = window.setInterval(() => {
-			setNow(new Date())
-		}, NOW_REFRESH_INTERVAL_MS)
-
-		scrollToCurrentTime()
-
-		return () => {
-			window.clearInterval(intervalId)
-		}
-	}, [scrollToCurrentTime])
-
-	const hours = useMemo(
-		() => Array.from({ length: 24 }, (_, hour) => hour),
-		[],
-	)
-	const positionedEvents = useMemo(
-		() => getPositionedEvents(events, startDate),
-		[events, startDate],
-	)
-
-	const isToday = isSameDay(startDate, now)
-	const nowMinute = isToday ? toMinutes(now) : null
-	const timelineHeight = MINUTES_PER_DAY * PIXELS_PER_MINUTE
-
-	return (
-		<div className={clsx(styles.container)}>
-			<div className={clsx(styles.header)}>
-				<h2 className={clsx(styles.title)}>Day</h2>
-				<p className={clsx(styles.dateLabel)}>
-					{new Intl.DateTimeFormat('en-US', {
-						weekday: 'long',
-						month: 'long',
-						day: 'numeric',
-						year: 'numeric',
-					}).format(startDate)}
-				</p>
-			</div>
-
-			<div
-				ref={viewportRef}
-				className={clsx(styles.scrollViewport)}
-				tabIndex={-1}
-				data-calendar-day-viewport
-			>
 				<div
-					className={clsx(styles.dayView)}
-					style={{ height: `${timelineHeight}px` }}
+					ref={viewportRef}
+					className={clsx(styles.scrollViewport)}
+					tabIndex={-1}
+					data-calendar-day-viewport
 				>
-					<div className={clsx(styles.timeRail)}>
-						{hours.map((hour) => (
-							<div
-								key={hour}
-								className={clsx(styles.timeLabel)}
-								style={{ top: `${hour * HOUR_SLOT_HEIGHT}px` }}
-							>
-								{formatHourLabel(hour)}
-							</div>
-						))}
-					</div>
+					<div
+						className={clsx(styles.dayView)}
+						style={{ height: `${timelineHeight}px` }}
+					>
+						<div className={clsx(styles.timeRail)}>
+							{hours.map((hour) => (
+								<div
+									key={hour}
+									className={clsx(styles.timeLabel)}
+									style={{
+										top: `${hour * HOUR_SLOT_HEIGHT}px`,
+									}}
+								>
+									{formatHourLabel(hour)}
+								</div>
+							))}
+						</div>
 
-					<div className={clsx(styles.gridArea)}>
-						{hours.map((hour) => (
-							<div
-								key={hour}
-								className={clsx(styles.hourLine)}
-								style={{ top: `${hour * HOUR_SLOT_HEIGHT}px` }}
-							/>
-						))}
+						<div className={clsx(styles.gridArea)}>
+							{hours.map((hour) => (
+								<div
+									key={hour}
+									className={clsx(styles.hourLine)}
+									style={{
+										top: `${hour * HOUR_SLOT_HEIGHT}px`,
+									}}
+								/>
+							))}
 
-						{isToday && nowMinute !== null && (
-							<div
-								ref={currentTimeMarkerRef}
-								className={clsx(styles.currentTimeLine)}
-								data-calendar-current-time-marker
-								style={{
-									top: `${nowMinute * PIXELS_PER_MINUTE}px`,
-								}}
-							>
-								<span className={clsx(styles.currentTimeDot)} />
-							</div>
-						)}
-
-						<div className={clsx(styles.eventLayer)}>
-							{positionedEvents.length === 0 && (
-								<div className={clsx(styles.emptyState)}>
-									No events scheduled.
+							{isToday && nowMinute !== null && (
+								<div
+									ref={currentTimeMarkerRef}
+									className={clsx(styles.currentTimeLine)}
+									data-calendar-current-time-marker
+									style={{
+										top: `${nowMinute * PIXELS_PER_MINUTE}px`,
+									}}
+								>
+									<span
+										className={clsx(styles.currentTimeDot)}
+									/>
 								</div>
 							)}
 
-							{positionedEvents.map((event, index) => {
-								const durationMinutes = Math.max(
-									event.endMinute - event.startMinute,
-									EVENT_MIN_DURATION_MINUTES,
-								)
-								const height =
-									durationMinutes * PIXELS_PER_MINUTE
-								const gapPercent = 1.4
-								const widthPercent =
-									(100 -
-										(event.columnCount - 1) * gapPercent) /
-									event.columnCount
-								const leftPercent =
-									event.columnIndex *
-									(widthPercent + gapPercent)
+							<div className={clsx(styles.eventLayer)}>
+								{positionedEvents.length === 0 && (
+									<div className={clsx(styles.emptyState)}>
+										No events scheduled.
+									</div>
+								)}
 
-								return (
-									<article
-										key={event.id}
-										className={clsx(styles.eventCard)}
-										style={{
-											top: `${event.startMinute * PIXELS_PER_MINUTE}px`,
-											height: `${height}px`,
-											width: `${widthPercent}%`,
-											left: `${leftPercent}%`,
-											// @ts-ignore
-											'--color-first': event.color,
-											// @ts-ignore
-											'--color-second':
-												event.gradientColor,
-										}}
-										onClick={() => {
-											if (event.onEventClicked) {
-												event.onEventClicked(
-													event,
-													index,
-												)
-											}
-										}}
-									>
-										<h3 className={clsx(styles.eventTitle)}>
-											{event.name}
-										</h3>
-										<p className={clsx(styles.eventTime)}>
-											{formatTimeRange(
-												event.startMinute,
-												event.endMinute,
-											)}
-										</p>
-										{event.description && (
-											<p
+								{positionedEvents.map((event, index) => {
+									const durationMinutes = Math.max(
+										event.endMinute - event.startMinute,
+										EVENT_MIN_DURATION_MINUTES,
+									)
+									const height =
+										durationMinutes * PIXELS_PER_MINUTE
+									const gapPercent = 1.4
+									const widthPercent =
+										(100 -
+											(event.columnCount - 1) *
+												gapPercent) /
+										event.columnCount
+									const leftPercent =
+										event.columnIndex *
+										(widthPercent + gapPercent)
+
+									return (
+										<article
+											key={event.id}
+											className={clsx(styles.eventCard)}
+											style={{
+												top: `${event.startMinute * PIXELS_PER_MINUTE}px`,
+												height: `${height}px`,
+												width: `${widthPercent}%`,
+												left: `${leftPercent}%`,
+												// @ts-ignore
+												'--color-first': event.color,
+												// @ts-ignore
+												'--color-second':
+													event.gradientColor,
+											}}
+											onClick={() => {
+												if (event.onEventClicked) {
+													event.onEventClicked(
+														event,
+														index,
+													)
+												}
+											}}
+										>
+											<h3
 												className={clsx(
-													styles.eventDescription,
+													styles.eventTitle,
 												)}
 											>
-												{event.description}
+												{event.name}
+											</h3>
+											<p
+												className={clsx(
+													styles.eventTime,
+												)}
+											>
+												{formatTimeRange(
+													event.startMinute,
+													event.endMinute,
+												)}
 											</p>
-										)}
-									</article>
-								)
-							})}
+											{event.description && (
+												<p
+													className={clsx(
+														styles.eventDescription,
+													)}
+												>
+													{event.description}
+												</p>
+											)}
+										</article>
+									)
+								})}
+							</div>
 						</div>
 					</div>
 				</div>
 			</div>
-		</div>
-	)
-})
+		)
+	},
+)
 
 DayCalendar.displayName = 'DayCalendar'

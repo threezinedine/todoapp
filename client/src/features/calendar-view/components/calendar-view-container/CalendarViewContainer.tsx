@@ -28,6 +28,7 @@ export function CalendarViewContainer() {
 						onClick={() => {
 							calendarRef?.current?.previousPeriod()
 						}}
+						dataTestId="previous-period-button"
 					/>
 					<Button
 						text="Next"
@@ -35,6 +36,7 @@ export function CalendarViewContainer() {
 						onClick={() => {
 							calendarRef?.current?.nextPeriod()
 						}}
+						dataTestId="next-period-button"
 					/>
 				</div>
 				<ViewSwitch

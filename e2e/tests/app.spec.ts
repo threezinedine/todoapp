@@ -128,7 +128,7 @@ async function deleteTaskByCardMenu(page: Page, taskName: string) {
 }
 
 async function selectTasksForBulkDelete(page: Page, taskNames: string[]) {
-	await page.click('[data-testid="select-tasks-button"]')
+	await clickOnSelectButton(page)
 
 	for (const taskName of taskNames) {
 		await page.locator(`[data-testid="task-card-${taskName}"]`).click()
@@ -138,6 +138,10 @@ async function selectTasksForBulkDelete(page: Page, taskNames: string[]) {
 	await page
 		.locator('[data-testid="delete-selected-tasks-confirm-modal-confirm"]')
 		.click()
+}
+
+async function clickOnSelectButton(page: Page) {
+	await page.click('[data-testid="select-tasks-button"]')
 }
 
 async function closeTimeModal(page: Page) {
@@ -150,6 +154,14 @@ async function closeTimeModal(page: Page) {
 	).not.toBeVisible({
 		timeout: 5000,
 	})
+}
+
+async function clickNextPeriodButton(page: Page) {
+	await page.locator(`[data-testid="next-period-button"]`).click()
+}
+
+async function clickPreviousPeriodButton(page: Page) {
+	await page.locator(`[data-testid="previous-period-button"]`).click()
 }
 
 /**
@@ -344,5 +356,19 @@ test.describe('App Walkthrough', () => {
 				timeout: 5000,
 			})
 		}
+
+		await clickOnSelectButton(page) // click select button to exit the multiple choice mode
+
+		// work with other day
+		await clickNextPeriodButton(page) // move to the next day
+
+		const nextDayTaskName = createRandomTaskName()
+		await createNewTask(page, nextDayTaskName)
+
+		await expect(
+			page.locator(`[data-testid="task-card-${nextDayTaskName}"]`),
+		).toBeVisible({
+			timeout: 5000,
+		})
 	})
 })

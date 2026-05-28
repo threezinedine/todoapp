@@ -39,7 +39,6 @@ export function TasksContainer({
 			title: 'Success',
 		})
 		setIsModalOpen(false)
-		fetchTasks()
 	}
 
 	function onCreateTaskFailed(response: Response) {
