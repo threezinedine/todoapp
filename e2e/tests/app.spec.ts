@@ -52,6 +52,94 @@ async function clickStartButtonInTimeModal(page: Page, waitForLabel?: string) {
 	}
 }
 
+async function submitLoginToken(page: Page, token: string) {
+	await page.locator('[data-testid="login-form-token"]').fill(token)
+	await page.locator('[data-testid="login-form-submit"]').click()
+}
+
+async function assertAndCloseLoginErrorModal(page: Page, message: string) {
+	await expect(page.getByText('Login Failed')).toBeVisible({
+		timeout: 5000,
+	})
+
+	await expect(page.getByText(message)).toBeVisible({
+		timeout: 5000,
+	})
+
+	await page
+		.locator('[data-testid="login-error-modal-overlay"]')
+		.click({ position: { x: 10, y: 10 } })
+
+	await expect(page.getByText('Login Failed')).not.toBeVisible({
+		timeout: 5000,
+	})
+}
+
+async function loginWithDevToken(page: Page) {
+	await submitLoginToken(page, 'dev-token-only')
+	await page.waitForURL('/')
+}
+
+async function assertTimeModalLabel(page: Page, value: string, timeout = 5000) {
+	await expect(page.locator('[data-testid="time-modal-label"]')).toHaveText(
+		value,
+		{ timeout },
+	)
+}
+
+async function assertTimeModalMode(
+	page: Page,
+	mode: 'work' | 'shortBreak' | 'longBreak',
+	timeout = 5000,
+) {
+	await expect(
+		page.locator(`[data-testid="time-modal-view-switch-btn-${mode}"]`),
+	).toHaveAttribute('aria-checked', 'true', { timeout })
+}
+
+async function assertTaskCardCompleted(
+	page: Page,
+	taskName: string,
+	checked = true,
+) {
+	if (checked) {
+		await expect(
+			page.locator(`[data-testid="task-card-${taskName}-checkbox"]`),
+		).toBeChecked({
+			timeout: 5000,
+		})
+	} else {
+		await expect(
+			page.locator(`[data-testid="task-card-${taskName}-checkbox"]`),
+		).not.toBeChecked({
+			timeout: 5000,
+		})
+	}
+}
+
+async function deleteTaskByCardMenu(page: Page, taskName: string) {
+	await page.locator(`[data-testid="task-card-${taskName}-option"]`).click()
+	await page.locator(`[data-testid="task-card-${taskName}-delete"]`).click()
+	await page
+		.locator(
+			`[data-testid="task-card-${taskName}-delete-validate-modal-confirm"]`,
+		)
+		.click()
+}
+
+async function selectTasksForBulkDelete(page: Page, taskNames: string[]) {
+	await page.click('[data-testid="select-tasks-button"]')
+
+	for (const taskName of taskNames) {
+		await page.locator(`[data-testid="task-card-${taskName}"]`).click()
+	}
+
+	await page.click('[data-testid="delete-selected-tasks-button"]')
+	await page
+		.locator('[data-testid="delete-selected-tasks-confirm-modal-confirm"]')
+		.click()
+}
+
 async function closeTimeModal(page: Page) {
 	await page
 		.locator('[data-testid="time-modal-overlay"]')
@@ -89,72 +177,22 @@ test.describe('App Walkthrough', () => {
 		await page.waitForURL('/login')
 
 		// type wrong login token
-		await page
-			.locator('[data-testid="login-form-token"]')
-			.fill('wrong-token')
-
-		// press the submit button
-		await page.locator('[data-testid="login-form-submit"]').click()
-
-		// wait for the error content inside the modal to appear (signals React re-rendered)
-		await expect(page.getByText('Login Failed')).toBeVisible({
-			timeout: 5000,
-		})
+		await submitLoginToken(page, 'wrong-token')
 
 		// verify the modal container is attached to the DOM
 		await expect(
 			page.locator('[data-testid="login-error-modal"]'),
 		).toBeAttached()
-
-		await expect(page.getByText('Unauthorized')).toBeVisible({
-			timeout: 5000,
-		})
-
-		// close the modal
-		await page
-			.locator('[data-testid="login-error-modal-overlay"]')
-			.click({ position: { x: 10, y: 10 } })
-
-		// verify the modal is closed
-		await expect(page.getByText('Login Failed')).not.toBeVisible({
-			timeout: 5000,
-		})
+		await assertAndCloseLoginErrorModal(page, 'Unauthorized')
 
 		// clear the token input
 		await page.locator('[data-testid="login-form-token"]').fill('')
 
 		// press the submit button again without filling the token
 		await page.locator('[data-testid="login-form-submit"]').click()
+		await assertAndCloseLoginErrorModal(page, 'Token is required.')
 
-		// wait for the error content inside the modal to appear (signals React re-rendered)
-		await expect(page.getByText('Login Failed')).toBeVisible({
-			timeout: 5000,
-		})
-
-		await expect(page.getByText('Token is required.')).toBeVisible({
-			timeout: 5000,
-		})
-
-		// close the modal
-		await page
-			.locator('[data-testid="login-error-modal-overlay"]')
-			.click({ position: { x: 10, y: 10 } })
-
-		// verify the modal is closed
-		await expect(page.getByText('Login Failed')).not.toBeVisible({
-			timeout: 5000,
-		})
-
-		// add the correct token to the input
-		await page
-			.locator('[data-testid="login-form-token"]')
-			.fill('dev-token-only')
-
-		// press the submit button
-		await page.locator('[data-testid="login-form-submit"]').click()
-
-		// wait for navigation to home page
-		await page.waitForURL('/')
+		await loginWithDevToken(page)
 
 		await expect(page.url()).not.toContain('/login')
 
@@ -190,31 +228,24 @@ test.describe('App Walkthrough', () => {
 
 		// login and return the home page for the next test
 		await page.goto('/login')
-		await page
-			.locator('[data-testid="login-form-token"]')
-			.fill('dev-token-only')
-		await page.locator('[data-testid="login-form-submit"]').click()
+		await submitLoginToken(page, 'dev-token-only')
 		await page.waitForTimeout(100)
 		await page.goto('/')
 
 		// test create a new task -> it shows up in the task list.
 		const randomTaskName = createRandomTaskName()
-		await createNewTask(page, randomTaskName, 2)
+		await createNewTask(page, randomTaskName, 4)
 
 		// click on the new task to open the time modal
 		await openTimeModalByTaskName(page, randomTaskName)
 
-		// assert the time modal label shows 00:03
-		await expect(
-			page.locator('[data-testid="time-modal-label"]'),
-		).toHaveText('00:02', {
-			timeout: 5000,
-		})
+		// assert the time modal label shows 00:04
+		await assertTimeModalLabel(page, '00:04')
 
 		// click on start button -> assert the label starts counting down
-		await page
-			.locator('[data-testid="time-modal-start-stop-button"]')
-			.click()
+		await clickStartButtonInTimeModal(page)
+
+		await assertTaskCardCompleted(page, randomTaskName, false) // assert the task is not completed while the timer is running
 
 		expect(
 			await page
@@ -222,41 +253,27 @@ test.describe('App Walkthrough', () => {
 				.innerText(),
 		).toBe('Stop')
 
-		await expect(
-			page.locator('[data-testid="time-modal-start-stop-button"]'),
-		).toHaveText('Start', {
-			timeout: 5000,
-		})
+		await assertTimeModalLabel(page, '00:03') // assert the label is counting down
+
+		await clickStartButtonInTimeModal(page, 'Start') // click stop and assert the button text changes to Start
+
+		await assertTaskCardCompleted(page, randomTaskName, false) // assert the task is still not completed after stopping the timer
+
+		await clickStartButtonInTimeModal(page, 'Stop') // click start again
 
 		// assert the test task card has a "completed" badge after the timer ends
-		await expect(
-			page.locator(
-				`[data-testid="task-card-${randomTaskName}-checkbox"]`,
-			),
-		).toBeChecked({
-			timeout: 5000,
-		})
+		await assertTaskCardCompleted(page, randomTaskName)
 
 		// reload the page and assert the task is still completed (signals the task completion state is persisted)
 		await page.reload()
 
-		await expect(
-			page.locator(
-				`[data-testid="task-card-${randomTaskName}-checkbox"]`,
-			),
-		).toBeChecked({
-			timeout: 5000,
-		})
+		await assertTaskCardCompleted(page, randomTaskName)
 
 		// click on the task card again to open the time modal and assert the mode is switched to short break after the work timer ended
 		await openTimeModalByTaskName(page, randomTaskName)
 
 		// check the aria-activate attribute of the short break button in the view switch is true (signals the mode switched to short break after the work timer ended)
-		await expect(
-			page.locator(
-				'[data-testid="time-modal-view-switch-btn-shortBreak"]',
-			),
-		).toHaveAttribute('aria-checked', 'true')
+		await assertTimeModalMode(page, 'shortBreak')
 
 		await closeTimeModal(page)
 
@@ -264,11 +281,7 @@ test.describe('App Walkthrough', () => {
 		await openTimeModalByTaskName(page, randomTaskName)
 
 		// assert the mode is shortBreak
-		await expect(
-			page.locator(
-				'[data-testid="time-modal-view-switch-btn-shortBreak"]',
-			),
-		).toHaveAttribute('aria-checked', 'true')
+		await assertTimeModalMode(page, 'shortBreak')
 
 		await closeTimeModal(page)
 
@@ -283,19 +296,7 @@ test.describe('App Walkthrough', () => {
 		}
 
 		// delete the first task by single task card interaction
-		await page
-			.locator(`[data-testid="task-card-${randomTaskName}-option"]`)
-			.click()
-		await page
-			.locator(`[data-testid="task-card-${randomTaskName}-delete"]`)
-			.click()
-
-		// confirm the delete action in the modal
-		await page
-			.locator(
-				`[data-testid="task-card-${randomTaskName}-delete-validate-modal-confirm"]`,
-			)
-			.click()
+		await deleteTaskByCardMenu(page, randomTaskName)
 
 		// assert no visible time modal exists (signals the modal is closed after confirming delete)
 		await expect(
@@ -311,33 +312,19 @@ test.describe('App Walkthrough', () => {
 			timeout: 5000,
 		})
 
-		openTimeModalByTaskName(page, taskNames[1]) // open the second task
+		await openTimeModalByTaskName(page, taskNames[1]) // open the second task
 
 		// start the second task's timer
-		await page
-			.locator('[data-testid="time-modal-start-stop-button"]')
-			.click()
+		await clickStartButtonInTimeModal(page)
 
 		// wait until move to short break
-		await expect(
-			page.locator(
-				'[data-testid="time-modal-view-switch-btn-shortBreak"]',
-			),
-		).toHaveAttribute('aria-checked', 'true', {
-			timeout: 10000,
-		})
+		await assertTimeModalMode(page, 'shortBreak', 10000)
 
 		// start the short break timer
-		await page
-			.locator('[data-testid="time-modal-start-stop-button"]')
-			.click()
+		await clickStartButtonInTimeModal(page)
 
 		// wait until move to work with the name of the third task
-		await expect(
-			page.locator('[data-testid="time-modal-label"]'),
-		).toHaveText('00:03', {
-			timeout: 10000,
-		})
+		await assertTimeModalLabel(page, '00:03', 10000)
 
 		await expect(
 			page.locator('[data-testid="time-modal-task-name"]'),
@@ -345,23 +332,10 @@ test.describe('App Walkthrough', () => {
 			timeout: 5000,
 		})
 
-		closeTimeModal(page)
+		await closeTimeModal(page)
 
 		// delete all remaining test tasks by multiple choice
-		await page.click('[data-testid="select-tasks-button"]') // switch to select mode
-
-		for (const taskName of taskNames) {
-			await page.locator(`[data-testid="task-card-${taskName}"]`).click()
-		}
-
-		await page.click('[data-testid="delete-selected-tasks-button"]')
-
-		// confirm the delete action in the modal
-		await page
-			.locator(
-				'[data-testid="delete-selected-tasks-confirm-modal-confirm"]',
-			)
-			.click()
+		await selectTasksForBulkDelete(page, taskNames)
 
 		for (const taskName of taskNames) {
 			await expect(
