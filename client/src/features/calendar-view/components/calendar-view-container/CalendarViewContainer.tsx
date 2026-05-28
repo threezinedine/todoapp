@@ -13,10 +13,9 @@ const CALENDAR_VIEW_OPTIONS = [
 
 export function CalendarViewContainer() {
 	const calendarRef = useRef<CalendarHandle>(null)
-	const { fetchTasks } = useTasksStore()
+	const { fetchTasks, currentDate } = useTasksStore()
 	const [variant, _] =
 		useState<(typeof CALENDAR_VIEW_OPTIONS)[number]['value']>('day')
-	const [startDate, setStartDate] = useState(new Date())
 
 	return (
 		<div className={clsx(styles.wrapper)}>
@@ -53,15 +52,13 @@ export function CalendarViewContainer() {
 						if (variant === 'day') {
 							fetchTasks(date)
 						}
-						setStartDate(date)
 					}}
 					onPreviousPeriod={(date) => {
 						if (variant === 'day') {
 							fetchTasks(date)
 						}
-						setStartDate(date)
 					}}
-					startDate={startDate}
+					startDate={currentDate}
 					ref={calendarRef}
 					variant={variant}
 					events={[
