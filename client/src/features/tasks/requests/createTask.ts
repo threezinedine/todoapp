@@ -9,7 +9,7 @@ export function createTask(
 	return post('/tasks', {
 		name: title,
 		description,
-		due_date: dueDate,
+		due_date: dueDate?.toISOString().split('T')[0],
 		seconds,
 	})
 }

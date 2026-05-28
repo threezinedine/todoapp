@@ -1,8 +1,9 @@
-import { Calendar, type CalendarHandle } from '~/components'
+import { Button, Calendar, type CalendarHandle } from '~/components'
 import { ViewSwitch } from '~/state-components'
 import styles from './CalendarViewContainer.module.scss'
-import { useRef } from 'react'
+import { useRef, useState } from 'react'
 import clsx from 'clsx'
+import { useTasksStore } from '~/features/tasks'
 
 const CALENDAR_VIEW_OPTIONS = [
 	{ value: 'day', label: 'Day' },
@@ -12,10 +13,30 @@ const CALENDAR_VIEW_OPTIONS = [
 
 export function CalendarViewContainer() {
 	const calendarRef = useRef<CalendarHandle>(null)
+	const { fetchTasks } = useTasksStore()
+	const [variant, _] =
+		useState<(typeof CALENDAR_VIEW_OPTIONS)[number]['value']>('day')
+	const [startDate, setStartDate] = useState(new Date())
 
 	return (
 		<div className={clsx(styles.wrapper)}>
 			<div className={clsx(styles.viewSwitchWrapper)}>
+				<div className={clsx(styles.navigationButtons)}>
+					<Button
+						text="Previous"
+						variant="glick-black"
+						onClick={() => {
+							calendarRef?.current?.previousPeriod()
+						}}
+					/>
+					<Button
+						text="Next"
+						variant="glick-black"
+						onClick={() => {
+							calendarRef?.current?.nextPeriod()
+						}}
+					/>
+				</div>
 				<ViewSwitch
 					defaultValue="day"
 					options={[...CALENDAR_VIEW_OPTIONS]}
@@ -26,8 +47,21 @@ export function CalendarViewContainer() {
 			</div>
 			<div className={clsx(styles.calendarWrapper)}>
 				<Calendar
+					onNextPeriod={(date) => {
+						if (variant === 'day') {
+							fetchTasks(date)
+						}
+						setStartDate(date)
+					}}
+					onPreviousPeriod={(date) => {
+						if (variant === 'day') {
+							fetchTasks(date)
+						}
+						setStartDate(date)
+					}}
+					startDate={startDate}
 					ref={calendarRef}
-					variant="day"
+					variant={variant}
 					events={[
 						{
 							id: '1',

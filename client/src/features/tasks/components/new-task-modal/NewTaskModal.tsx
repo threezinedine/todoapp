@@ -4,8 +4,8 @@ import { Button, Form, Modal } from '~/components'
 import type { FormHandle } from '~/components'
 import styles from './NewTaskModal.module.scss'
 import clsx from 'clsx'
-import { createTask } from '../../requests/createTask'
 import type { FieldProps } from '~/components/form'
+import { useTasksStore } from '../../stores/TaskStore'
 
 export function NewTaskModal({
 	isOpen,
@@ -15,6 +15,7 @@ export function NewTaskModal({
 	onClose,
 }: NewTaskModalProps) {
 	const formRef = useRef<FormHandle>(null)
+	const { createTask, currentDate } = useTasksStore()
 
 	async function onSubmit(fields: Record<string, any>) {
 		if (fields.Seconds === '') {
@@ -22,18 +23,16 @@ export function NewTaskModal({
 		}
 
 		try {
-			const res = await createTask(
+			const response = await createTask?.(
 				fields.Name,
 				fields.Description,
-				fields['Due Date'],
 				fields.Seconds,
 			)
 
-			if (res.ok) {
-				onSuccess?.(res)
-				formRef.current?.reset()
-			} else {
-				onFailed?.(res)
+			if (response?.ok) {
+				onSuccess?.(response)
+			} else if (response) {
+				onFailed?.(response)
 			}
 		} catch (err) {
 			onError?.(err)
@@ -52,7 +51,7 @@ export function NewTaskModal({
 		{
 			field: 'Due Date',
 			type: 'date',
-			defaultValue: new Date(),
+			defaultValue: currentDate.toISOString().split('T')[0],
 		},
 	]
 

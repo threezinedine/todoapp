@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 import { getTasks, getTasksOrder } from '../requests/getTasks'
-import { deleteTask } from '../requests/createTask'
+import { createTask, deleteTask } from '../requests/createTask'
 import { toast } from '~/stores'
 
 export interface Task {
@@ -13,22 +13,34 @@ export interface Task {
 interface TasksState {
 	tasks: Task[]
 	isTasksLoading: boolean
-	fetchTasks: () => Promise<void>
+	fetchTasks: (date?: Date) => Promise<void>
+	currentDate: Date
 	completeTask?: (taskId: string) => Promise<void>
 	deleteTask?: (taskId: string) => Promise<void>
 
 	resetSelected: () => void
 	selectTask?: (taskId: string, isSelected: boolean) => Promise<void>
+	createTask?: (
+		title: string,
+		description?: string,
+		seconds?: number,
+	) => Promise<Response>
 }
 
 export const useTasksStore = create<TasksState>()((set) => ({
 	tasks: [],
 	isTasksLoading: false,
-	fetchTasks: async () => {
+	currentDate: new Date(),
+	fetchTasks: async (date) => {
+		if (!date) {
+			date = new Date()
+		}
+		set({ currentDate: date })
+
 		set({ isTasksLoading: true })
 		try {
-			const data = await getTasks()
-			const orderData = await getTasksOrder()
+			const data = await getTasks(date)
+			const orderData = await getTasksOrder(date)
 
 			if (data instanceof Response && orderData instanceof Response) {
 				if (!data.ok || !orderData.ok) {
@@ -133,5 +145,47 @@ export const useTasksStore = create<TasksState>()((set) => ({
 				task.taskId === taskId ? { ...task, isSelected } : task,
 			),
 		}))
+	},
+
+	createTask: async (title, description, seconds) => {
+		const response = await createTask(
+			title,
+			description,
+			useTasksStore.getState().currentDate,
+			seconds,
+		)
+
+		if (response instanceof Response) {
+			if (!response.ok) {
+				const errorData = await response.json()
+				console.error('Failed to create task:', errorData)
+				toast.error(
+					errorData?.message ||
+						response.statusText ||
+						'Failed to create task',
+					{
+						title: 'Create Task Failed',
+					},
+				)
+				return response
+			} else {
+				toast.success('Task created successfully!', {
+					title: 'Success',
+				})
+			}
+		} else {
+			console.error('Unexpected response type:', response)
+			toast.error('An unexpected error occurred while creating task.', {
+				title: 'Create Task Error',
+			})
+			throw new Error('Unexpected response type')
+		}
+
+		// refetch tasks after creating a new one
+		await useTasksStore
+			.getState()
+			.fetchTasks(useTasksStore.getState().currentDate)
+
+		return response
 	},
 }))
