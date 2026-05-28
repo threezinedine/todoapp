@@ -1,5 +1,14 @@
-import { useEffect, useMemo, useState } from 'react'
+import {
+	forwardRef,
+	useCallback,
+	useEffect,
+	useImperativeHandle,
+	useMemo,
+	useRef,
+	useState,
+} from 'react'
 import type {
+	CalendarHandle,
 	CalendarComponentProps,
 	CalendarEventProps,
 } from './CalendarProps'
@@ -18,6 +27,40 @@ interface PositionedEvent extends CalendarEventProps {
 	endMinute: number
 	columnIndex: number
 	columnCount: number
+}
+
+interface PeriodRange {
+	newStartDate: Date
+	newEndDate: Date
+}
+
+function addDays(date: Date, days: number) {
+	const nextDate = new Date(date)
+	nextDate.setDate(nextDate.getDate() + days)
+	return nextDate
+}
+
+export function nextPeriod(startDate: Date, endDate?: Date): PeriodRange {
+	const newStartDate = addDays(startDate, 1)
+	const newEndDate = addDays(endDate ?? startDate, 1)
+
+	return {
+		newStartDate,
+		newEndDate,
+	}
+}
+
+export function previousPeriod(
+	startDate: Date,
+	endDate?: Date,
+): PeriodRange {
+	const newStartDate = addDays(startDate, -1)
+	const newEndDate = addDays(endDate ?? startDate, -1)
+
+	return {
+		newStartDate,
+		newEndDate,
+	}
 }
 
 function isSameDay(a: Date, b: Date) {
@@ -237,45 +280,99 @@ function getPositionedEvents(
 	}))
 }
 
-export function DayCalendar({
-	startDate = new Date(),
-	events = [],
-}: CalendarComponentProps) {
+export const DayCalendar = forwardRef<
+	CalendarHandle,
+	CalendarComponentProps
+>(function DayCalendar(
+	{
+		startDate = new Date(),
+		endDate,
+		events = [],
+		onPreviousPeriod,
+		onNextPeriod,
+	},
+	ref,
+) {
 	const [now, setNow] = useState(() => new Date())
+	const viewportRef = useRef<HTMLDivElement>(null)
+	const currentTimeMarkerRef = useRef<HTMLDivElement>(null)
+
+	const scrollToCurrentTime = useCallback(() => {
+		const viewport = viewportRef.current
+		const marker = currentTimeMarkerRef.current
+
+		if (!viewport || !marker) {
+			return
+		}
+
+		const centeredTop = Math.max(
+			0,
+			marker.offsetTop - viewport.clientHeight / 2,
+		)
+
+		if (typeof viewport.scrollTo === 'function') {
+			viewport.scrollTo({
+				top: centeredTop,
+				behavior: 'smooth',
+			})
+			return
+		}
+
+		viewport.scrollTop = centeredTop
+	}, [])
+
+	useImperativeHandle(
+		ref,
+		() => ({
+			focus: () => {
+				viewportRef.current?.focus()
+				scrollToCurrentTime()
+			},
+			nextPeriod: () => {
+				if (!onNextPeriod) {
+					return
+				}
+
+				const { newStartDate, newEndDate } = nextPeriod(
+					startDate,
+					endDate,
+				)
+
+				return onNextPeriod(newStartDate, newEndDate)
+			},
+			previousPeriod: () => {
+				if (!onPreviousPeriod) {
+					return
+				}
+
+				const { newStartDate, newEndDate } = previousPeriod(
+					startDate,
+					endDate,
+				)
+
+				return onPreviousPeriod(newStartDate, newEndDate)
+			},
+		}),
+		[
+			endDate,
+			onNextPeriod,
+			onPreviousPeriod,
+			scrollToCurrentTime,
+			startDate,
+		],
+	)
 
 	useEffect(() => {
 		const intervalId = window.setInterval(() => {
 			setNow(new Date())
 		}, NOW_REFRESH_INTERVAL_MS)
 
-		// auto-scroll to current time on mount
-		const viewport = document.querySelector<HTMLElement>(
-			'[data-calendar-day-viewport]',
-		)
-		const marker = document.querySelector<HTMLElement>(
-			'[data-calendar-current-time-marker]',
-		)
-
-		if (viewport && marker) {
-			const centeredTop = Math.max(
-				0,
-				marker.offsetTop - viewport.clientHeight / 2,
-			)
-
-			if (typeof viewport.scrollTo === 'function') {
-				viewport.scrollTo({
-					top: centeredTop,
-					behavior: 'smooth',
-				})
-			} else {
-				viewport.scrollTop = centeredTop
-			}
-		}
+		scrollToCurrentTime()
 
 		return () => {
 			window.clearInterval(intervalId)
 		}
-	}, [])
+	}, [scrollToCurrentTime])
 
 	const hours = useMemo(
 		() => Array.from({ length: 24 }, (_, hour) => hour),
@@ -305,7 +402,9 @@ export function DayCalendar({
 			</div>
 
 			<div
+				ref={viewportRef}
 				className={clsx(styles.scrollViewport)}
+				tabIndex={-1}
 				data-calendar-day-viewport
 			>
 				<div
@@ -335,6 +434,7 @@ export function DayCalendar({
 
 						{isToday && nowMinute !== null && (
 							<div
+								ref={currentTimeMarkerRef}
 								className={clsx(styles.currentTimeLine)}
 								data-calendar-current-time-marker
 								style={{
@@ -419,4 +519,6 @@ export function DayCalendar({
 			</div>
 		</div>
 	)
-}
+})
+
+DayCalendar.displayName = 'DayCalendar'

@@ -1,4 +1,4 @@
-import { useRef } from 'react'
+import { useRef, useState } from 'react'
 import type { Meta, StoryObj } from '@storybook/react'
 import { Calendar } from './Calendar'
 import type { CalendarHandle } from './CalendarProps'
@@ -26,15 +26,36 @@ const styles: React.CSSProperties = {
 export const DayCalendar: Story = {
 	render: () => {
 		const ref = useRef<CalendarHandle>(null)
+		const [startDate, setStartDate] = useState(new Date())
 
 		return (
 			<div style={styles}>
-				<Button
-					text="Focus"
-					onClick={() => {
-						ref?.current?.focus()
+				<div
+					style={{
+						display: 'flex',
+						gap: '1rem',
+						marginBottom: '1rem',
 					}}
-				/>
+				>
+					<Button
+						text="Focus"
+						onClick={() => {
+							ref?.current?.focus()
+						}}
+					/>
+					<Button
+						text="Previous period"
+						onClick={() => {
+							ref?.current?.previousPeriod()
+						}}
+					/>
+					<Button
+						text="Next period"
+						onClick={() => {
+							ref?.current?.nextPeriod()
+						}}
+					/>
+				</div>
 				<Calendar
 					ref={ref}
 					events={[
@@ -68,8 +89,33 @@ export const DayCalendar: Story = {
 								alert(`Clicked on event: ${event.name}`)
 							},
 						},
+						{
+							id: '3',
+							name: 'Design new feature',
+							startedAt: new Date(
+								new Date().getTime() + 24 * 60 * 60 * 1000,
+							),
+							endedAt: new Date(
+								new Date().getTime() + 25 * 60 * 60 * 1000,
+							),
+							color: '#ffb86c',
+							gradientColor: '#ff9e44',
+							onEventClicked: (event) => {
+								alert(`Clicked on event: ${event.name}`)
+							},
+						},
 					]}
 					variant="day"
+					onPreviousPeriod={(newStartDate) => {
+						setStartDate(newStartDate)
+					}}
+					onNextPeriod={(newStartDate) => {
+						setStartDate(newStartDate)
+					}}
+					startDate={startDate}
+					endDate={
+						new Date(startDate.getTime() + 24 * 60 * 60 * 1000)
+					}
 				/>
 			</div>
 		)

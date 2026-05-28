@@ -1,8 +1,12 @@
-import { createRef } from 'react'
-import { describe, expect, it, vi } from 'vitest'
+import { createRef, forwardRef, useImperativeHandle } from 'react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import { Calendar } from './Calendar'
 import type { CalendarHandle } from './CalendarProps'
+
+const dayFocusSpy = vi.fn()
+const dayNextPeriodSpy = vi.fn()
+const dayPreviousPeriodSpy = vi.fn()
 
 vi.mock('./Calendar.module.scss', () => ({
 	default: {
@@ -11,14 +15,15 @@ vi.mock('./Calendar.module.scss', () => ({
 }))
 
 vi.mock('./DayCalendar', () => ({
-	DayCalendar: () => (
-		<div data-testid="day-calendar">
-			<div data-calendar-day-viewport>
-				<div data-calendar-current-time-marker>Now marker</div>
-			</div>
-			Day View
-		</div>
-	),
+	DayCalendar: forwardRef<CalendarHandle>(function DayCalendarMock(_, ref) {
+		useImperativeHandle(ref, () => ({
+			focus: dayFocusSpy,
+			nextPeriod: dayNextPeriodSpy,
+			previousPeriod: dayPreviousPeriodSpy,
+		}))
+
+		return <div data-testid="day-calendar">Day View</div>
+	}),
 }))
 
 vi.mock('./WeekCalendar', () => ({
@@ -26,6 +31,10 @@ vi.mock('./WeekCalendar', () => ({
 }))
 
 describe('Calendar', () => {
+	beforeEach(() => {
+		vi.clearAllMocks()
+	})
+
 	it('renders month placeholder by default', () => {
 		render(<Calendar />)
 
@@ -57,13 +66,11 @@ describe('Calendar', () => {
 		expect(container).toHaveAttribute('tabindex', '-1')
 		expect(ref.current).not.toBeNull()
 		expect(typeof ref.current?.focus).toBe('function')
-
-		ref.current?.focus()
-
-		expect(document.activeElement).toBe(container)
+		expect(typeof ref.current?.nextPeriod).toBe('function')
+		expect(typeof ref.current?.previousPeriod).toBe('function')
 	})
 
-	it('focus() scrolls to current time for day variant', () => {
+	it('delegates focus() to DayCalendar when variant is day', () => {
 		const ref = createRef<CalendarHandle>()
 		render(
 			<Calendar
@@ -72,40 +79,40 @@ describe('Calendar', () => {
 			/>,
 		)
 
-		const viewport = document.querySelector(
-			'[data-calendar-day-viewport]',
-		) as HTMLElement
-		const marker = document.querySelector(
-			'[data-calendar-current-time-marker]',
-		) as HTMLElement
-
-		expect(viewport).toBeInTheDocument()
-		expect(marker).toBeInTheDocument()
-
-		Object.defineProperty(viewport, 'clientHeight', {
-			value: 400,
-			configurable: true,
-		})
-		Object.defineProperty(marker, 'offsetTop', {
-			value: 900,
-			configurable: true,
-		})
-
-		const scrollToSpy = vi.fn()
-		Object.defineProperty(viewport, 'scrollTo', {
-			value: scrollToSpy,
-			configurable: true,
-		})
-
 		ref.current?.focus()
 
-		expect(scrollToSpy).toHaveBeenCalledWith({
-			top: 700,
-			behavior: 'smooth',
-		})
+		expect(dayFocusSpy).toHaveBeenCalledTimes(1)
 	})
 
-	it('focus() does not try to scroll when variant is not day', () => {
+	it('delegates nextPeriod() to DayCalendar when variant is day', () => {
+		const ref = createRef<CalendarHandle>()
+		render(
+			<Calendar
+				ref={ref}
+				variant="day"
+			/>,
+		)
+
+		ref.current?.nextPeriod()
+
+		expect(dayNextPeriodSpy).toHaveBeenCalledTimes(1)
+	})
+
+	it('delegates previousPeriod() to DayCalendar when variant is day', () => {
+		const ref = createRef<CalendarHandle>()
+		render(
+			<Calendar
+				ref={ref}
+				variant="day"
+			/>,
+		)
+
+		ref.current?.previousPeriod()
+
+		expect(dayPreviousPeriodSpy).toHaveBeenCalledTimes(1)
+	})
+
+	it('ref methods do not delegate to DayCalendar when variant is not day', () => {
 		const ref = createRef<CalendarHandle>()
 		render(
 			<Calendar
@@ -114,11 +121,12 @@ describe('Calendar', () => {
 			/>,
 		)
 
-		const viewport = document.querySelector(
-			'[data-calendar-day-viewport]',
-		) as HTMLElement | null
-
-		expect(viewport).toBeNull()
 		expect(() => ref.current?.focus()).not.toThrow()
+		expect(() => ref.current?.nextPeriod()).not.toThrow()
+		expect(() => ref.current?.previousPeriod()).not.toThrow()
+
+		expect(dayFocusSpy).not.toHaveBeenCalled()
+		expect(dayNextPeriodSpy).not.toHaveBeenCalled()
+		expect(dayPreviousPeriodSpy).not.toHaveBeenCalled()
 	})
 })

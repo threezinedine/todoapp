@@ -17,6 +17,14 @@ export interface CalendarComponentProps {
 	startDate?: Date
 	endDate?: Date
 	events?: CalendarEventProps[]
+	onPreviousPeriod?: (
+		newStartDate: Date,
+		newEndDate: Date,
+	) => Promise<void> | void
+	onNextPeriod?: (
+		newStartDate: Date,
+		newEndDate: Date,
+	) => Promise<void> | void
 }
 
 export interface CalendarProps extends CalendarComponentProps {
@@ -25,4 +33,6 @@ export interface CalendarProps extends CalendarComponentProps {
 
 export interface CalendarHandle {
 	focus: () => void
+	nextPeriod: () => Promise<void> | void
+	previousPeriod: () => Promise<void> | void
 }

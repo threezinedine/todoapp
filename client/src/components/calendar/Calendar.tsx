@@ -5,56 +5,59 @@ import { WeekCalendar } from './WeekCalendar'
 import styles from './Calendar.module.scss'
 import clsx from 'clsx'
 
-const DAY_VIEWPORT_SELECTOR = '[data-calendar-day-viewport]'
-const CURRENT_TIME_MARKER_SELECTOR = '[data-calendar-current-time-marker]'
-
 export const Calendar = forwardRef<CalendarHandle, CalendarProps>(
 	function Calendar(
-		{ variant = 'month', events, startDate: providedStartDate },
+		{
+			variant = 'month',
+			events,
+			startDate: providedStartDate,
+			endDate: providedEndDate,
+			onPreviousPeriod,
+			onNextPeriod,
+		},
 		ref,
 	) {
 		const containerRef = useRef<HTMLDivElement>(null)
+		const dayCalendarRef = useRef<CalendarHandle>(null)
 		const startDate = providedStartDate ?? new Date()
-		const endDate = new Date()
-		endDate.setDate(endDate.getDate() + 7) // Example: set end date to 7 days from start date
+		const endDate = (() => {
+			if (providedEndDate) {
+				return providedEndDate
+			}
+
+			if (variant === 'week') {
+				const weekEndDate = new Date(startDate)
+				weekEndDate.setDate(weekEndDate.getDate() + 7)
+				return weekEndDate
+			}
+
+			return startDate
+		})()
 
 		useImperativeHandle(
 			ref,
 			() => ({
 				focus: () => {
+					if (variant === 'day') {
+						dayCalendarRef.current?.focus()
+						return
+					}
+
 					containerRef.current?.focus()
-
-					if (variant !== 'day' || !containerRef.current) {
+				},
+				nextPeriod: () => {
+					if (variant !== 'day') {
 						return
 					}
 
-					const viewport =
-						containerRef.current.querySelector<HTMLElement>(
-							DAY_VIEWPORT_SELECTOR,
-						)
-					const currentTimeMarker =
-						containerRef.current.querySelector<HTMLElement>(
-							CURRENT_TIME_MARKER_SELECTOR,
-						)
-
-					if (!viewport || !currentTimeMarker) {
+					return dayCalendarRef.current?.nextPeriod()
+				},
+				previousPeriod: () => {
+					if (variant !== 'day') {
 						return
 					}
 
-					const centeredTop = Math.max(
-						0,
-						currentTimeMarker.offsetTop - viewport.clientHeight / 2,
-					)
-
-					if (typeof viewport.scrollTo === 'function') {
-						viewport.scrollTo({
-							top: centeredTop,
-							behavior: 'smooth',
-						})
-						return
-					}
-
-					viewport.scrollTop = centeredTop
+					return dayCalendarRef.current?.previousPeriod()
 				},
 			}),
 			[variant],
@@ -68,9 +71,12 @@ export const Calendar = forwardRef<CalendarHandle, CalendarProps>(
 			>
 				{variant === 'day' && (
 					<DayCalendar
+						ref={dayCalendarRef}
 						startDate={startDate}
 						endDate={endDate}
 						events={events}
+						onPreviousPeriod={onPreviousPeriod}
+						onNextPeriod={onNextPeriod}
 					/>
 				)}
 				{variant === 'week' && (

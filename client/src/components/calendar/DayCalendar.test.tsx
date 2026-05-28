@@ -1,6 +1,10 @@
 import { describe, expect, it, vi, beforeEach, afterEach } from 'vitest'
 import { act, render, screen } from '@testing-library/react'
-import { DayCalendar } from './DayCalendar'
+import {
+	DayCalendar,
+	nextPeriod,
+	previousPeriod,
+} from './DayCalendar'
 import type { CalendarEventProps } from './CalendarProps'
 
 vi.mock('./DayCalendar.module.scss', () => ({
@@ -242,5 +246,31 @@ describe('DayCalendar', () => {
 		const updatedTop = parseFloat(currentLine.style.top)
 		expect(updatedTop).toBeGreaterThan(initialTop)
 		expect(updatedTop).toBeCloseTo(645.333, 2)
+	})
+
+	it('computes nextPeriod for day calendar', () => {
+		const startDate = new Date(2026, 4, 10, 9, 30)
+		const endDate = new Date(2026, 4, 10, 23, 59)
+
+		const { newStartDate, newEndDate } = nextPeriod(
+			startDate,
+			endDate,
+		)
+
+		expect(newStartDate).toEqual(new Date(2026, 4, 11, 9, 30))
+		expect(newEndDate).toEqual(new Date(2026, 4, 11, 23, 59))
+	})
+
+	it('computes previousPeriod for day calendar', () => {
+		const startDate = new Date(2026, 4, 10, 9, 30)
+		const endDate = new Date(2026, 4, 10, 23, 59)
+
+		const { newStartDate, newEndDate } = previousPeriod(
+			startDate,
+			endDate,
+		)
+
+		expect(newStartDate).toEqual(new Date(2026, 4, 9, 9, 30))
+		expect(newEndDate).toEqual(new Date(2026, 4, 9, 23, 59))
 	})
 })
