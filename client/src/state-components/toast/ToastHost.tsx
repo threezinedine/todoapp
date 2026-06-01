@@ -17,6 +17,7 @@ export function ToastHost(props: ToastProps) {
 	return (
 		<Toast
 			ref={toastRef}
+			onDismiss={(id) => useToastStore.getState().onToastDismissed(id)}
 			{...props}
 		/>
 	)

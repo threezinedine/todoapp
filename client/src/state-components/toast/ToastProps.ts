@@ -36,6 +36,7 @@ export interface ToastProps {
 	maxVisible?: number
 	defaultDurationMs?: number
 	pauseOnHover?: boolean
+	onDismiss?: (id: string) => void
 	className?: string
 	dataTestId?: string
 }

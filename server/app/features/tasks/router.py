@@ -197,6 +197,22 @@ async def create_task(
         await db.commit()
         await db.refresh(new_task)
 
+        # after creating a new task, we need to add it to the end of the task order for the day
+        result = await db.execute(
+            select(TaskOrder).where(
+                TaskOrder.userId == user.id, TaskOrder.date == new_task.dueDate
+            )
+        )
+        task_order = result.scalar_one_or_none()
+
+        if task_order:
+            order_task_ids = (
+                task_order.orderTaskIds.split(",") if task_order.orderTaskIds else []
+            )
+            order_task_ids.append(new_task.id)
+            task_order.orderTaskIds = ",".join(order_task_ids)
+            await db.commit()
+
         return CreateTaskResponse(
             task=TaskResponse(
                 id=new_task.id,
@@ -305,6 +321,20 @@ async def delete_task(
 
         if not existing_task:
             raise HTTPException(status_code=404, detail="Task not found")
+
+        result = await db.execute(
+            select(TaskOrder).where(
+                TaskOrder.userId == user.id, TaskOrder.date == existing_task.dueDate
+            )
+        )
+        task_order = result.scalar_one_or_none()
+
+        if task_order and task_order.orderTaskIds:
+            order_task_ids = task_order.orderTaskIds.split(",")
+            if task_id in order_task_ids:
+                order_task_ids.remove(task_id)
+                task_order.orderTaskIds = ",".join(order_task_ids)
+                await db.commit()
 
         # delete all sessions related to the task
         await db.execute(delete(Session).where(Session.taskId == task_id))

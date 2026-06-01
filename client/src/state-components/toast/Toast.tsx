@@ -46,6 +46,7 @@ export const Toast = forwardRef<ToastHandle, ToastProps>(function Toast(
 		maxVisible = DEFAULT_MAX_VISIBLE,
 		defaultDurationMs = DEFAULT_DURATION_MS,
 		pauseOnHover = true,
+		onDismiss,
 		className,
 		dataTestId,
 	}: ToastProps,
@@ -79,8 +80,9 @@ export const Toast = forwardRef<ToastHandle, ToastProps>(function Toast(
 			clearTimer(id)
 			delete timingsRef.current[id]
 			setToasts((current) => current.filter((toast) => toast.id !== id))
+			onDismiss?.(id)
 		},
-		[clearTimer],
+		[clearTimer, onDismiss],
 	)
 
 	const scheduleDismiss = useCallback(
@@ -189,6 +191,7 @@ export const Toast = forwardRef<ToastHandle, ToastProps>(function Toast(
 				dropped.forEach((toast) => {
 					clearTimer(toast.id)
 					delete timingsRef.current[toast.id]
+					onDismiss?.(toast.id)
 				})
 				return next.slice(0, maxVisible)
 			})
@@ -196,7 +199,7 @@ export const Toast = forwardRef<ToastHandle, ToastProps>(function Toast(
 			scheduleDismiss(id, totalDurationMs)
 			return id
 		},
-		[clearTimer, defaultDurationMs, maxVisible, scheduleDismiss],
+		[clearTimer, defaultDurationMs, maxVisible, onDismiss, scheduleDismiss],
 	)
 
 	const withVariant = useCallback(

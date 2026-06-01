@@ -10,6 +10,7 @@ interface ToastStoreState {
 	lastToastMessage: string | null
 	lastToastId: string | null
 	setHandler: (handler: ToastHandle | null) => void
+	onToastDismissed: (id: string) => void
 	show: (toast: ToastItemInput) => string
 	success: (message: string, options?: ToastQuickOptions) => string
 	error: (message: string, options?: ToastQuickOptions) => string
@@ -36,6 +37,14 @@ export const useToastStore = create<ToastStoreState>()((set, get) => ({
 	lastToastMessage: null,
 	lastToastId: null,
 	setHandler: (handler) => set({ handler }),
+	onToastDismissed: (id) => {
+		if (get().lastToastId === id) {
+			set({
+				lastToastMessage: null,
+				lastToastId: null,
+			})
+		}
+	},
 	show: (toast) => {
 		const state = get()
 		const duplicateToastId = getDuplicateToastId(state, toast.message)

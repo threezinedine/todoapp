@@ -57,4 +57,17 @@ describe('toast store dedupe', () => {
 		toast.info('Sync complete')
 		expect(handler.info).toHaveBeenCalledTimes(2)
 	})
+
+	it('resets dedupe restriction after dismiss', () => {
+		const handler = createHandlerMock()
+		useToastStore.getState().setHandler(handler)
+
+		toast.success('Task created successfully!')
+		toast.success('Task created successfully!')
+		expect(handler.success).toHaveBeenCalledTimes(1)
+
+		useToastStore.getState().onToastDismissed('toast-success-id')
+		toast.success('Task created successfully!')
+		expect(handler.success).toHaveBeenCalledTimes(2)
+	})
 })
