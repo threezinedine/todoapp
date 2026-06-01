@@ -479,3 +479,95 @@ async def test_update_task_order_with_duplicate_task_ids_returns_400(
         headers=TEST_AUTH_HEADER,
     )
     assert update_response.status_code == 400
+
+
+@pytest.mark.asyncio
+async def test_delete_task_at_the_date_with_modified_order_returns(client: AsyncClient):
+    """Deleting a task that has a modified order should not cause issues with the remaining tasks' order."""
+    # First, create some tasks to reorder
+    task_ids = await _create_tasks(client, 3)
+
+    # Now, update the task order
+    new_order = [task_ids[2], task_ids[0], task_ids[1]]
+    update_response = await client.patch(
+        "/api/tasks/orders",
+        json={"order_task_ids": new_order},
+        headers=TEST_AUTH_HEADER,
+    )
+    assert update_response.status_code == 200
+
+    # Now, delete one of the tasks in the order
+    delete_response = await client.delete(
+        f"/api/tasks/{task_ids[0]}",
+        headers=TEST_AUTH_HEADER,
+    )
+    assert delete_response.status_code == 200
+
+    # Verify that the remaining tasks are still in the correct order
+    get_response = await client.get(
+        "/api/tasks/orders",
+        headers=TEST_AUTH_HEADER,
+    )
+    assert get_response.status_code == 200
+    expected_order_after_deletion = [task_ids[2], task_ids[1]]
+    assert get_response.json().get("order_task_ids") == expected_order_after_deletion
+
+
+@pytest.mark.asyncio
+async def test_reorder_tasks_with_non_existent_task_ids_returns_400(
+    client: AsyncClient,
+):
+    """Calling PATCH /api/tasks/order with non-existent task IDs should return 400."""
+    # First, create some tasks to reorder
+    task_ids = await _create_tasks(client, 3)
+
+    # Now, update the task order with a non-existent task id
+    new_order = [task_ids[2], "non-existent-task-id", task_ids[0]]
+
+    update_response = await client.patch(
+        "/api/tasks/orders",
+        json={"order_task_ids": new_order},
+        headers=TEST_AUTH_HEADER,
+    )
+    assert update_response.status_code == 400
+
+
+@pytest.mark.asyncio
+async def create_new_task_with_the_date_which_orders_already_modified_returns_200(
+    client: AsyncClient,
+):
+    """Creating a new task with a date that already has a modified order should return 200 and include the new task in the order."""
+    # First, create some tasks to reorder
+    task_ids = await _create_tasks(client, 3)
+
+    # Now, update the task order
+    new_order = [task_ids[2], task_ids[0], task_ids[1]]
+    update_response = await client.patch(
+        "/api/tasks/orders",
+        json={"order_task_ids": new_order},
+        headers=TEST_AUTH_HEADER,
+    )
+    assert update_response.status_code == 200
+
+    # Now, create a new task for the same date
+    create_response = await client.post(
+        "/api/tasks",
+        json={
+            "name": "New Task for Modified Order Date",
+            "description": "This task is created after modifying the order for the date",
+            "due_date": date.today().isoformat(),
+        },
+        headers=TEST_AUTH_HEADER,
+    )
+    assert create_response.status_code == 200
+    new_task = create_response.json().get("task", {})
+    new_task_id = new_task.get("id")
+
+    # Verify that the new task is included in the order (it should be added to the end)
+    get_response = await client.get(
+        "/api/tasks/orders",
+        headers=TEST_AUTH_HEADER,
+    )
+    assert get_response.status_code == 200
+    expected_order_after_creation = [task_ids[2], task_ids[0], task_ids[1], new_task_id]
+    assert get_response.json().get("order_task_ids") == expected_order_after_creation
