@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 import { getTasks, getTasksOrder } from '../requests/getTasks'
-import { createTask, deleteTask } from '../requests/createTask'
+import { createTask, deleteTask, reorderTasks } from '../requests/createTask'
 import { toast } from '~/stores'
 
 export interface Task {
@@ -25,6 +25,11 @@ interface TasksState {
 		description?: string,
 		seconds?: number,
 	) => Promise<Response>
+	moveTask: (
+		taskId: string,
+		targetTaskId: string,
+		position: 'above' | 'below',
+	) => Promise<void>
 }
 
 export const useTasksStore = create<TasksState>()((set) => ({
@@ -187,5 +192,73 @@ export const useTasksStore = create<TasksState>()((set) => ({
 			.fetchTasks(useTasksStore.getState().currentDate)
 
 		return response
+	},
+	moveTask: async (taskId, targetTaskId, position) => {
+		// move the task in the local state optimistically
+		const tasks = useTasksStore.getState().tasks
+		const newTasks: Task[] = []
+
+		function getTaskName(id: string) {
+			return (
+				tasks.find((t) => t.taskId === id)?.taskName ?? 'Unknown Task'
+			)
+		}
+
+		console.log(
+			'Moving task',
+			getTaskName(taskId),
+			'to',
+			position,
+			'of',
+			getTaskName(targetTaskId),
+		)
+
+		for (const task of tasks) {
+			console.log(
+				task.taskName,
+				getTaskName(taskId),
+				getTaskName(targetTaskId),
+			)
+			if (task.taskId !== taskId && task.taskId !== targetTaskId) {
+				newTasks.push(task)
+				console.log('pushing task', task.taskName)
+			} else {
+				if (task.taskId === targetTaskId) {
+					if (position === 'above') {
+						newTasks.push({
+							...tasks.find((t) => t.taskId === taskId)!,
+						})
+						console.log('pushing task', getTaskName(taskId))
+						newTasks.push(task)
+						console.log('pushing task', task.taskName)
+					} else {
+						newTasks.push(task)
+						console.log('pushing task', task.taskName)
+						newTasks.push({
+							...tasks.find((t) => t.taskId === taskId)!,
+						})
+						console.log('pushing task', getTaskName(taskId))
+					}
+				}
+			}
+		}
+
+		try {
+			reorderTasks(
+				newTasks.map((t) => t.taskId),
+				useTasksStore.getState().currentDate,
+			)
+		} catch (error) {
+			console.error('Failed to reorder tasks:', error)
+			toast.error('Failed to reorder tasks. Please try again.', {
+				title: 'Reorder Tasks Failed',
+			})
+			return
+		}
+
+		toast.success('Tasks reordered successfully!', {
+			title: 'Success',
+		})
+		set({ tasks: newTasks })
 	},
 }))

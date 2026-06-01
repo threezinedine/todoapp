@@ -156,7 +156,6 @@ export const TimeModal = forwardRef<TimeModalHandle, TimeModalProps>(
 		}, [isRunning, mode, ping])
 
 		useEffect(() => {
-			console.log(isRunning, mode, remainingSeconds)
 			if (mode !== 'work' && remainingSeconds === 0) {
 				setIsRunning(false)
 				void moveToNextUnfinishedTaskOrClose()

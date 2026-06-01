@@ -16,6 +16,7 @@ export function TasksList({
 }: TasksListProps) {
 	const draggedTaskIdRef = useRef<HTMLElement | null>(null)
 	const hoverRef = useRef<HTMLElement | null>(null)
+	const isAboveRef = useRef<boolean>(false)
 
 	function handleDragging(event: React.DragEvent<HTMLDivElement>) {
 		if (draggedTaskIdRef.current === null) {
@@ -49,6 +50,7 @@ export function TasksList({
 			if (element !== draggedTaskIdRef.current) {
 				const rect = element.getBoundingClientRect()
 				const isUpperHalf = event.clientY < rect.top + rect.height / 2
+				isAboveRef.current = isUpperHalf
 
 				if (isUpperHalf) {
 					if (element.classList.contains(styles.hoveredLower)) {
@@ -81,9 +83,7 @@ export function TasksList({
 					targetTaskId &&
 					sourceTaskId !== targetTaskId
 				) {
-					const isAbove = hoverRef.current.classList.contains(
-						styles.hoveredUpper,
-					)
+					const isAbove = isAboveRef.current || false
 					void onTaskReorder(
 						sourceTaskId,
 						targetTaskId,

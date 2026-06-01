@@ -47,6 +47,32 @@ export async function post(url: string, data?: any) {
 	return response
 }
 
+export async function patch(url: string, data?: any) {
+	let headers: Record<string, string> = {
+		'Content-Type': 'application/json',
+	}
+
+	const token = await getToken()
+
+	if (token) {
+		headers = {
+			...headers,
+			Authorization: `Bearer ${token}`,
+		}
+	}
+
+	if (import.meta.env.VITE_API_ENVIRONMENT === 'development') {
+		headers['X-Test-Environment'] = 'true'
+	}
+
+	const response = await fetch(`${import.meta.env.VITE_API_URL}${url}`, {
+		method: 'PATCH',
+		headers,
+		body: JSON.stringify(data),
+	})
+	return response
+}
+
 export async function put(url: string, data?: any) {
 	let headers: Record<string, string> = {
 		'Content-Type': 'application/json',

@@ -1,4 +1,4 @@
-import { post, del } from '~/utils'
+import { post, del, patch } from '~/utils'
 
 export function createTask(
 	title: string,
@@ -16,4 +16,11 @@ export function createTask(
 
 export function deleteTask(id: string) {
 	return del(`/tasks/${id}`)
+}
+
+export function reorderTasks(taskIds: string[], date: Date) {
+	return patch('/tasks/orders', {
+		order_task_ids: taskIds,
+		date: date.toISOString().split('T')[0],
+	})
 }

@@ -26,6 +26,7 @@ export function TasksContainer({
 		deleteTask,
 		resetSelected,
 		selectTask,
+		moveTask,
 	} = useTasksStore()
 	const [isSelectMode, setIsSelectMode] = useState(false)
 	const selectedModalRef = useRef<ValidateModalHandle>(null)
@@ -61,6 +62,14 @@ export function TasksContainer({
 				})
 			})
 		setIsModalOpen(false)
+	}
+
+	function handleTaskReorder(
+		sourceTaskId: string,
+		targetTaskId: string,
+		position: 'above' | 'below',
+	) {
+		moveTask(sourceTaskId, targetTaskId, position)
 	}
 
 	function onCreateTaskError() {
@@ -126,7 +135,7 @@ export function TasksContainer({
 						isLoading={isTasksLoading}
 						tasks={tasks}
 						testId="tasks-list"
-						onTaskReorder={() => {}}
+						onTaskReorder={handleTaskReorder}
 						onTaskOpen={onTaskOpen}
 						onTaskDelete={deleteTask}
 						variant={isSelectMode ? 'name-select' : 'default'}
