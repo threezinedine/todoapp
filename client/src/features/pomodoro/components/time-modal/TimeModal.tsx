@@ -5,6 +5,7 @@ import {
 	useImperativeHandle,
 	useMemo,
 	useState,
+	useRef,
 } from 'react'
 import type {
 	PomodoroMode,
@@ -45,6 +46,7 @@ export const TimeModal = forwardRef<TimeModalHandle, TimeModalProps>(
 		const [remainingSeconds, setRemainingSeconds] = useState(
 			MODE_SECONDS.work,
 		)
+		const audioRef = useRef<HTMLAudioElement>(null)
 
 		const { completeTask, tasks } = useTasksStore()
 		const {
@@ -58,6 +60,7 @@ export const TimeModal = forwardRef<TimeModalHandle, TimeModalProps>(
 			taskId,
 			connectWebSocket,
 			disconnectWebSocket,
+			setOnTaskComplete,
 		} = useTimeStore()
 		const displayedSeconds =
 			mode === 'work'
@@ -109,6 +112,17 @@ export const TimeModal = forwardRef<TimeModalHandle, TimeModalProps>(
 			toShortBreak: () => onChangeMode('shortBreak'),
 			toLongBreak: () => onChangeMode('longBreak'),
 		}))
+
+		useEffect(() => {
+			setOnTaskComplete?.(async () => {
+				console.log('Play sound')
+				if (audioRef.current) {
+					audioRef.current.play().catch((error) => {
+						console.error('Failed to play audio:', error)
+					})
+				}
+			})
+		}, [])
 
 		useEffect(() => {
 			if (isOpen) {
@@ -259,6 +273,10 @@ export const TimeModal = forwardRef<TimeModalHandle, TimeModalProps>(
 						/>
 					</div>
 				</div>
+				<audio
+					ref={audioRef}
+					src="/finish.mp3"
+				></audio>
 			</Modal>
 		)
 	},

@@ -21,6 +21,9 @@ interface TimeState {
 	isLoading: boolean
 	culmulativeBreaks: number
 
+	onTaskComplete?: () => Promise<void> | void
+	setOnTaskComplete?: (callback: () => Promise<void> | void) => void
+
 	assignTask: (taskId: string) => void
 
 	connectWebSocket: () => Promise<void>
@@ -37,6 +40,10 @@ export const useTimeStore = create<TimeState>((set, get) => ({
 	taskRemainSeconds: null,
 	websocket: null,
 	isLoading: false,
+	onTaskComplete: undefined,
+	setOnTaskComplete: (callback) => {
+		set({ onTaskComplete: callback })
+	},
 	culmulativeBreaks: 0,
 	assignTask: (taskId: string) => {
 		set({ taskId })
@@ -88,6 +95,14 @@ export const useTimeStore = create<TimeState>((set, get) => ({
 							culmulativeBreaks: newCulmulativeBreaks,
 							state: 'break',
 						})
+					}
+
+					console.log(
+						'Pomodoro session completed!',
+						get().onTaskComplete,
+					)
+					if (get().onTaskComplete) {
+						get().onTaskComplete!()
 					}
 				}
 			}
