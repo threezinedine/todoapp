@@ -58,6 +58,7 @@ export const TimeModal = forwardRef<TimeModalHandle, TimeModalProps>(
 			stop,
 			ping,
 			taskId,
+			changeState,
 			connectWebSocket,
 			disconnectWebSocket,
 			setOnTaskComplete,
@@ -155,6 +156,13 @@ export const TimeModal = forwardRef<TimeModalHandle, TimeModalProps>(
 		}, [isRunning, mode, ping])
 
 		useEffect(() => {
+			console.log(isRunning, mode, remainingSeconds)
+			if (mode !== 'work' && remainingSeconds === 0) {
+				setIsRunning(false)
+				void moveToNextUnfinishedTaskOrClose()
+				changeState('work')
+			}
+
 			if (
 				mode === 'work' ||
 				isRunning === false ||
@@ -164,7 +172,7 @@ export const TimeModal = forwardRef<TimeModalHandle, TimeModalProps>(
 			}
 
 			setIsRunning(false)
-			void moveToNextUnfinishedTaskOrClose()
+			// void moveToNextUnfinishedTaskOrClose()
 		}, [isRunning, mode, remainingSeconds, moveToNextUnfinishedTaskOrClose])
 
 		useEffect(() => {

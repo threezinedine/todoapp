@@ -32,6 +32,7 @@ interface TimeState {
 	disconnectWebSocket: () => void
 	ping: () => Promise<void>
 	reset: () => Promise<void>
+	changeState: (newState: TimeState['state']) => void
 }
 
 export const useTimeStore = create<TimeState>((set, get) => ({
@@ -97,10 +98,6 @@ export const useTimeStore = create<TimeState>((set, get) => ({
 						})
 					}
 
-					console.log(
-						'Pomodoro session completed!',
-						get().onTaskComplete,
-					)
 					if (get().onTaskComplete) {
 						get().onTaskComplete!()
 					}
@@ -161,5 +158,8 @@ export const useTimeStore = create<TimeState>((set, get) => ({
 			isLoading: false,
 			culmulativeBreaks: 0,
 		})
+	},
+	changeState: (newState) => {
+		set({ state: newState })
 	},
 }))

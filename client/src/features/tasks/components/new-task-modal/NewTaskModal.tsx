@@ -59,6 +59,7 @@ export function NewTaskModal({
 		modalFields.push({
 			field: 'Seconds',
 			type: 'number',
+			defaultValue: 3,
 		})
 	}
 

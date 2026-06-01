@@ -344,6 +344,22 @@ test.describe('App Walkthrough', () => {
 			timeout: 5000,
 		})
 
+		// start the timer and wait until the end of the third task's timer to assert the auto-switching between tasks and modes works correctly
+		await clickStartButtonInTimeModal(page)
+
+		await assertTimeModalMode(page, 'shortBreak', 15000) // wait until move to short break
+
+		await clickStartButtonInTimeModal(page) // start the short break timer
+
+		await assertTimeModalMode(page, 'work', 10000) // wait until move to work
+
+		// assert the task name now is the first task
+		await expect(
+			page.locator('[data-testid="time-modal-task-name"]'),
+		).toHaveText(taskNames[0], {
+			timeout: 5000,
+		})
+
 		await closeTimeModal(page)
 
 		// delete all remaining test tasks by multiple choice
