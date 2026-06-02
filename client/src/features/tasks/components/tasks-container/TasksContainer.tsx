@@ -1,10 +1,13 @@
 import { useEffect, useRef, useState } from 'react'
 import { Button } from '~/components'
 import { TasksList } from '../tasks-list'
+import { TimeModal } from '../time-modal'
+import type { TimeModalHandle } from '../time-modal/TimeModalProps'
 import styles from './TasksContainer.module.scss'
 import { NewTaskModal } from '../new-task-modal/NewTaskModal'
 import clsx from 'clsx'
-import { useTasksStore } from '../../stores/TaskStore'
+import { useTasksStore } from '../../stores/task-store'
+import { useTimeStore } from '../../stores/time-store'
 import { toast } from '~/stores'
 import {
 	Dropdown,
@@ -13,11 +16,7 @@ import {
 } from '~/state-components'
 import { AddIcon } from '~/icons'
 
-export function TasksContainer({
-	onTaskOpen,
-}: {
-	onTaskOpen?: (taskId: string) => Promise<void> | void
-}) {
+export function TasksContainer() {
 	const [isModalOpen, setIsModalOpen] = useState(false)
 	const {
 		tasks,
@@ -28,8 +27,10 @@ export function TasksContainer({
 		selectTask,
 		moveTask,
 	} = useTasksStore()
+	const { assignTask } = useTimeStore()
 	const [isSelectMode, setIsSelectMode] = useState(false)
 	const selectedModalRef = useRef<ValidateModalHandle>(null)
+	const timeModalRef = useRef<TimeModalHandle>(null)
 
 	useEffect(() => {
 		fetchTasks()
@@ -77,6 +78,12 @@ export function TasksContainer({
 			title: 'Create Task Error',
 		})
 		setIsModalOpen(false)
+	}
+
+	function handleOpenTimeModal(taskId: string) {
+		assignTask(taskId)
+		timeModalRef.current?.toggle()
+		timeModalRef.current?.toWork()
 	}
 
 	return (
@@ -136,7 +143,7 @@ export function TasksContainer({
 						tasks={tasks}
 						testId="tasks-list"
 						onTaskReorder={handleTaskReorder}
-						onTaskOpen={onTaskOpen}
+						onTaskOpen={handleOpenTimeModal}
 						onTaskDelete={deleteTask}
 						variant={isSelectMode ? 'name-select' : 'default'}
 						onTaskSelectedChange={(taskId, isSelected) => {
@@ -147,6 +154,7 @@ export function TasksContainer({
 					/>
 				</div>
 			</div>
+			<TimeModal ref={timeModalRef} />
 			<NewTaskModal
 				isOpen={isModalOpen}
 				onSuccess={onCreateTaskSuccess}

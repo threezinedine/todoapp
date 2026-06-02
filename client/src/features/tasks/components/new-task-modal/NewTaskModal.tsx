@@ -5,7 +5,7 @@ import type { FormHandle } from '~/components'
 import styles from './NewTaskModal.module.scss'
 import clsx from 'clsx'
 import type { FieldProps } from '~/components/form'
-import { useTasksStore } from '../../stores/TaskStore'
+import { useTasksStore } from '../../stores/task-store'
 
 export function NewTaskModal({
 	isOpen,
