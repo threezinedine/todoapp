@@ -1,13 +1,5 @@
 import { describe, expect, it, vi } from 'vitest'
-import { FSMState } from '../fsm'
-
-function createState(hooks?: {
-	onEnter?: () => void
-	onExit?: () => void
-	onUpdate?: () => void
-}) {
-	return new FSMState(hooks?.onEnter, hooks?.onExit, hooks?.onUpdate)
-}
+import { createState } from '../fsm'
 
 describe('FSMState', () => {
 	it('runs root callbacks safely when no child states are registered', () => {
@@ -337,5 +329,72 @@ describe('FSMState', () => {
 		expect(nestedRootUpdate).toHaveBeenCalledTimes(1)
 		expect(nestedLeafEnter).toHaveBeenCalledTimes(1)
 		expect(nestedLeftUpdate).toHaveBeenCalledTimes(1)
+	})
+
+	describe('isStateActive', () => {
+		it('returns false when no state is active', () => {
+			const fsm = createState()
+
+			expect(fsm.isStateActive('idle')).toBe(false)
+		})
+
+		it('returns true for current top-level state and false for others', () => {
+			const fsm = createState()
+			fsm.addState('idle', createState())
+			fsm.addState('running', createState())
+
+			expect(fsm.isStateActive('idle')).toBe(true)
+			expect(fsm.isStateActive('running')).toBe(false)
+
+			fsm.transitionTo('running')
+
+			expect(fsm.isStateActive('idle')).toBe(false)
+			expect(fsm.isStateActive('running')).toBe(true)
+		})
+
+		it('returns true for an active nested route', () => {
+			const root = createState()
+			const on = createState()
+			const off = createState()
+			const working = createState()
+			const paused = createState()
+
+			on.addState('working', working)
+			on.addState('paused', paused)
+			root.addState('on', on)
+			root.addState('off', off)
+
+			expect(root.isStateActive('on/working')).toBe(true)
+			expect(root.isStateActive('on/paused')).toBe(false)
+		})
+
+		it('returns false when the route root does not match current top-level state', () => {
+			const root = createState()
+			const on = createState()
+			const off = createState()
+			const working = createState()
+
+			on.addState('working', working)
+			root.addState('on', on)
+			root.addState('off', off)
+
+			expect(root.isStateActive('off/working')).toBe(false)
+		})
+
+		it('supports deep route checks', () => {
+			const root = createState()
+			const on = createState()
+			const working = createState()
+			const focused = createState()
+			const distracted = createState()
+
+			working.addState('focused', focused)
+			working.addState('distracted', distracted)
+			on.addState('working', working)
+			root.addState('on', on)
+
+			expect(root.isStateActive('on/working/focused')).toBe(true)
+			expect(root.isStateActive('on/working/distracted')).toBe(false)
+		})
 	})
 })

@@ -115,6 +115,33 @@ export class FSMState {
 		}
 	}
 
+	/**
+	 * State checking via the route scheme like: "On/Working/Idle"
+	 * @param stateName
+	 * @returns
+	 */
+	isStateActive(stateName: string): boolean {
+		const parts = stateName.split('/')
+
+		if (parts.length === 0) {
+			return false
+		}
+
+		if (parts.length === 1) {
+			if (this.currentStateName === parts[0]) {
+				return true
+			} else {
+				return false
+			}
+		}
+
+		if (this.currentState === null || this.currentStateName !== parts[0]) {
+			return false
+		}
+
+		return this.currentState.isStateActive(parts.slice(1).join('/'))
+	}
+
 	debugInfo(index?: number, name?: string) {
 		let infoIndex = 0
 
@@ -144,4 +171,12 @@ export class FSMState {
 
 		return finalInfo
 	}
+}
+
+export function createState(hooks?: {
+	onEnter?: () => void
+	onExit?: () => void
+	onUpdate?: () => void
+}) {
+	return new FSMState(hooks?.onEnter, hooks?.onExit, hooks?.onUpdate)
 }
